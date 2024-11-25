@@ -121,5 +121,65 @@ if st.button("Calculate Probabilities"):
         st.write("BTTS (GG) Probability:", f"{btts_prob * 100:.2f}%")
         st.write("HT/FT Combined Probability Matrix:", combined_probs)
 
+        # Process Input
+if st.button("Calculate Probabilities"):
+    try:
+        # Define helper function for probabilities
+        def calculate_poisson_prob(goal_avg, max_goals=4):
+            return [poisson.pmf(i, goal_avg) for i in range(max_goals + 1)]
+        
+        # Calculate average goal probabilities
+        ht_goal_avg = (ht_home + ht_away) / 2
+        ft_goal_avg = (ft_home + ft_away) / 2
+
+        # Calculate probabilities for halftime and full-time
+        ht_probs = calculate_poisson_prob(ht_goal_avg, max_goals=2)
+        ft_probs = calculate_poisson_prob(ft_goal_avg, max_goals=4)
+
+        # Calculate HT Over/Under 1.5 goals probabilities
+        ht_over_15_prob = 1 - sum(ht_probs[:2])  # Goals 2 or more
+        ht_under_15_prob = sum(ht_probs[:2])  # Goals 0 or 1
+
+        # Combine HT/FT probabilities
+        combined_probs = np.outer(ht_probs, ft_probs)
+
+        # Calculate BTTS and Over/Under probabilities
+        btts_prob = 1 / btts_gg
+        under_25_prob = 1 / under_25
+        over_25_prob = 1 / over_25
+
+        # Display probabilities
+        st.subheader("Calculated Probabilities")
+        st.write("Halftime Probabilities (0-0 to 2-2):", ht_probs)
+        st.write("Fulltime Probabilities (0-0 to 4-4):", ft_probs)
+        st.write("Halftime Over 1.5 Goals Probability:", f"{ht_over_15_prob * 100:.2f}%")
+        st.write("Halftime Under 1.5 Goals Probability:", f"{ht_under_15_prob * 100:.2f}%")
+        st.write("Over 2.5 Goals Probability:", f"{over_25_prob * 100:.2f}%")
+        st.write("Under 2.5 Goals Probability:", f"{under_25_prob * 100:.2f}%")
+
+        st.write("BTTS (GG) Probability:", f"{btts_prob * 100:.2f}%")
+        st.write("HT/FT Combined Probability Matrix:", combined_probs)
+
+        # Recommendation for Halftime Correct Score
+        ht_recommendations = {
+            score: ht_probs[int(score[0])] * correct_score_odds[score]
+            for score in correct_score_odds.keys() if ":" in score and int(score.split(":")[0]) <= 2
+        }
+        ht_best_score = max(ht_recommendations, key=ht_recommendations.get)
+        st.subheader("Recommended Halftime Correct Score")
+        st.write(f"Recommended HT Score: {ht_best_score} with expected value: {ht_recommendations[ht_best_score]:.2f}")
+
+        # Recommendation for Full-time Correct Score
+        ft_recommendations = {
+            score: ft_probs[int(score[0])] * correct_score_odds[score]
+            for score in correct_score_odds.keys() if ":" in score and int(score.split(":")[0]) <= 4
+        }
+        ft_best_score = max(ft_recommendations, key=ft_recommendations.get)
+        st.subheader("Recommended Full-time Correct Score")
+        st.write(f"Recommended FT Score: {ft_best_score} with expected value: {ft_recommendations[ft_best_score]:.2f}")
+
+    except Exception as e:
+        st.error(f"Error in calculation: {e}")
+
     except Exception as e:
         st.error(f"Error in calculation: {e}")
