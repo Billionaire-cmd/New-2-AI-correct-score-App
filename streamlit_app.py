@@ -24,7 +24,7 @@ def calculate_exact_goals_percentage(probabilities):
     return [prob / total_prob * 100 for prob in probabilities]
 
 # App Title and Introduction
-st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
+st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor pro")
 st.markdown("""
 Welcome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
 This app uses advanced statistical models, including the Poisson distribution, betting odds, and team statistics, 
