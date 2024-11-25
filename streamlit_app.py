@@ -14,11 +14,11 @@ and provides AI-based recommendations for bets with the best potential profits.
 st.sidebar.header("Match Details")
 team_a = st.sidebar.text_input("Team A", "Team A")
 team_b = st.sidebar.text_input("Team B", "Team B")
-team_a_goals = st.sidebar.number_input("Avg Goals Scored by Team A", 1.5)
-team_b_goals = st.sidebar.number_input("Avg Goals Scored by Team B", 1.2)
-odds_a = st.sidebar.number_input("Odds for Team A Win", 2.5)
-odds_b = st.sidebar.number_input("Odds for Team B Win", 2.8)
-odds_draw = st.sidebar.number_input("Odds for Draw", 3.2)
+team_a_goals = st.sidebar.number_input("Avg Goals Scored by Team A", 1.5, min_value=0.0)
+team_b_goals = st.sidebar.number_input("Avg Goals Scored by Team B", 1.2, min_value=0.0)
+odds_a = st.sidebar.number_input("Odds for Team A Win", 2.5, min_value=0.0)
+odds_b = st.sidebar.number_input("Odds for Team B Win", 2.8, min_value=0.0)
+odds_draw = st.sidebar.number_input("Odds for Draw", 3.2, min_value=0.0)
 
 # Generate Probabilities using Poisson Distribution
 def poisson_prob(lam, goal):
@@ -57,9 +57,9 @@ st.write(f"BTTS No (NG) Probability: {btts_no:.2%}")
 
 # AI Betting Recommendations
 st.header("AI Betting Recommendations")
-ev_a_win = (1 / odds_a) * team_a_goals
-ev_b_win = (1 / odds_b) * team_b_goals
-ev_draw = (1 / odds_draw) * (1 - (team_a_goals + team_b_goals))
+ev_a_win = (1 / odds_a) * team_a_goals if odds_a > 0 else 0
+ev_b_win = (1 / odds_b) * team_b_goals if odds_b > 0 else 0
+ev_draw = (1 / odds_draw) * (1 - (team_a_goals + team_b_goals)) if odds_draw > 0 else 0
 
 if ev_a_win > ev_b_win and ev_a_win > ev_draw:
     recommendation = f"Bet on Team A to Win. Expected Value: {ev_a_win:.2f}"
