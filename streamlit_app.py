@@ -55,8 +55,6 @@ for i in range(5):
     for j in range(5):
         score = f"{i}:{j}"
         correct_score_odds_fulltime[score] = st.sidebar.number_input(f"FT Odds for {score}", value=10.0, step=0.01)
-# "Other" scores for Fulltime
-correct_score_odds_fulltime["Other"] = st.sidebar.number_input("FT Odds for scores exceeding 4:4", value=50.0, step=0.01)
 
 # Correct Score Odds (Halftime)
 st.sidebar.subheader("Correct Score Odds (Halftime)")
@@ -65,8 +63,6 @@ for i in range(3):
     for j in range(3):
         ht_score = f"{i}:{j}"
         correct_score_odds_halftime[ht_score] = st.sidebar.number_input(f"HT Odds for {ht_score}", value=10.0, step=0.01)
-# "Other" scores for Halftime
-correct_score_odds_halftime["Other"] = st.sidebar.number_input("HT Odds for scores exceeding 2:2", value=50.0, step=0.01)
 
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
@@ -97,36 +93,16 @@ if st.button("Predict Probabilities and Insights"):
         sorted_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)
         sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)
 
-        # Bookmaker's Margins
+        # Bookmaker's Margins for Correct Score Betting (Low Value Bet Recommendation)
         margin_match_outcomes = calculate_margin([ft_home, ft_draw, ft_away])
 
-        # Expected Values for Betting Markets
-        # Fulltime Correct Score EVs
-        fulltime_bets = {}
-        for score, odds in correct_score_odds_fulltime.items():
-            prob = fulltime_score_probs.get(score, 0)
-            ev = calculate_expected_value(prob, odds)
-            fulltime_bets[score] = ev
+        # Recommended Bet for Low Value Bet
+        st.subheader("Recommended Low Value Bet")
+        st.write("For **Low Value Bet**, the Full-time and Halftime Correct Score recommendations are:")
 
-        # Halftime Correct Score EVs
-        halftime_bets = {}
-        for score, odds in correct_score_odds_halftime.items():
-            prob = halftime_score_probs.get(score, 0)
-            ev = calculate_expected_value(prob, odds)
-            halftime_bets[score] = ev
-
-        # Determine Low Value Bet Recommendations (focused on Fulltime and Halftime Correct Scores)
-        low_value_bets_fulltime = sorted(fulltime_bets.items(), key=lambda x: x[1])[:3]  # Top 3 lowest EVs
-        low_value_bets_halftime = sorted(halftime_bets.items(), key=lambda x: x[1])[:3]  # Top 3 lowest EVs
-
-        # Display Recommendations
-        st.subheader("Low Value Bet Recommendations (Full-time Correct Score)")
-        for score, ev in low_value_bets_fulltime:
-            st.write(f"Score: {score}, Expected Value: {ev:.2f}")
-
-        st.subheader("Low Value Bet Recommendations (Halftime Correct Score)")
-        for score, ev in low_value_bets_halftime:
-            st.write(f"Score: {score}, Expected Value: {ev:.2f}")
+        # Provide Fulltime and Halftime Correct Score Recommendations based on probabilities
+        st.write(f"**Full-time Correct Score Recommendation**: {sorted_fulltime_scores[0][0]} with a probability of {sorted_fulltime_scores[0][1]*100:.2f}%")
+        st.write(f"**Halftime Correct Score Recommendation**: {sorted_halftime_scores[0][0]} with a probability of {sorted_halftime_scores[0][1]*100:.2f}%")
 
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Error during calculation: {e}")
