@@ -143,120 +143,24 @@ if st.button("Predict Probabilities and Insights"):
         over_1_5_ft_prob = sum(score_matrix[i][j] for i in range(2,5) for j in range(5)) * 100
         under_1_5_ft_prob = 100 - over_1_5_ft_prob
 
-        # Match Outcome Probabilities
-        home_win_prob = sum(score_matrix[i][j] for i in range(1,5) for j in range(0,i)) * 100
-        draw_prob = sum(score_matrix[i][i] for i in range(5)) * 100
-        away_win_prob = 100 - home_win_prob - draw_prob
-
-        # Bookmaker's Margins
-        margin_btts = calculate_margin([btts_gg, btts_ng])
-        margin_over_under_2_5 = calculate_margin([over_2_5_ft, under_2_5_ft])
-        margin_over_under_1_5_ht = calculate_margin([over_1_5_ht, under_1_5_ht])
-        margin_over_under_1_5_ft = calculate_margin([over_1_5_ft, under_1_5_ft])
-        margin_match_outcomes = calculate_margin([ft_home, ft_draw, ft_away])
-
-        # Expected Values for Betting Markets
-        # BTTS
-        btts_yes_ev = calculate_expected_value(btts_yes_prob / 100, btts_gg)
-        btts_no_ev = calculate_expected_value(btts_no_prob / 100, btts_ng)
-
-        # Over/Under 2.5
-        over_2_5_ev = calculate_expected_value(over_2_5_prob / 100, over_2_5_ft)
-        under_2_5_ev = calculate_expected_value(under_2_5_prob / 100, under_2_5_ft)
-
-        # Over/Under 1.5 (Halftime)
-        over_1_5_ht_ev = calculate_expected_value(over_1_5_ht_prob / 100, over_1_5_ht)
-        under_1_5_ht_ev = calculate_expected_value(under_1_5_ht_prob / 100, under_1_5_ht)
-
-        # Over/Under 1.5 (Fulltime)
-        over_1_5_ft_ev = calculate_expected_value(over_1_5_ft_prob / 100, over_1_5_ft)
-        under_1_5_ft_ev = calculate_expected_value(under_1_5_ft_prob / 100, under_1_5_ft)
-
-        # Match Outcomes
-        home_win_ev = calculate_expected_value(home_win_prob / 100, ft_home)
-        draw_ev = calculate_expected_value(draw_prob / 100, ft_draw)
-        away_win_ev = calculate_expected_value(away_win_prob / 100, ft_away)
-
-        # Compile Value Bets
-        value_bets = []
-        if btts_yes_ev > 0:
-            value_bets.append(("BTTS Yes", btts_yes_ev))
-        if btts_no_ev > 0:
-            value_bets.append(("BTTS No", btts_no_ev))
-        if over_2_5_ev > 0:
-            value_bets.append(("Over 2.5 FT", over_2_5_ev))
-        if under_2_5_ev > 0:
-            value_bets.append(("Under 2.5 FT", under_2_5_ev))
-        if over_1_5_ht_ev > 0:
-            value_bets.append(("Over 1.5 HT", over_1_5_ht_ev))
-        if under_1_5_ht_ev > 0:
-            value_bets.append(("Under 1.5 HT", under_1_5_ht_ev))
-        if over_1_5_ft_ev > 0:
-            value_bets.append(("Over 1.5 FT", over_1_5_ft_ev))
-        if under_1_5_ft_ev > 0:
-            value_bets.append(("Under 1.5 FT", under_1_5_ft_ev))
-        if home_win_ev > 0:
-            value_bets.append(("Home Win", home_win_ev))
-        if draw_ev > 0:
-            value_bets.append(("Draw", draw_ev))
-        if away_win_ev > 0:
-            value_bets.append(("Away Win", away_win_ev))
-
-        # Recommendations
-        if value_bets:
-            best_value_bet = max(value_bets, key=lambda x: x[1])
-        else:
-            best_value_bet = None
-
         # Display Results
-        st.header("Predictions and Insights")
+        st.subheader("Predicted Fulltime Probabilities")
+        st.write(sorted_fulltime_scores)
 
-        # Correct Score Predictions
-        st.subheader("Correct Score Predictions")
-        st.write("### Top 5 Likely Halftime Scores:")
-        for ht_score, prob in sorted_halftime_scores[:5]:
-            st.write(f"**{ht_score}:** {prob * 100:.2f}%")
-        st.write("### Top 5 Likely Fulltime Scores:")
-        for score, prob in sorted_fulltime_scores[:5]:
-            st.write(f"**{score}:** {prob * 100:.2f}%")
+        st.subheader("Predicted Halftime Probabilities")
+        st.write(sorted_halftime_scores)
 
-        # BTTS Probabilities and Margin
-        st.subheader("BTTS (GG/NG) Probabilities and Margin")
-        st.write(f"**BTTS (Yes):** {btts_yes_prob:.2f}%")
-        st.write(f"**BTTS (No):** {btts_no_prob:.2f}%")
-        st.write(f"**Bookmaker's Margin for BTTS:** {margin_btts:.2f}%")
+        st.subheader("Predicted BTTS Probability")
+        st.write(f"BTTS Yes: {btts_yes_prob:.2f}%  |  BTTS No: {btts_no_prob:.2f}%")
 
-        # Over/Under 2.5 Goals Probabilities and Margin
-        st.subheader("Over/Under 2.5 Goals Probabilities and Margin (Fulltime)")
-        st.write(f"**Over 2.5 Goals:** {over_2_5_prob:.2f}%")
-        st.write(f"**Under 2.5 Goals:** {under_2_5_prob:.2f}%")
-        st.write(f"**Bookmaker's Margin for Over/Under 2.5:** {margin_over_under_2_5:.2f}%")
+        st.subheader("Over/Under 2.5 Goals (Fulltime) Probability")
+        st.write(f"Over 2.5: {over_2_5_prob:.2f}%  |  Under 2.5: {under_2_5_prob:.2f}%")
 
-        # Over/Under 1.5 Goals Probabilities and Margin (Halftime)
-        st.subheader("Over/Under 1.5 Goals Probabilities and Margin (Halftime)")
-        st.write(f"**Over 1.5 Goals (HT):** {over_1_5_ht_prob:.2f}%")
-        st.write(f"**Under 1.5 Goals (HT):** {under_1_5_ht_prob:.2f}%")
-        st.write(f"**Bookmaker's Margin for Over/Under 1.5 (HT):** {margin_over_under_1_5_ht:.2f}%")
+        st.subheader("Over/Under 1.5 Goals (Halftime) Probability")
+        st.write(f"Over 1.5: {over_1_5_ht_prob:.2f}%  |  Under 1.5: {under_1_5_ht_prob:.2f}%")
 
-        # Over/Under 1.5 Goals Probabilities and Margin (Fulltime)
-        st.subheader("Over/Under 1.5 Goals Probabilities and Margin (Fulltime)")
-        st.write(f"**Over 1.5 Goals (FT):** {over_1_5_ft_prob:.2f}%")
-        st.write(f"**Under 1.5 Goals (FT):** {under_1_5_ft_prob:.2f}%")
-        st.write(f"**Bookmaker's Margin for Over/Under 1.5 (FT):** {margin_over_under_1_5_ft:.2f}%")
-
-        # Match Outcome Probabilities and Margin
-        st.subheader("Match Outcome Probabilities and Margin")
-        st.write(f"**Home Win:** {home_win_prob:.2f}%")
-        st.write(f"**Draw:** {draw_prob:.2f}%")
-        st.write(f"**Away Win:** {away_win_prob:.2f}%")
-        st.write(f"**Bookmaker's Margin for Match Outcomes:** {margin_match_outcomes:.2f}%")
-
-        # Value Bet Recommendation
-        st.subheader("Low Value Bet Recommendation")
-        if best_value_bet:
-            st.write(f"**Recommended Bet:** {best_value_bet[0]} (Expected Value: {best_value_bet[1]:.2f})")
-        else:
-            st.write("**No Value Bets Found.**")
+        st.subheader("Over/Under 1.5 Goals (Fulltime) Probability")
+        st.write(f"Over 1.5: {over_1_5_ft_prob:.2f}%  |  Under 1.5: {under_1_5_ft_prob:.2f}%")
 
     except Exception as e:
-        st.error(f"Error in calculation: {e}")
+        st.error(f"An error occurred: {e}")
