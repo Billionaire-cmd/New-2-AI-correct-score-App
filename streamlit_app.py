@@ -32,28 +32,20 @@ ft_home = st.sidebar.number_input("Fulltime Home Odds", min_value=1.0, step=0.1,
 ft_draw = st.sidebar.number_input("Fulltime Draw Odds", min_value=1.0, step=0.1, value=3.2)
 ft_away = st.sidebar.number_input("Fulltime Away Odds", min_value=1.0, step=0.1, value=3.4)
 
-# BTTS and Over/Under Odds
-st.sidebar.subheader("BTTS GG/NG Odds")
-btts_gg = st.sidebar.number_input("BTTS (Yes) Odds", min_value=1.0, step=0.1, value=1.8)
-btts_ng = st.sidebar.number_input("BTTS (No) Odds", min_value=1.0, step=0.1, value=1.9)
-
-st.sidebar.subheader("Over/Under Odds (Fulltime)")
-over_2_5_ft = st.sidebar.number_input("Over 2.5 FT Odds", min_value=1.0, step=0.1, value=2.0)
-under_2_5_ft = st.sidebar.number_input("Under 2.5 FT Odds", min_value=1.0, step=0.1, value=1.8)
-
 # Correct Score Odds
 st.sidebar.subheader("Correct Score Odds (HT and FT)")
 correct_score_odds = {}
-for score in ["0:0", "1:0", "0:1", "1:1", "2:0", "2:1", "2:2", "3:0", "3:1", "3:2", "3:3"]:
-    correct_score_odds[score] = st.sidebar.number_input(f"Odds for {score}", value=10.0, step=0.01)
+for i in range(5):
+    for j in range(5):
+        score = f"{i}:{j}"
+        correct_score_odds[score] = st.sidebar.number_input(f"Odds for {score}", value=10.0, step=0.01)
+
+# "Other" scores
+correct_score_odds["Other"] = st.sidebar.number_input("Odds for scores exceeding 4:4", value=50.0, step=0.01)
 
 # Function to Calculate Poisson Probabilities
-def calculate_poisson_prob(lambda_, max_goals):
+def calculate_poisson_prob(lambda_, max_goals=4):
     return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
-
-# Function to Calculate Margins
-def calculate_margin(odds):
-    return (1 / odds.sum() - 1) * 100
 
 # Predict Probabilities and Correct Scores
 if st.button("Predict Probabilities and Insights"):
@@ -65,6 +57,10 @@ if st.button("Predict Probabilities and Insights"):
 
         # Calculate score probabilities
         score_probs = {f"{i}:{j}": score_matrix[i, j] for i in range(5) for j in range(5)}
+        other_prob = 1 - sum(score_probs.values())  # Probability of scores exceeding 4:4
+        score_probs["Other"] = other_prob
+
+        # Sort scores by probabilities
         sorted_scores = sorted(score_probs.items(), key=lambda x: x[1], reverse=True)
 
         # Insights
