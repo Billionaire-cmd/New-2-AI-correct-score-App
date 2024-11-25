@@ -1,8 +1,6 @@
 import streamlit as st
 import numpy as np
 from scipy.stats import poisson
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Function to Calculate Poisson Probabilities
 def calculate_poisson_prob(lambda_, max_goals=4):
@@ -18,20 +16,6 @@ def calculate_margin(odds_list):
 def calculate_expected_value(prob, odds):
     """Calculate expected value."""
     return (prob * odds) - 1
-
-# Monte Carlo Simulation for Goal Prediction
-def monte_carlo_simulation(home_avg, away_avg, num_simulations=10000):
-    """Run Monte Carlo simulations for goal prediction."""
-    home_goals = np.random.poisson(home_avg, num_simulations)
-    away_goals = np.random.poisson(away_avg, num_simulations)
-    return home_goals, away_goals
-
-# Function to Adjust for Team Strength
-def adjust_for_team_strength(home_goals, away_goals, home_strength=1.0, away_strength=1.0):
-    """Adjust home and away team goals based on strength."""
-    adjusted_home_goals = home_goals * home_strength
-    adjusted_away_goals = away_goals * away_strength
-    return adjusted_home_goals, adjusted_away_goals
 
 # App Title and Introduction
 st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
@@ -64,6 +48,21 @@ ft_home = st.sidebar.number_input("Fulltime Home Odds", min_value=1.0, step=0.1,
 ft_draw = st.sidebar.number_input("Fulltime Draw Odds", min_value=1.0, step=0.1, value=3.2)
 ft_away = st.sidebar.number_input("Fulltime Away Odds", min_value=1.0, step=0.1, value=3.4)
 
+# BTTS and Over/Under Odds
+st.sidebar.subheader("BTTS GG/NG Odds")
+btts_gg = st.sidebar.number_input("BTTS (Yes) Odds", min_value=1.0, step=0.1, value=1.8)
+btts_ng = st.sidebar.number_input("BTTS (No) Odds", min_value=1.0, step=0.1, value=1.9)
+
+st.sidebar.subheader("Over/Under Odds (Halftime)")
+over_1_5_ht = st.sidebar.number_input("Over 1.5 HT Odds", min_value=1.0, step=0.1, value=2.5)
+under_1_5_ht = st.sidebar.number_input("Under 1.5 HT Odds", min_value=1.0, step=0.1, value=1.6)
+
+st.sidebar.subheader("Over/Under Odds (Fulltime)")
+over_1_5_ft = st.sidebar.number_input("Over 1.5 FT Odds", min_value=1.0, step=0.1, value=1.4)
+under_1_5_ft = st.sidebar.number_input("Under 1.5 FT Odds", min_value=1.0, step=0.1, value=2.9)
+over_2_5_ft = st.sidebar.number_input("Over 2.5 FT Odds", min_value=1.0, step=0.1, value=2.0)
+under_2_5_ft = st.sidebar.number_input("Under 2.5 FT Odds", min_value=1.0, step=0.1, value=1.8)
+
 # Correct Score Odds (Fulltime)
 st.sidebar.subheader("Correct Score Odds (Fulltime)")
 correct_score_odds_fulltime = {}
@@ -71,6 +70,8 @@ for i in range(5):
     for j in range(5):
         score = f"{i}:{j}"
         correct_score_odds_fulltime[score] = st.sidebar.number_input(f"FT Odds for {score}", value=10.0, step=0.01)
+# "Other" scores for Fulltime
+correct_score_odds_fulltime["Other"] = st.sidebar.number_input("FT Odds for scores exceeding 4:4", value=50.0, step=0.01)
 
 # Correct Score Odds (Halftime)
 st.sidebar.subheader("Correct Score Odds (Halftime)")
@@ -79,6 +80,8 @@ for i in range(3):
     for j in range(3):
         ht_score = f"{i}:{j}"
         correct_score_odds_halftime[ht_score] = st.sidebar.number_input(f"HT Odds for {ht_score}", value=10.0, step=0.01)
+# "Other" scores for Halftime
+correct_score_odds_halftime["Other"] = st.sidebar.number_input("HT Odds for scores exceeding 2:2", value=50.0, step=0.01)
 
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
@@ -88,45 +91,68 @@ if st.button("Predict Probabilities and Insights"):
         fulltime_away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
         score_matrix = np.outer(fulltime_home_probs, fulltime_away_probs)
 
-        # Monte Carlo Simulation for goal prediction
-        home_goals, away_goals = monte_carlo_simulation(avg_goals_home, avg_goals_away)
+        # Calculate Poisson Probabilities for Halftime (assuming halftime goals are ~50% of fulltime goals)
+        halftime_home_avg = avg_goals_home / 2
+        halftime_away_avg = avg_goals_away / 2
+        halftime_home_probs = calculate_poisson_prob(halftime_home_avg, max_goals=2)
+        halftime_away_probs = calculate_poisson_prob(halftime_away_avg, max_goals=2)
+        halftime_score_matrix = np.outer(halftime_home_probs, halftime_away_probs)
 
-        # Adjust for Team Strength
-        home_strength = 1.1  # Example strength factor for home team
-        away_strength = 0.9  # Example strength factor for away team
-        adjusted_home_goals, adjusted_away_goals = adjust_for_team_strength(home_goals, away_goals, home_strength, away_strength)
+        # Calculate Fulltime Score Probabilities
+        fulltime_score_probs = {f"{i}:{j}": score_matrix[i, j] for i in range(5) for j in range(5)}
+        fulltime_other_prob = 1 - sum(fulltime_score_probs.values())
+        fulltime_score_probs["Other"] = fulltime_other_prob
 
-        # Create Histogram of Goals
-        st.subheader("Goal Distribution from Monte Carlo Simulation")
-        fig, ax = plt.subplots()
-        ax.hist(home_goals, bins=30, alpha=0.5, label='Home Team Goals')
-        ax.hist(away_goals, bins=30, alpha=0.5, label='Away Team Goals')
-        ax.legend(loc='best')
-        ax.set_title("Monte Carlo Simulation - Goals Distribution")
-        st.pyplot(fig)
+        # Calculate Halftime Score Probabilities
+        halftime_score_probs = {f"{i}:{j}": halftime_score_matrix[i, j] for i in range(3) for j in range(3)}
+        halftime_other_prob = 1 - sum(halftime_score_probs.values())
+        halftime_score_probs["Other"] = halftime_other_prob
 
-        # Betting Strategy Suggestion based on Odds and Probabilities
-        home_odds = np.array([ht_home, ft_home])
-        away_odds = np.array([ht_away, ft_away])
-        draw_odds = np.array([ht_draw, ft_draw])
+        # Sort Scores by Probability
+        sorted_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)
+        sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)
 
-        best_betting_strategy = "None"
-        best_value = -float('inf')
-        
-        # Calculate the best betting strategy based on expected value
-        for odds, team in zip([home_odds, away_odds, draw_odds], ["Home", "Away", "Draw"]):
-            expected_value = calculate_expected_value(np.mean(score_matrix), np.mean(odds))
-            if expected_value > best_value:
-                best_value = expected_value
-                best_betting_strategy = team
-        
-        st.subheader("Betting Strategy Suggestion")
-        st.write(f"The best betting strategy based on expected value is: **{best_betting_strategy}**")
+        # BTTS Probabilities
+        btts_yes_prob = sum(score_matrix[i][j] for i in range(1,5) for j in range(1,5)) * 100
+        btts_no_prob = 100 - btts_yes_prob
 
-        # Display Monte Carlo Simulation Results
-        st.subheader("Monte Carlo Simulation Results")
-        st.write(f"Home Goals (mean): {np.mean(home_goals)} | Away Goals (mean): {np.mean(away_goals)}")
-        st.write(f"Adjusted Home Goals (mean): {np.mean(adjusted_home_goals)} | Adjusted Away Goals (mean): {np.mean(adjusted_away_goals)}")
-        
+        # Over/Under 2.5 Goals Probabilities (Fulltime)
+        over_2_5_prob = sum(score_matrix[i][j] for i in range(3,5) for j in range(5)) * 100
+        under_2_5_prob = 100 - over_2_5_prob
+
+        # Over/Under 1.5 Goals Probabilities (Halftime)
+        over_1_5_ht_prob = sum(halftime_score_matrix[i][j] for i in range(2,3) for j in range(3)) * 100
+        under_1_5_ht_prob = 100 - over_1_5_ht_prob
+
+        # Over/Under 1.5 Goals Probabilities (Fulltime)
+        over_1_5_ft_prob = sum(score_matrix[i][j] for i in range(2,5) for j in range(5)) * 100
+        under_1_5_ft_prob = 100 - over_1_5_ft_prob
+
+        # Display Results
+        st.subheader("Predicted Fulltime Probabilities")
+        st.write(sorted_fulltime_scores)
+
+        st.subheader("Predicted Halftime Probabilities")
+        st.write(sorted_halftime_scores)
+
+        st.subheader("Predicted BTTS Probability")
+        st.write(f"BTTS Yes: {btts_yes_prob:.2f}%  |  BTTS No: {btts_no_prob:.2f}%")
+
+        st.subheader("Over/Under 2.5 Goals Fulltime Probability")
+        st.write(f"Over 2.5 FT: {over_2_5_prob:.2f}%  |  Under 2.5 FT: {under_2_5_prob:.2f}%")
+
+        st.subheader("Over/Under 1.5 Goals Halftime Probability")
+        st.write(f"Over 1.5 HT: {over_1_5_ht_prob:.2f}%  |  Under 1.5 HT: {under_1_5_ht_prob:.2f}%")
+
+        st.subheader("Over/Under 1.5 Goals Fulltime Probability")
+        st.write(f"Over 1.5 FT: {over_1_5_ft_prob:.2f}%  |  Under 1.5 FT: {under_1_5_ft_prob:.2f}%")
+
+        st.subheader("Calculated Margin for HT and FT Odds")
+        margin_ht = calculate_margin([ht_home, ht_draw, ht_away])
+        margin_ft = calculate_margin([ft_home, ft_draw, ft_away])
+        st.write(f"HT Margin: {margin_ht:.2f}%")
+        st.write(f"FT Margin: {margin_ft:.2f}%")
+
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        st.error(f"Error: {e}")
+
