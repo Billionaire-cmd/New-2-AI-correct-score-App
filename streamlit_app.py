@@ -161,5 +161,18 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"  - Over 1.5 Goals: {over_1_5_ht_prob:.2f}%")
         st.write(f"  - Under 1.5 Goals: {under_1_5_ht_prob:.2f}%")
 
+        # Display Final Recommendations
+        st.subheader("Final Recommendation")
+
+        # Halftime Correct Score Recommendation
+        top_halftime_score = sorted_halftime_scores[0]  # Get the top HT score
+        st.write(f"**Halftime Correct Score Recommendation:** {top_halftime_score[0]} "
+                 f"(Probability: {top_halftime_score[1] * 100:.2f}%)")
+
+        # Fulltime Correct Score Recommendation
+        top_fulltime_score = sorted_fulltime_scores[0]  # Get the top FT score
+        st.write(f"**Fulltime Correct Score Recommendation:** {top_fulltime_score[0]} "
+                 f"(Probability: {top_fulltime_score[1] * 100:.2f}%)")
+
     except Exception as e:
         st.error(f"Error in prediction: {e}")
