@@ -18,7 +18,7 @@ def calculate_expected_value(prob, odds):
     return (prob * odds) - 1
 
 # App Title and Introduction
-st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
+st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor App")
 st.markdown("""
 Welcome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
 This app uses advanced statistical models, including the Poisson distribution, betting odds, and team statistics, 
