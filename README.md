@@ -1,9 +1,8 @@
-# 📦 Streamlit App Starter Kit 
+# New 2 AI correct score App
 ```
-⬆️ (Replace above with your app's name)
+⬆️ (Replace above with y name)
 ```
-
-Description of the app ...
+AI correct score App
 
 ## Demo App
 
