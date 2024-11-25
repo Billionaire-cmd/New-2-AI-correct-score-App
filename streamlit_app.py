@@ -64,6 +64,16 @@ for i in range(3):
         ht_score = f"{i}:{j}"
         correct_score_odds_halftime[ht_score] = st.sidebar.number_input(f"HT Odds for {ht_score}", value=10.0, step=0.01)
 
+# Function to Calculate Poisson Probabilities
+def calculate_poisson_prob(lambda_, max_goals=4):
+    """Calculate Poisson probabilities up to max_goals."""
+    return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
+
+# Function to Calculate Expected Value
+def calculate_expected_value(prob, odds):
+    """Calculate expected value."""
+    return (prob * odds) - 1
+
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
     try:
@@ -90,19 +100,31 @@ if st.button("Predict Probabilities and Insights"):
         halftime_score_probs["Other"] = halftime_other_prob
 
         # Sort Scores by Probability
-        sorted_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)
-        sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)
+        sorted_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1])
+        sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1])
 
-        # Bookmaker's Margins for Correct Score Betting (Low Value Bet Recommendation)
-        margin_match_outcomes = calculate_margin([ft_home, ft_draw, ft_away])
+        # Expected Value Calculation for "Low Value" Betting (negative or close-to-zero EV)
+        low_value_bets = {}
+        
+        # For Fulltime
+        for score, prob in sorted_fulltime_scores:
+            odds = correct_score_odds_fulltime.get(score, 10.0)  # Default to 10 if not set
+            ev = calculate_expected_value(prob, odds)
+            low_value_bets[score] = ev
+        
+        # For Halftime
+        for score, prob in sorted_halftime_scores:
+            odds = correct_score_odds_halftime.get(score, 10.0)  # Default to 10 if not set
+            ev = calculate_expected_value(prob, odds)
+            low_value_bets[score] = ev
 
-        # Recommended Bet for Low Value Bet
-        st.subheader("Recommended Low Value Bet")
-        st.write("For **Low Value Bet**, the Full-time and Halftime Correct Score recommendations are:")
-
-        # Provide Fulltime and Halftime Correct Score Recommendations based on probabilities
-        st.write(f"**Full-time Correct Score Recommendation**: {sorted_fulltime_scores[0][0]} with a probability of {sorted_fulltime_scores[0][1]*100:.2f}%")
-        st.write(f"**Halftime Correct Score Recommendation**: {sorted_halftime_scores[0][0]} with a probability of {sorted_halftime_scores[0][1]*100:.2f}%")
-
+        # Display Low Value Bet Recommendations (negative EV or close-to-zero)
+        st.subheader("Low Value Bet Recommendations (Negative or Close-to-Zero EV)")
+        low_value_bet_recommendations = {k: v for k, v in low_value_bets.items() if v < 0 or v < 0.05}
+        
+        # Show recommended low value bets
+        for bet, ev in low_value_bet_recommendations.items():
+            st.write(f"**Bet:** {bet} | **Expected Value:** {ev:.4f}")
+    
     except Exception as e:
-        st.error(f"Error during calculation: {e}")
+        st.error(f"Error during prediction: {e}")
