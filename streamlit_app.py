@@ -3,75 +3,76 @@ import numpy as np
 import pandas as pd
 from scipy.stats import poisson
 
-# Title and Description
+# Function to calculate Poisson probabilities
+def poisson_prob(mean, goals):
+    return poisson.pmf(goals, mean)
+
+# Function to predict correct scores
+def predict_scores(team_a_mean, team_b_mean):
+    scores = []
+    probs = []
+    for a in range(6):  # Maximum of 5 goals considered
+        for b in range(6):
+            prob = poisson_prob(team_a_mean, a) * poisson_prob(team_b_mean, b)
+            scores.append(f"{a}-{b}")
+            probs.append(prob)
+    df = pd.DataFrame({"Scoreline": scores, "Probability": probs})
+    df = df.sort_values(by="Probability", ascending=False).reset_index(drop=True)
+    return df
+
+# Function for BTTS (GG/NG) probability
+def btts_probability(team_a_mean, team_b_mean):
+    btts = 1 - (poisson_prob(team_a_mean, 0) * poisson_prob(team_b_mean, 0))
+    return btts
+
+# Function for over/under 2.5 goals
+def over_under_probability(team_a_mean, team_b_mean):
+    total_prob = 0
+    for a in range(6):
+        for b in range(6):
+            if a + b > 2.5:  # Over 2.5 goals
+                total_prob += poisson_prob(team_a_mean, a) * poisson_prob(team_b_mean, b)
+    return total_prob
+
+# Function to recommend the best bet
+def recommend_bet(predictions, btts, over):
+    top_score = predictions.iloc[0]['Scoreline']
+    if btts > 0.6 and over > 0.7:
+        return f"Best Bet: Both Teams to Score (BTTS) and Over 2.5 Goals."
+    else:
+        return f"Best Bet: Correct Score Prediction: {top_score}"
+
+# Streamlit App
 st.title("Sports Betting Correct Score Predictor")
-st.write("""
-This app predicts realistic correct scores for sports matches, aligns them with HT/FT outcomes, 
-and provides AI-based recommendations for bets with the best potential profits.
-""")
 
-# User Inputs
-st.sidebar.header("Match Details")
-team_a = st.sidebar.text_input("Team A", "Team A")
-team_b = st.sidebar.text_input("Team B", "Team B")
-team_a_goals = st.sidebar.number_input("Avg Goals Scored by Team A", value=1.5, min_value=0.0)
-team_b_goals = st.sidebar.number_input("Avg Goals Scored by Team B", value=1.2, min_value=0.0)
-odds_a = st.sidebar.number_input("Odds for Team A Win", value=2.5, min_value=0.0)
-odds_b = st.sidebar.number_input("Odds for Team B Win", value=2.8, min_value=0.0)
-odds_draw = st.sidebar.number_input("Odds for Draw", value=3.2, min_value=0.0)
+st.sidebar.header("Input Match Statistics")
+team_a_mean = st.sidebar.slider("Team A Average Goals", 0.5, 3.0, 1.5, 0.1)
+team_b_mean = st.sidebar.slider("Team B Average Goals", 0.5, 3.0, 1.2, 0.1)
 
-# Generate Probabilities using Poisson Distribution
-def poisson_prob(lam, goal):
-    return poisson.pmf(goal, lam)
+st.sidebar.header("Odds")
+team_a_odds = st.sidebar.number_input("Team A Win Odds", value=2.5)
+team_b_odds = st.sidebar.number_input("Team B Win Odds", value=2.8)
+draw_odds = st.sidebar.number_input("Draw Odds", value=3.0)
 
-max_goals = 5  # Limit for practical purposes
-st.header("Correct Score Probabilities")
-score_matrix = np.zeros((max_goals + 1, max_goals + 1))
-for i in range(max_goals + 1):
-    for j in range(max_goals + 1):
-        score_matrix[i, j] = poisson_prob(team_a_goals, i) * poisson_prob(team_b_goals, j)
+# Predict correct scores
+st.subheader("Correct Score Prediction")
+predictions = predict_scores(team_a_mean, team_b_mean)
+st.table(predictions.head(5))
 
-# Display Probability Table
-df_scores = pd.DataFrame(score_matrix, index=[f"A {i}" for i in range(max_goals + 1)], 
-                         columns=[f"B {i}" for i in range(max_goals + 1)])
-st.write("Probability of each scoreline:")
-st.dataframe(df_scores)
+# Calculate BTTS probability
+btts = btts_probability(team_a_mean, team_b_mean)
+st.subheader("Both Teams to Score (BTTS)")
+st.write(f"Probability: {btts:.2%} (GG if > 60%)")
 
-# HT/FT Prediction
-st.header("HT/FT Prediction")
-ht_prob = poisson_prob(team_a_goals / 2, np.arange(max_goals + 1)) * \
-          poisson_prob(team_b_goals / 2, np.arange(max_goals + 1))
-ft_prob = poisson_prob(team_a_goals, np.arange(max_goals + 1)) * \
-          poisson_prob(team_b_goals, np.arange(max_goals + 1))
+# Calculate Over/Under 2.5 goals probability
+over = over_under_probability(team_a_mean, team_b_mean)
+st.subheader("Over/Under 2.5 Goals")
+st.write(f"Probability of Over 2.5 Goals: {over:.2%}")
 
-ht_result = np.argmax(ht_prob)
-ft_result = np.argmax(ft_prob)
-st.write(f"Predicted HT/FT Outcome: {ht_result}-0/{ft_result}-1 (Example: 0-1/2-1)")
+# Recommend best bet
+st.subheader("AI Bet Recommendation")
+recommendation = recommend_bet(predictions, btts, over)
+st.write(recommendation)
 
-# BTTS (Both Teams to Score)
-st.header("Both Teams to Score (BTTS)")
-btts_yes = 1 - poisson_prob(team_a_goals, 0) * poisson_prob(team_b_goals, 0)
-btts_no = poisson_prob(team_a_goals, 0) * poisson_prob(team_b_goals, 0)
-st.write(f"BTTS Yes (GG) Probability: {btts_yes:.2%}")
-st.write(f"BTTS No (NG) Probability: {btts_no:.2%}")
-
-# AI Betting Recommendations
-st.header("AI Betting Recommendations")
-ev_a_win = (1 / odds_a) * team_a_goals if odds_a > 0 else 0
-ev_b_win = (1 / odds_b) * team_b_goals if odds_b > 0 else 0
-ev_draw = (1 / odds_draw) * (1 - (team_a_goals + team_b_goals)) if odds_draw > 0 else 0
-
-if ev_a_win > ev_b_win and ev_a_win > ev_draw:
-    recommendation = f"Bet on Team A to Win. Expected Value: {ev_a_win:.2f}"
-elif ev_b_win > ev_a_win and ev_b_win > ev_draw:
-    recommendation = f"Bet on Team B to Win. Expected Value: {ev_b_win:.2f}"
-else:
-    recommendation = f"Bet on Draw. Expected Value: {ev_draw:.2f}"
-
-st.write("Recommended Bet:", recommendation)
-
-# Additional Notes
-st.write("""
-**Disclaimer**: This app uses statistical methods and AI algorithms to suggest bets. 
-It does not guarantee winning outcomes and should be used responsibly.
-""")
+st.write("**Example Outcome:** HT/FT = (0-1/2-1)")
+st.write("This means Halftime result is 0-1, and Fulltime result is 2-1.")
