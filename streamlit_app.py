@@ -77,10 +77,10 @@ btts_ng = st.number_input("BTTS NG Odds", min_value=1.0, step=0.1)
 over_25 = st.number_input("Over 2.5 Odds", min_value=1.0, step=0.1)
 under_25 = st.number_input("Under 2.5 Odds", min_value=1.0, step=0.1)
 
-# Additional HT Over/Under Inputs
-st.subheader("Halftime Over/Under 1.5 Odds")
-ht_over_15 = st.number_input("HT Over 1.5 Odds", min_value=1.0, step=0.1)
-ht_under_15 = st.number_input("HT Under 1.5 Odds", min_value=1.0, step=0.1)
+# HT Over/Under 1.5 Goals
+st.subheader("HT Over/Under 1.5 Goals Odds")
+ht_over_15 = st.number_input("HT Over 1.5 Goals Odds", min_value=1.0, step=0.1)
+ht_under_15 = st.number_input("HT Under 1.5 Goals Odds", min_value=1.0, step=0.1)
 
 # Process Input
 if st.button("Calculate Probabilities"):
@@ -97,21 +97,27 @@ if st.button("Calculate Probabilities"):
         ht_probs = calculate_poisson_prob(ht_goal_avg, max_goals=2)
         ft_probs = calculate_poisson_prob(ft_goal_avg, max_goals=4)
 
+        # Calculate HT Over/Under 1.5 goals probabilities
+        ht_over_15_prob = 1 - sum(ht_probs[:2])  # Goals 2 or more
+        ht_under_15_prob = sum(ht_probs[:2])  # Goals 0 or 1
+
         # Combine HT/FT probabilities
         combined_probs = np.outer(ht_probs, ft_probs)
-
-        # Calculate HT Over/Under 1.5 probabilities
-        ht_over_15_prob = sum(ht_probs[2:])  # Sum probabilities for 2 or more goals in HT
-        ht_under_15_prob = sum(ht_probs[:2])  # Sum probabilities for 0 or 1 goals in HT
 
         # Calculate BTTS and Over/Under probabilities
         btts_prob = 1 / btts_gg
         under_25_prob = 1 / under_25
         over_25_prob = 1 / over_25
 
-        # Output probabilities
-        st.write(f"HT Over 1.5 Probability: {ht_over_15_prob * 100:.2f}%")
-        st.write(f"HT Under 1.5 Probability: {ht_under_15_prob * 100:.2f}%")
-        
+        # Display probabilities
+        st.subheader("Calculated Probabilities")
+        st.write("Halftime Probabilities (0-0 to 2-2):", ht_probs)
+        st.write("Fulltime Probabilities (0-0 to 4-4):", ft_probs)
+        st.write("BTTS GG Probability:", f"{btts_prob * 100:.2f}%")
+        st.write("Under 2.5 Probability:", f"{under_25_prob * 100:.2f}%")
+        st.write("Over 2.5 Probability:", f"{over_25_prob * 100:.2f}%")
+        st.write("HT Over 1.5 Goals Probability:", f"{ht_over_15_prob * 100:.2f}%")
+        st.write("HT Under 1.5 Goals Probability:", f"{ht_under_15_prob * 100:.2f}%")
+
     except Exception as e:
-        st.error(f"Error occurred: {e}")
+        st.error(f"Error in calculation: {e}")
