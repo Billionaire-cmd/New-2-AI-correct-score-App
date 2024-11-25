@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import poisson
 
 # Function to Calculate Poisson Probabilities
-def calculate_poisson_prob(lambda_, max_goals=4):
+def calculate_poisson_prob(lambda_, max_goals):
     """Calculate Poisson probabilities up to max_goals."""
     return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
 
@@ -33,6 +33,10 @@ st.sidebar.header("Match Statistics and Inputs")
 avg_goals_home = st.sidebar.number_input("Average Goals Scored by Home Team", min_value=0.0, step=0.1, value=1.5)
 avg_goals_away = st.sidebar.number_input("Average Goals Scored by Away Team", min_value=0.0, step=0.1, value=1.2)
 
+# Average Points
+avg_points_home = st.sidebar.number_input("Average Points for Home Team", min_value=0.0, step=0.1, value=1.8)
+avg_points_away = st.sidebar.number_input("Average Points for Away Team", min_value=0.0, step=0.1, value=1.5)
+
 # Betting Odds
 st.sidebar.subheader("Halftime Odds")
 ht_home = st.sidebar.number_input("Halftime Home Odds", min_value=1.0, step=0.1, value=2.5)
@@ -60,9 +64,6 @@ for i in range(3):
         ht_score = f"{i}:{j}"
         correct_score_odds_halftime[ht_score] = st.sidebar.number_input(f"HT Odds for {ht_score}", value=10.0, step=0.01)
 
-# Low Value Bet Threshold
-low_value_threshold = 0.05  # Threshold for low value bet based on expected value (EV)
-
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
     try:
@@ -78,12 +79,12 @@ if st.button("Predict Probabilities and Insights"):
         halftime_away_probs = calculate_poisson_prob(halftime_away_avg, max_goals=2)
         halftime_score_matrix = np.outer(halftime_home_probs, halftime_away_probs)
 
-        # Fulltime Score Probabilities
+        # Calculate Fulltime Score Probabilities
         fulltime_score_probs = {f"{i}:{j}": score_matrix[i, j] for i in range(5) for j in range(5)}
         fulltime_other_prob = 1 - sum(fulltime_score_probs.values())
         fulltime_score_probs["Other"] = fulltime_other_prob
 
-        # Halftime Score Probabilities
+        # Calculate Halftime Score Probabilities
         halftime_score_probs = {f"{i}:{j}": halftime_score_matrix[i, j] for i in range(3) for j in range(3)}
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
@@ -92,23 +93,15 @@ if st.button("Predict Probabilities and Insights"):
         sorted_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)
         sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)
 
-        # Expected Value Calculation for Fulltime Correct Score
-        fulltime_score_ev = {score: calculate_expected_value(prob, correct_score_odds_fulltime[score]) for score, prob in fulltime_score_probs.items()}
-        low_value_fulltime_bets = {score: ev for score, ev in fulltime_score_ev.items() if ev < low_value_threshold}
+        # Low Value Bet Recommendation for Full-time Correct Score
+        low_value_bet_ft = sorted_fulltime_scores[0]  # Highest probability fulltime score
+        st.subheader("Low Value Bet Full-time Correct Score Recommendation")
+        st.write(f"Recommended Full-time Correct Score: {low_value_bet_ft[0]} with Probability: {low_value_bet_ft[1]:.2%}")
 
-        # Expected Value Calculation for Halftime Correct Score
-        halftime_score_ev = {score: calculate_expected_value(prob, correct_score_odds_halftime[score]) for score, prob in halftime_score_probs.items()}
-        low_value_halftime_bets = {score: ev for score, ev in halftime_score_ev.items() if ev < low_value_threshold}
-
-        # Display the Low Value Bet Recommendations
-        st.subheader("Low Value Bet Recommendations")
-        st.write("### Full-time Correct Score Bets with Low Value:")
-        for score, ev in low_value_fulltime_bets.items():
-            st.write(f"Score: {score}, Expected Value: {ev:.2f}")
-
-        st.write("### Halftime Correct Score Bets with Low Value:")
-        for score, ev in low_value_halftime_bets.items():
-            st.write(f"Score: {score}, Expected Value: {ev:.2f}")
+        # Low Value Bet Recommendation for Halftime Correct Score
+        low_value_bet_ht = sorted_halftime_scores[0]  # Highest probability halftime score
+        st.subheader("Low Value Bet Halftime Correct Score Recommendation")
+        st.write(f"Recommended Halftime Correct Score: {low_value_bet_ht[0]} with Probability: {low_value_bet_ht[1]:.2%}")
 
     except Exception as e:
-        st.error(f"Error during prediction: {e}")
+        st.error(f"Error: {e}")
