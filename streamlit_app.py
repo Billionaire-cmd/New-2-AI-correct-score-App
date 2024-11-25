@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import poisson
 
 # Function to Calculate Poisson Probabilities
-def calculate_poisson_prob(lambda_, max_goals=4):
+def calculate_poisson_prob(lambda_, max_goals):
     """Calculate Poisson probabilities up to max_goals."""
     return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
 
@@ -83,6 +83,21 @@ for i in range(3):
 # "Other" scores for Halftime
 correct_score_odds_halftime["Other"] = st.sidebar.number_input("HT Odds for scores exceeding 2:2", value=50.0, step=0.01)
 
+# Function to Calculate Poisson Probabilities
+def calculate_poisson_prob(lambda_, max_goals=4):
+    """Calculate Poisson probabilities up to max_goals."""
+    return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
+
+# Function to Calculate Bookmaker's Margin
+def calculate_margin(odds_list):
+    """Calculate bookmaker's margin given a list of odds."""
+    return (sum(1 / odds for odds in odds_list) - 1) * 100
+
+# Function to Calculate Expected Value
+def calculate_expected_value(prob, odds):
+    """Calculate expected value."""
+    return (prob * odds) - 1
+
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
     try:
@@ -124,105 +139,27 @@ if st.button("Predict Probabilities and Insights"):
         over_1_5_ht_prob = sum(halftime_score_matrix[i][j] for i in range(2,3) for j in range(3)) * 100
         under_1_5_ht_prob = 100 - over_1_5_ht_prob
 
-        # Over/Under 1.5 Goals Probabilities (Fulltime)
-        over_1_5_ft_prob = sum(score_matrix[i][j] for i in range(2,5) for j in range(5)) * 100
-        under_1_5_ft_prob = 100 - over_1_5_ft_prob
+        # Display Insights
+        st.subheader("Football Match Outcome Probabilities")
 
-        # Over/Under 2.5 Expected Value (Fulltime)
-        under_2_5_ev = calculate_expected_value(under_2_5_prob / 100, under_2_5_ft)
+        st.write(f"**Halftime Probabilities:**")
+        for score, prob in sorted_halftime_scores:
+            st.write(f"  - {score}: {prob * 100:.2f}%")
+        st.write(f"**Fulltime Probabilities:**")
+        for score, prob in sorted_fulltime_scores:
+            st.write(f"  - {score}: {prob * 100:.2f}%")
 
-        # Over/Under 1.5 Expected Value (Halftime)
-        over_1_5_ht_ev = calculate_expected_value(over_1_5_ht_prob / 100, over_1_5_ht)
-        under_1_5_ht_ev = calculate_expected_value(under_1_5_ht_prob / 100, under_1_5_ht)
+        st.write(f"\n**BTTS Probabilities:**")
+        st.write(f"  - BTTS Yes: {btts_yes_prob:.2f}%")
+        st.write(f"  - BTTS No: {btts_no_prob:.2f}%")
 
-        # Over/Under 1.5 Expected Value (Fulltime)
-        over_1_5_ft_ev = calculate_expected_value(over_1_5_ft_prob / 100, over_1_5_ft)
-        under_1_5_ft_ev = calculate_expected_value(under_1_5_ft_prob / 100, under_1_5_ft)
+        st.write(f"\n**Over/Under 2.5 Goals (Fulltime):**")
+        st.write(f"  - Over 2.5 Goals: {over_2_5_prob:.2f}%")
+        st.write(f"  - Under 2.5 Goals: {under_2_5_prob:.2f}%")
 
-        # Match Outcome Expected Value (Fulltime)
-        home_win_ev = calculate_expected_value(home_win_prob / 100, ft_home)
-        draw_ev = calculate_expected_value(draw_prob / 100, ft_draw)
-        away_win_ev = calculate_expected_value(away_win_prob / 100, ft_away)
-
-        # Display Predictions and Insights
-        st.subheader("Predicted Probabilities")
-        
-        # Fulltime Score Probabilities
-        st.write("### Fulltime Score Probabilities")
-        for score, prob in sorted_fulltime_scores[:5]:
-            st.write(f"{score}: {prob*100:.2f}%")
-        st.write(f"Other Scores: {fulltime_other_prob*100:.2f}%")
-
-        # Halftime Score Probabilities
-        st.write("### Halftime Score Probabilities")
-        for score, prob in sorted_halftime_scores[:5]:
-            st.write(f"{score}: {prob*100:.2f}%")
-        st.write(f"Other Scores: {halftime_other_prob*100:.2f}%")
-
-        # Betting Probabilities
-        st.write("### Betting Probabilities")
-        st.write(f"BTTS (Yes): {btts_yes_prob:.2f}%")
-        st.write(f"BTTS (No): {btts_no_prob:.2f}%")
-        st.write(f"Over 2.5 Goals (Fulltime): {over_2_5_prob:.2f}%")
-        st.write(f"Under 2.5 Goals (Fulltime): {under_2_5_prob:.2f}%")
-        st.write(f"Over 1.5 Goals (Halftime): {over_1_5_ht_prob:.2f}%")
-        st.write(f"Under 1.5 Goals (Halftime): {under_1_5_ht_prob:.2f}%")
-        st.write(f"Over 1.5 Goals (Fulltime): {over_1_5_ft_prob:.2f}%")
-        st.write(f"Under 1.5 Goals (Fulltime): {under_1_5_ft_prob:.2f}%")
-        st.write(f"Home Win: {home_win_prob:.2f}%")
-        st.write(f"Draw: {draw_prob:.2f}%")
-        st.write(f"Away Win: {away_win_prob:.2f}%")
-
-        # Bookmaker's Margin
-        st.write("### Bookmaker's Margin")
-        st.write(f"Margin (BTTS): {margin_btts:.2f}%")
-        st.write(f"Margin (Over/Under 2.5): {margin_over_under_2_5:.2f}%")
-        st.write(f"Margin (Over/Under 1.5 HT): {margin_over_under_1_5_ht:.2f}%")
-        st.write(f"Margin (Over/Under 1.5 FT): {margin_over_under_1_5_ft:.2f}%")
-        st.write(f"Margin (Match Outcomes): {margin_match_outcomes:.2f}%")
-
-        # Expected Value for Betting Markets
-        st.write("### Expected Values for Betting Markets")
-        st.write(f"BTTS (Yes) EV: {btts_yes_ev:.2f}")
-        st.write(f"BTTS (No) EV: {btts_no_ev:.2f}")
-        st.write(f"Over 2.5 Goals EV (Fulltime): {over_2_5_ev:.2f}")
-        st.write(f"Under 2.5 Goals EV (Fulltime): {under_2_5_ev:.2f}")
-        st.write(f"Over 1.5 Goals EV (Halftime): {over_1_5_ht_ev:.2f}")
-        st.write(f"Under 1.5 Goals EV (Halftime): {under_1_5_ht_ev:.2f}")
-        st.write(f"Over 1.5 Goals EV (Fulltime): {over_1_5_ft_ev:.2f}")
-        st.write(f"Under 1.5 Goals EV (Fulltime): {under_1_5_ft_ev:.2f}")
-        st.write(f"Home Win EV: {home_win_ev:.2f}")
-        st.write(f"Draw EV: {draw_ev:.2f}")
-        st.write(f"Away Win EV: {away_win_ev:.2f}")
+        st.write(f"\n**Over/Under 1.5 Goals (Halftime):**")
+        st.write(f"  - Over 1.5 Goals: {over_1_5_ht_prob:.2f}%")
+        st.write(f"  - Under 1.5 Goals: {under_1_5_ht_prob:.2f}%")
 
     except Exception as e:
-        st.error(f"An error occurred: {e}")
-  
-        # Display Results
-        st.subheader("Predicted Fulltime Probabilities")
-        st.write(sorted_fulltime_scores)
-
-        st.subheader("Predicted Halftime Probabilities")
-        st.write(sorted_halftime_scores)
-
-        st.subheader("Predicted BTTS Probability")
-        st.write(f"BTTS Yes: {btts_yes_prob:.2f}%  |  BTTS No: {btts_no_prob:.2f}%")
-
-        st.subheader("Over/Under 2.5 Goals Fulltime Probability")
-        st.write(f"Over 2.5 FT: {over_2_5_prob:.2f}%  |  Under 2.5 FT: {under_2_5_prob:.2f}%")
-
-        st.subheader("Over/Under 1.5 Goals Halftime Probability")
-        st.write(f"Over 1.5 HT: {over_1_5_ht_prob:.2f}%  |  Under 1.5 HT: {under_1_5_ht_prob:.2f}%")
-
-        st.subheader("Over/Under 1.5 Goals Fulltime Probability")
-        st.write(f"Over 1.5 FT: {over_1_5_ft_prob:.2f}%  |  Under 1.5 FT: {under_1_5_ft_prob:.2f}%")
-
-        st.subheader("Calculated Margin for HT and FT Odds")
-        margin_ht = calculate_margin([ht_home, ht_draw, ht_away])
-        margin_ft = calculate_margin([ft_home, ft_draw, ft_away])
-        st.write(f"HT Margin: {margin_ht:.2f}%")
-        st.write(f"FT Margin: {margin_ft:.2f}%")
-
-    except Exception as e:
-        st.error(f"Error: {e}")
-
+        st.error(f"Error in prediction: {e}")
