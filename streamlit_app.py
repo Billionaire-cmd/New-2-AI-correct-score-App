@@ -1,55 +1,57 @@
+import streamlit as st
 import numpy as np
 from scipy.stats import poisson
-import pandas as pd
 
-# Example Team Data (for demonstration purposes)
-team_data = {
-    'Team A': {'attack': 1.5, 'defense': 1.2},  # goals per match
-    'Team B': {'attack': 1.2, 'defense': 1.0}   # goals per match
-}
+# Helper function to calculate Poisson distribution for goal probabilities
+def calculate_poisson_prob(goal_avg, max_goals=4):
+    return [poisson.pmf(i, goal_avg) for i in range(max_goals + 1)]
 
-# Bookmaker Odds (for HT/FT)
-bookmaker_odds = {
-    'HT Home': 2.5, 'HT Draw': 3.0, 'HT Away': 3.5,
-    'FT Home': 2.8, 'FT Draw': 3.2, 'FT Away': 3.0
-}
+# Function to calculate HT/FT correct score probabilities
+def calculate_correct_score_probabilities(home_avg, away_avg, max_goals=4):
+    ht_probs = calculate_poisson_prob(home_avg, max_goals)
+    ft_probs = calculate_poisson_prob(away_avg, max_goals)
+    
+    # Generate HT/FT combinations
+    ht_ft_probs = {}
+    for ht in range(max_goals+1):
+        for ft in range(max_goals+1):
+            ht_ft_probs[(ht, ft)] = ht_probs[ht] * ft_probs[ft]
+    
+    return ht_ft_probs
 
-# Poisson Distribution Function for Goal Prediction
-def poisson_prob(lmbda, max_goals=4):
-    return [poisson.pmf(i, lmbda) for i in range(max_goals + 1)]
+# Streamlit app
+def main():
+    # Title of the app
+    st.title("🤖 Rabiotic Advanced Halftime/Full-time Correct Score Predictor")
 
-# Calculate Expected Goals (HT and FT)
-ht_home_goals = team_data['Team A']['attack'] * 0.6 + team_data['Team B']['defense'] * 0.4
-ht_away_goals = team_data['Team B']['attack'] * 0.6 + team_data['Team A']['defense'] * 0.4
-ft_home_goals = team_data['Team A']['attack'] * 0.6 + team_data['Team B']['defense'] * 0.4
-ft_away_goals = team_data['Team B']['attack'] * 0.6 + team_data['Team A']['defense'] * 0.4
+    # Description
+    st.write("""
+    Welcome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**.
+    This tool uses advanced statistical methods to calculate the most likely correct scores for football matches, based on team performance, betting odds, and other factors.
+    """)
 
-# HT and FT Poisson Probabilities
-ht_home_probs = poisson_prob(ht_home_goals)
-ht_away_probs = poisson_prob(ht_away_goals)
-ft_home_probs = poisson_prob(ft_home_goals)
-ft_away_probs = poisson_prob(ft_away_goals)
+    # Input fields for home and away team stats (average goals scored)
+    home_avg = st.number_input("Enter Home Team's Average Goals Scored per Match", min_value=0.0, max_value=5.0, value=1.5)
+    away_avg = st.number_input("Enter Away Team's Average Goals Scored per Match", min_value=0.0, max_value=5.0, value=1.2)
 
-# Predict the HT/FT score combinations (e.g., 1-0, 2-1)
-def predict_ht_ft(ht_home_probs, ht_away_probs, ft_home_probs, ft_away_probs):
-    predictions = []
-    for ht_home in range(4):
-        for ht_away in range(4):
-            for ft_home in range(5):
-                for ft_away in range(5):
-                    prob_ht = ht_home_probs[ht_home] * ht_away_probs[ht_away]
-                    prob_ft = ft_home_probs[ft_home] * ft_away_probs[ft_away]
-                    predictions.append(((ht_home, ht_away), (ft_home, ft_away), prob_ht * prob_ft))
-    return predictions
+    # Input for max goals considered
+    max_goals = st.slider("Select Maximum Goals Considered", min_value=1, max_value=5, value=4)
 
-# Get Predictions
-predictions = predict_ht_ft(ht_home_probs, ht_away_probs, ft_home_probs, ft_away_probs)
+    # Button to generate prediction
+    if st.button("Predict HT/FT Correct Scores"):
+        # Calculate HT/FT probabilities
+        ht_ft_probs = calculate_correct_score_probabilities(home_avg, away_avg, max_goals)
+        
+        # Display the results
+        st.subheader("Predicted Halftime/Full-time Correct Scores")
+        for score, prob in ht_ft_probs.items():
+            st.write(f"Score: {score}, Probability: {prob:.4f}")
+        
+        # Display a message about the model
+        st.write("""
+        The above predictions are based on the Poisson distribution and the inputted team statistics. 
+        Use this tool to help identify possible outcomes, but keep in mind that football matches can be unpredictable!
+        """)
 
-# Sort Predictions by Probability
-predictions.sort(key=lambda x: x[2], reverse=True)
-
-# Output Top 5 HT/FT Predictions
-top_predictions = predictions[:5]
-for prediction in top_predictions:
-    st.write(f"HT: {prediction[0]} -> FT: {prediction[1]} with Probability: {prediction[2]:.2f}")
-
+if __name__ == "__main__":
+    main()
