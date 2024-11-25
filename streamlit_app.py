@@ -37,58 +37,69 @@ st.sidebar.subheader("BTTS GG/NG Odds")
 btts_gg = st.sidebar.number_input("BTTS (Yes) Odds", min_value=1.0, step=0.1, value=1.8)
 btts_ng = st.sidebar.number_input("BTTS (No) Odds", min_value=1.0, step=0.1, value=1.9)
 
-st.sidebar.subheader("Over/Under Odds (Halftime)")
-over_1_5_ht = st.sidebar.number_input("Over 1.5 HT Odds", min_value=1.0, step=0.1, value=2.5)
-under_1_5_ht = st.sidebar.number_input("Under 1.5 HT Odds", min_value=1.0, step=0.1, value=1.6)
-
 st.sidebar.subheader("Over/Under Odds (Fulltime)")
-over_1_5_ft = st.sidebar.number_input("Over 1.5 FT Odds", min_value=1.0, step=0.1, value=1.4)
-under_1_5_ft = st.sidebar.number_input("Under 1.5 FT Odds", min_value=1.0, step=0.1, value=2.9)
 over_2_5_ft = st.sidebar.number_input("Over 2.5 FT Odds", min_value=1.0, step=0.1, value=2.0)
 under_2_5_ft = st.sidebar.number_input("Under 2.5 FT Odds", min_value=1.0, step=0.1, value=1.8)
 
 # Correct Score Odds
 st.sidebar.subheader("Correct Score Odds (HT and FT)")
 correct_score_odds = {}
-for score in ["0:0", "1:0", "0:1", "1:1", "2:0", "2:1", "2:2", "3:0", "3:1", "3:2", "3:3", "4:0", "4:1", "4:2", "4:3", "4:4"]:
+for score in ["0:0", "1:0", "0:1", "1:1", "2:0", "2:1", "2:2", "3:0", "3:1", "3:2", "3:3"]:
     correct_score_odds[score] = st.sidebar.number_input(f"Odds for {score}", value=10.0, step=0.01)
 
-# Function to Calculate Probabilities
+# Function to Calculate Poisson Probabilities
 def calculate_poisson_prob(lambda_, max_goals):
-    """Calculate Poisson probabilities."""
     return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
 
+# Function to Calculate Margins
+def calculate_margin(odds):
+    return (1 / odds.sum() - 1) * 100
+
 # Predict Probabilities and Correct Scores
-if st.button("Predict Correct Scores"):
+if st.button("Predict Probabilities and Insights"):
     try:
-        # Calculate Poisson Probabilities for Home and Away Teams
+        # Poisson probabilities
         home_probs = calculate_poisson_prob(avg_goals_home, max_goals=4)
         away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
-
-        # Calculate Match Probabilities
         score_matrix = np.outer(home_probs, away_probs)
 
-        # Extract Probabilities for Specific Scores
-        score_probs = {}
-        for i in range(5):
-            for j in range(5):
-                score_probs[f"{i}:{j}"] = score_matrix[i, j]
-
-        # Sort Scores by Probability
+        # Calculate score probabilities
+        score_probs = {f"{i}:{j}": score_matrix[i, j] for i in range(5) for j in range(5)}
         sorted_scores = sorted(score_probs.items(), key=lambda x: x[1], reverse=True)
 
-        # Display Results
-        st.header("Correct Score Predictions")
-        st.write("### Top 5 Likely Scores (with Probabilities):")
+        # Insights
+        st.header("Predictions and Insights")
+
+        # Correct Score
+        st.subheader("Correct Score Predictions")
+        st.write("### Top 5 Likely Scores:")
         for score, prob in sorted_scores[:5]:
             st.write(f"**{score}:** {prob * 100:.2f}%")
 
-        # Recommendations
-        st.subheader("Recommendations")
-        ht_recommend = "1:0"  # Hardcoded recommendation
-        ft_recommend = "1:1"  # Hardcoded recommendation
-        st.write(f"**Recommended Halftime Score:** {ht_recommend}")
-        st.write(f"**Recommended Fulltime Score:** {ft_recommend}")
+        # BTTS
+        btts_prob = sum(score_matrix[i][j] for i in range(1, 5) for j in range(1, 5)) * 100
+        st.subheader("BTTS (GG/NG) Probabilities")
+        st.write(f"**BTTS (Yes):** {btts_prob:.2f}%")
+        st.write(f"**BTTS (No):** {100 - btts_prob:.2f}%")
+
+        # Over/Under
+        over_2_5_prob = sum(score_matrix[i][j] for i in range(3, 5) for j in range(5)) * 100
+        st.subheader("Over/Under 2.5 Goals Probabilities")
+        st.write(f"**Over 2.5 Goals:** {over_2_5_prob:.2f}%")
+        st.write(f"**Under 2.5 Goals:** {100 - over_2_5_prob:.2f}%")
+
+        # Win/Draw Probabilities
+        home_win_prob = sum(score_matrix[i][j] for i in range(5) for j in range(i)) * 100
+        draw_prob = sum(score_matrix[i][i] for i in range(5)) * 100
+        away_win_prob = 100 - home_win_prob - draw_prob
+        st.subheader("Match Outcome Probabilities")
+        st.write(f"**Home Win:** {home_win_prob:.2f}%")
+        st.write(f"**Draw:** {draw_prob:.2f}%")
+        st.write(f"**Away Win:** {away_win_prob:.2f}%")
+
+        # Moderate Value Bet
+        st.subheader("Moderate Value Bet Recommendation")
+        st.write(f"**Recommended Bet:** {sorted_scores[0][0]} (Probability: {sorted_scores[0][1] * 100:.2f}%)")
 
     except Exception as e:
         st.error(f"Error in calculation: {e}")
