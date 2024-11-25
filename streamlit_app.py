@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import poisson
 
 # Function to Calculate Poisson Probabilities
-def calculate_poisson_prob(lambda_, max_goals=4):
+def calculate_poisson_prob(lambda_, max_goals):
     """Calculate Poisson probabilities up to max_goals."""
     return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
 
@@ -17,8 +17,16 @@ def calculate_expected_value(prob, odds):
     """Calculate expected value."""
     return (prob * odds) - 1
 
+# Function to Recommend Low Value Bet (based on expected value threshold)
+def low_value_bet_recommendation(expected_value, threshold=-0.05):
+    """Recommend bets with a low expected value."""
+    if expected_value < threshold:
+        return "Low Value Bet"
+    else:
+        return "Not a Low Value Bet"
+
 # App Title and Introduction
-st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor pro")
+st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
 st.markdown("""
 Welcome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
 This app uses advanced statistical models, including the Poisson distribution, betting odds, and team statistics, 
@@ -83,21 +91,6 @@ for i in range(3):
 # "Other" scores for Halftime
 correct_score_odds_halftime["Other"] = st.sidebar.number_input("HT Odds for scores exceeding 2:2", value=50.0, step=0.01)
 
-# Function to Calculate Poisson Probabilities
-def calculate_poisson_prob(lambda_, max_goals=4):
-    """Calculate Poisson probabilities up to max_goals."""
-    return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
-
-# Function to Calculate Bookmaker's Margin
-def calculate_margin(odds_list):
-    """Calculate bookmaker's margin given a list of odds."""
-    return (sum(1 / odds for odds in odds_list) - 1) * 100
-
-# Function to Calculate Expected Value
-def calculate_expected_value(prob, odds):
-    """Calculate expected value."""
-    return (prob * odds) - 1
-
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
     try:
@@ -123,10 +116,6 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
-        # Sort Scores by Probability
-        sorted_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)
-        sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)
-
         # BTTS Probabilities
         btts_yes_prob = sum(score_matrix[i][j] for i in range(1,5) for j in range(1,5)) * 100
         btts_no_prob = 100 - btts_yes_prob
@@ -143,32 +132,26 @@ if st.button("Predict Probabilities and Insights"):
         over_1_5_ft_prob = sum(score_matrix[i][j] for i in range(2,5) for j in range(5)) * 100
         under_1_5_ft_prob = 100 - over_1_5_ft_prob
 
-        # Expected Value Calculations for Market Recommendations
-        ht_home_ev = calculate_expected_value(halftime_home_probs[1], ht_home)
-        ht_away_ev = calculate_expected_value(halftime_away_probs[1], ht_away)
-        ft_home_ev = calculate_expected_value(fulltime_home_probs[1], ft_home)
-        ft_away_ev = calculate_expected_value(fulltime_away_probs[1], ft_away)
-        ev_btts_gg = calculate_expected_value(btts_yes_prob / 100, btts_gg)
-        ev_btts_ng = calculate_expected_value(btts_no_prob / 100, btts_ng)
+        # Calculate Bookmaker's Margin
+        margin = calculate_margin([ht_home, ht_draw, ht_away, ft_home, ft_draw, ft_away, over_1_5_ft, under_1_5_ft])
 
-        # Output Results
-        st.subheader("Top Halftime/Fulltime Correct Score Predictions")
-        st.write(f"Halftime Correct Score: {sorted_halftime_scores[0][0]} with probability {sorted_halftime_scores[0][1]:.2%}")
-        st.write(f"Fulltime Correct Score: {sorted_fulltime_scores[0][0]} with probability {sorted_fulltime_scores[0][1]:.2%}")
-
-        st.subheader("Betting Market Analysis")
+        # Calculate Expected Value for Low Value Bet Recommendation
+        expected_value_ft_home = calculate_expected_value(fulltime_score_probs.get("1:0", 0), ft_home)
+        low_value_bet_ft_home = low_value_bet_recommendation(expected_value_ft_home)
+        
+        st.write(f"Bookmaker's Margin: {margin:.2f}%")
+        st.write(f"Over/Under 2.5 Goals (Fulltime) Probability: {over_2_5_prob:.2f}%")
         st.write(f"BTTS (Yes) Probability: {btts_yes_prob:.2f}%")
         st.write(f"BTTS (No) Probability: {btts_no_prob:.2f}%")
-        st.write(f"Over 2.5 Goals (Fulltime) Probability: {over_2_5_prob:.2f}%")
-        st.write(f"Under 2.5 Goals (Fulltime) Probability: {under_2_5_prob:.2f}%")
+        st.write(f"Halftime Fulltime Over 1.5 Goals Probability: {over_1_5_ht_prob:.2f}%")
+        st.write(f"Low Value Bet for FT 1:0 Home Odds: {low_value_bet_ft_home}")
 
-        # Show Expected Values for Different Bet Types
-        st.subheader("Expected Value (EV) Calculations")
-        st.write(f"HT Home EV: {ht_home_ev:.2f}")
-        st.write(f"HT Away EV: {ht_away_ev:.2f}")
-        st.write(f"FT Home EV: {ft_home_ev:.2f}")
-        st.write(f"FT Away EV: {ft_away_ev:.2f}")
-        st.write(f"BTTS Yes EV: {ev_btts_gg:.2f}")
-        st.write(f"BTTS No EV: {ev_btts_ng:.2f}")
+        st.write("### Predicted Fulltime Correct Scores Probabilities")
+        st.write(fulltime_score_probs)
+        
+        st.write("### Predicted Halftime Correct Scores Probabilities")
+        st.write(halftime_score_probs)
+
     except Exception as e:
         st.error(f"An error occurred: {e}")
+
