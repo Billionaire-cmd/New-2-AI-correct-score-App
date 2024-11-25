@@ -14,11 +14,11 @@ and provides AI-based recommendations for bets with the best potential profits.
 st.sidebar.header("Match Details")
 team_a = st.sidebar.text_input("Team A", "Team A")
 team_b = st.sidebar.text_input("Team B", "Team B")
-team_a_goals = st.sidebar.number_input("Avg Goals Scored by Team A", 1.5, min_value=0.0)
-team_b_goals = st.sidebar.number_input("Avg Goals Scored by Team B", 1.2, min_value=0.0)
-odds_a = st.sidebar.number_input("Odds for Team A Win", 2.5, min_value=0.0)
-odds_b = st.sidebar.number_input("Odds for Team B Win", 2.8, min_value=0.0)
-odds_draw = st.sidebar.number_input("Odds for Draw", 3.2, min_value=0.0)
+team_a_goals = st.sidebar.number_input("Avg Goals Scored by Team A", value=1.5, min_value=0.0)
+team_b_goals = st.sidebar.number_input("Avg Goals Scored by Team B", value=1.2, min_value=0.0)
+odds_a = st.sidebar.number_input("Odds for Team A Win", value=2.5, min_value=0.0)
+odds_b = st.sidebar.number_input("Odds for Team B Win", value=2.8, min_value=0.0)
+odds_draw = st.sidebar.number_input("Odds for Draw", value=3.2, min_value=0.0)
 
 # Generate Probabilities using Poisson Distribution
 def poisson_prob(lam, goal):
