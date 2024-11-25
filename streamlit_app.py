@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import poisson
 
 # Function to Calculate Poisson Probabilities
-def calculate_poisson_prob(lambda_, max_goals):
+def calculate_poisson_prob(lambda_, max_goals=4):
     """Calculate Poisson probabilities up to max_goals."""
     return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
 
@@ -83,21 +83,6 @@ for i in range(3):
 # "Other" scores for Halftime
 correct_score_odds_halftime["Other"] = st.sidebar.number_input("HT Odds for scores exceeding 2:2", value=50.0, step=0.01)
 
-# Function to Calculate Poisson Probabilities
-def calculate_poisson_prob(lambda_, max_goals=4):
-    """Calculate Poisson probabilities up to max_goals."""
-    return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
-
-# Function to Calculate Bookmaker's Margin
-def calculate_margin(odds_list):
-    """Calculate bookmaker's margin given a list of odds."""
-    return (sum(1 / odds for odds in odds_list) - 1) * 100
-
-# Function to Calculate Expected Value
-def calculate_expected_value(prob, odds):
-    """Calculate expected value."""
-    return (prob * odds) - 1
-
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
     try:
@@ -153,14 +138,14 @@ if st.button("Predict Probabilities and Insights"):
         st.subheader("Predicted BTTS Probability")
         st.write(f"BTTS Yes: {btts_yes_prob:.2f}%  |  BTTS No: {btts_no_prob:.2f}%")
 
-        st.subheader("Over/Under 2.5 Goals (Fulltime) Probability")
-        st.write(f"Over 2.5: {over_2_5_prob:.2f}%  |  Under 2.5: {under_2_5_prob:.2f}%")
+        st.subheader("Predicted Over/Under Probabilities")
+        st.write(f"Over 2.5 Goals (FT): {over_2_5_prob:.2f}%  |  Under 2.5 Goals (FT): {under_2_5_prob:.2f}%")
+        st.write(f"Over 1.5 Goals (HT): {over_1_5_ht_prob:.2f}%  |  Under 1.5 Goals (HT): {under_1_5_ht_prob:.2f}%")
+        st.write(f"Over 1.5 Goals (FT): {over_1_5_ft_prob:.2f}%  |  Under 1.5 Goals (FT): {under_1_5_ft_prob:.2f}%")
 
-        st.subheader("Over/Under 1.5 Goals (Halftime) Probability")
-        st.write(f"Over 1.5: {over_1_5_ht_prob:.2f}%  |  Under 1.5: {under_1_5_ht_prob:.2f}%")
-
-        st.subheader("Over/Under 1.5 Goals (Fulltime) Probability")
-        st.write(f"Over 1.5: {over_1_5_ft_prob:.2f}%  |  Under 1.5: {under_1_5_ft_prob:.2f}%")
+        # Calculate Margin for Betting Odds
+        bookmaker_margin = calculate_margin([ht_home, ht_draw, ht_away, ft_home, ft_draw, ft_away])
+        st.write(f"Bookmaker's Margin: {bookmaker_margin:.2f}%")
 
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        st.error(f"Error occurred: {e}")
