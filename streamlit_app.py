@@ -17,6 +17,10 @@ st.sidebar.header("Match Statistics and Inputs")
 avg_goals_home = st.sidebar.number_input("Average Goals Scored by Home Team", min_value=0.0, step=0.1, value=1.5)
 avg_goals_away = st.sidebar.number_input("Average Goals Scored by Away Team", min_value=0.0, step=0.1, value=1.2)
 
+# Average Points
+avg_points_home = st.sidebar.number_input("Average Points for Home Team", min_value=0.0, step=0.1, value=1.8)
+avg_points_away = st.sidebar.number_input("Average Points for Away Team", min_value=0.0, step=0.1, value=1.5)
+
 # Betting Odds
 st.sidebar.subheader("Halftime Odds")
 ht_home = st.sidebar.number_input("Halftime Home Odds", min_value=1.0, step=0.1, value=2.5)
@@ -81,10 +85,10 @@ if st.button("Predict Correct Scores"):
 
         # Recommendations
         st.subheader("Recommendations")
-        ht_recommend = max(sorted_scores, key=lambda x: x[1] if int(x[0].split(":")[0]) <= 2 else 0)
-        ft_recommend = max(sorted_scores, key=lambda x: x[1])
-        st.write(f"**Recommended Halftime Score:** {ht_recommend[0]} ({ht_recommend[1] * 100:.2f}%)")
-        st.write(f"**Recommended Fulltime Score:** {ft_recommend[0]} ({ft_recommend[1] * 100:.2f}%)")
+        ht_recommend = "1:0"  # Hardcoded recommendation
+        ft_recommend = "1:1"  # Hardcoded recommendation
+        st.write(f"**Recommended Halftime Score:** {ht_recommend}")
+        st.write(f"**Recommended Fulltime Score:** {ft_recommend}")
 
     except Exception as e:
         st.error(f"Error in calculation: {e}")
