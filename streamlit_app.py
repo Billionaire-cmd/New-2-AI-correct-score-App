@@ -139,4 +139,3 @@ if st.button("Calculate Probabilities"):
     - **Fulltime Bet**: Look for value in betting on **Home Win (2-1)** or **Away Win (1-2)**, depending on in-game changes.
     - **Dynamic Adjustments**: During live betting, adjust bets if the game shows clear momentum for one team.
     """)
-
