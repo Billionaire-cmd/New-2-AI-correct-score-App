@@ -143,11 +143,19 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
-        st.write("Fulltime Score Probabilities (Poisson):")
-        st.write(fulltime_score_probs)
+        # Display Fulltime Score Probabilities as text
+        st.write("### Fulltime Score Probabilities (Poisson):")
+        fulltime_score_text = "\n".join([f"Score {score}: Probability {prob*100:.2f}%" for score, prob in fulltime_score_probs.items()])
+        st.write(fulltime_score_text)
 
-        st.write("Halftime Score Probabilities (Poisson):")
-        st.write(halftime_score_probs)
+        # Display Halftime Score Probabilities as text
+        st.write("### Halftime Score Probabilities (Poisson):")
+        halftime_score_text = "\n".join([f"Score {score}: Probability {prob*100:.2f}%" for score, prob in halftime_score_probs.items()])
+        st.write(halftime_score_text)
+
+    except Exception as e:
+        st.error(f"Error in prediction: {str(e)}")
+
 
     except Exception as e:
         st.error(f"Error in prediction: {str(e)}")
