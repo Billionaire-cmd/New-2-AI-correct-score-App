@@ -17,8 +17,16 @@ def calculate_expected_value(prob, odds):
     """Calculate expected value."""
     return (prob * odds) - 1
 
-def main():
-    # Example Score Matrix (Replace with your actual score matrix)
+# App Title and Introduction
+st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
+st.markdown("""
+Welcome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
+This app uses advanced statistical models, including the Poisson distribution, betting odds, and team statistics, 
+to predict realistic halftime and full-time correct scores for football matches.  
+It is designed to enhance your betting strategies by providing precise calculations for maximum ROI.
+""")
+
+def main():    # Example Score Matrix (Replace with your actual score matrix)
     score_matrix = {
         (0, 0): 0.18, (1, 0): 0.10, (0, 1): 0.08, (2, 0): 0.06,
         (0, 2): 0.05, (1, 1): 0.15, (2, 1): 0.12, (1, 2): 0.10,
@@ -59,16 +67,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# App Title and Introduction
-st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
-st.markdown("""
-Welcome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
-This app uses advanced statistical models, including the Poisson distribution, betting odds, and team statistics, 
-to predict realistic halftime and full-time correct scores for football matches.  
-It is designed to enhance your betting strategies by providing precise calculations for maximum ROI.
-""")
-
+    
 # Sidebar for Inputs
 st.sidebar.header("Match Statistics and Inputs")
 
