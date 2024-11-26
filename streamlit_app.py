@@ -173,39 +173,6 @@ if st.button("Predict Probabilities and Insights"):
         top_fulltime_score = sorted_fulltime_scores[0]  # Get the top FT score
         st.write(f"**Fulltime Correct Score Recommendation:** {top_fulltime_score[0]} "
                  f"(Probability: {top_fulltime_score[1] * 100:.2f}%)")
-
-        # Calculate BTTS GG/NG Insights
-btts_yes_scores = [(i, j) for i in range(1, 5) for j in range(1, 5)]
-btts_no_scores = [(i, 0) for i in range(5)] + [(0, j) for j in range(5)]
-
-# Probabilities for BTTS GG
-btts_yes_prob = sum(score_matrix[i][j] for i, j in btts_yes_scores) * 100
-btts_yes_top_scores = sorted(
-    {f"{i}:{j}": score_matrix[i][j] for i, j in btts_yes_scores}.items(),
-    key=lambda x: x[1],
-    reverse=True,
-)
-
-# Probabilities for BTTS NG
-btts_no_prob = sum(score_matrix[i][j] for i, j in btts_no_scores) * 100
-btts_no_top_scores = sorted(
-    {f"{i}:{j}": score_matrix[i][j] for i, j in btts_no_scores}.items(),
-    key=lambda x: x[1],
-    reverse=True,
-)
-
-# Display BTTS GG/NG Insights
-st.subheader("BTTS GG/NG Insights")
-st.write(f"**BTTS GG (Yes) Probability:** {btts_yes_prob:.2f}%")
-st.write("Top Correct Scores for BTTS GG (Yes):")
-for score, prob in btts_yes_top_scores[:5]:  # Top 5 scores
-    st.write(f"  - {score}: {prob * 100:.2f}%")
-
-st.write(f"**BTTS NG (No) Probability:** {btts_no_prob:.2f}%")
-st.write("Top Correct Scores for BTTS NG (No):")
-for score, prob in btts_no_top_scores[:5]:  # Top 5 scores
-    st.write(f"  - {score}: {prob * 100:.2f}%")
-
     
     except Exception as e:
         st.error(f"Error in prediction: {e}")
