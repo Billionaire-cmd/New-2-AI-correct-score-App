@@ -250,55 +250,6 @@ try:
     ht_margin = calculate_margin(ht_odds)
     ft_margin = calculate_margin(ft_odds)
     
-    # Display HT/FT Margins
-    st.subheader("Bookmaker Margins")
-    st.write(f"Halftime Margin: {ht_margin:.2f}%")
-    st.write(f"Fulltime Margin: {ft_margin:.2f}%")
-
-    # Sidebar: Exact Goals Odds
-    st.sidebar.subheader("Exact Goals Odds (0 to 6+ Goals)")
-    exact_goals_odds = {
-        "0 Goals": st.sidebar.number_input("Odds for 0 Goals", min_value=1.0, step=0.1, value=6.0),
-        "1 Goal": st.sidebar.number_input("Odds for 1 Goal", min_value=1.0, step=0.1, value=5.5),
-        "2 Goals": st.sidebar.number_input("Odds for 2 Goals", min_value=1.0, step=0.1, value=4.0),
-        "3 Goals": st.sidebar.number_input("Odds for 3 Goals", min_value=1.0, step=0.1, value=3.0),
-        "4 Goals": st.sidebar.number_input("Odds for 4 Goals", min_value=1.0, step=0.1, value=2.5),
-        "5 Goals": st.sidebar.number_input("Odds for 5 Goals", min_value=1.0, step=0.1, value=15.0),
-        "6+ Goals": st.sidebar.number_input("Odds for 6+ Goals", min_value=1.0, step=0.1, value=30.0)
-    }
-
-    # Calculate Exact Goal Probabilities based on the odds inputted
-    exact_goal_probs = {}
-    total_odds = sum(1 / value for value in exact_goals_odds.values())
-    for goal, odds in exact_goals_odds.items():
-        prob = 1 / odds
-        exact_goal_probs[goal] = prob / total_odds * 100
-    
-    # Sidebar: Halftime/Fulltime Odds
-    st.sidebar.subheader("Halftime/Fulltime Odds")
-    ht_ft_odds = {}
-    halftime_fulltime_combinations = [
-        "HT:Home/FT:Home", "HT:Home/FT:Draw", "HT:Home/FT:Away",
-        "HT:Draw/FT:Home", "HT:Draw/FT:Draw", "HT:Draw/FT:Away",
-        "HT:Away/FT:Home", "HT:Away/FT:Draw", "HT:Away/FT:Away"
-    ]
-    
-    # Collect HT/FT odds
-    for combo in halftime_fulltime_combinations:
-        ht_ft_odds[combo] = st.sidebar.number_input(f"Odds for {combo}", value=10.0, step=0.1)
-
-    # HT/FT Expected Value Calculations
-    st.subheader("HT/FT Expected Values")
-    ht_ft_probabilities = []
-    for combo, odds in ht_ft_odds.items():
-        prob = np.random.uniform(0.05, 0.15)  # Example random probabilities, replace with actual logic
-        ev = calculate_expected_value(prob, odds)
-        ht_ft_probabilities.append((combo, prob * 100, ev))
-
-    # Sort and display HT/FT expected values
-    ht_ft_probabilities.sort(key=lambda x: x[2], reverse=True)
-    st.table(ht_ft_probabilities)
-
     except Exception as e:
         st.error(f"Error in prediction: {e}")
 
