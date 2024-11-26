@@ -69,6 +69,25 @@ st.sidebar.subheader("Team Average Points")
 avg_points_home = st.sidebar.number_input("Avg Points (Home)", min_value=0.0, value=1.5, step=0.1)
 avg_points_away = st.sidebar.number_input("Avg Points (Away)", min_value=0.0, value=1.2, step=0.1)
 
+# Sidebar for BTTS Inputs
+st.sidebar.subheader("BTTS (Both Teams To Score) Inputs")
+btts_gg_odds = st.sidebar.number_input("BTTS GG Odds (Both Teams To Score)", min_value=1.0, value=1.9, step=0.1)
+btts_ng_odds = st.sidebar.number_input("BTTS NG Odds (No Goal for One or Both)", min_value=1.0, value=2.0, step=0.1)
+
+# Display BTTS Information
+st.subheader("BTTS (Both Teams To Score) Odds")
+st.write(f"**BTTS GG Odds** (Both Teams To Score): {btts_gg_odds}")
+st.write(f"**BTTS NG Odds** (No Goal for One or Both): {btts_ng_odds}")
+
+# Calculation: Based on odds, calculate and display the likelihood of GG or NG
+# Example: Calculate the implied probability of BTTS GG and BTTS NG
+prob_btts_gg = 1 / btts_gg_odds * 100  # Convert odds to percentage probability
+prob_btts_ng = 1 / btts_ng_odds * 100  # Convert odds to percentage probability
+
+# Display Calculated Probabilities
+st.write(f"**Implied Probability for BTTS GG (Both Teams To Score)**: {prob_btts_gg:.2f}%")
+st.write(f"**Implied Probability for BTTS NG (No Goal for One or Both)**: {prob_btts_ng:.2f}%")
+
 # Display Average Points Information
 st.subheader("Team Average Points")
 st.write(f"**Home Team Average Points**: {avg_points_home}")
