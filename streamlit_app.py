@@ -48,24 +48,44 @@ ft_home = st.sidebar.number_input("Fulltime Home Odds", min_value=1.0, step=0.1,
 ft_draw = st.sidebar.number_input("Fulltime Draw Odds", min_value=1.0, step=0.1, value=3.2)
 ft_away = st.sidebar.number_input("Fulltime Away Odds", min_value=1.0, step=0.1, value=3.4)
 
-# Exact Score Odds (Halftime and Fulltime)
-def input_correct_score_odds(period="Fulltime"):
-    correct_score_odds = {}
-    for i in range(5):  # Max 4:4 score for Fulltime
-        for j in range(5):
-            score = f"{i}:{j}"
-            correct_score_odds[score] = st.sidebar.number_input(f"{period} Odds for {score}", value=10.0, step=0.01)
-    correct_score_odds["Other"] = st.sidebar.number_input(f"{period} Odds for scores exceeding 4:4", value=50.0, step=0.01)
-    return correct_score_odds
+# BTTS and Over/Under Odds
+st.sidebar.subheader("BTTS GG/NG Odds")
+btts_gg = st.sidebar.number_input("BTTS (Yes) Odds", min_value=1.0, step=0.1, value=1.8)
+btts_ng = st.sidebar.number_input("BTTS (No) Odds", min_value=1.0, step=0.1, value=1.9)
 
-correct_score_odds_fulltime = input_correct_score_odds("Fulltime")
-correct_score_odds_halftime = input_correct_score_odds("Halftime")
+st.sidebar.subheader("Over/Under Odds (Halftime)")
+over_1_5_ht = st.sidebar.number_input("Over 1.5 HT Odds", min_value=1.0, step=0.1, value=2.5)
+under_1_5_ht = st.sidebar.number_input("Under 1.5 HT Odds", min_value=1.0, step=0.1, value=1.6)
 
-# Probabilities for HT/FT based on odds
+st.sidebar.subheader("Over/Under Odds (Fulltime)")
+over_1_5_ft = st.sidebar.number_input("Over 1.5 FT Odds", min_value=1.0, step=0.1, value=1.4)
+under_1_5_ft = st.sidebar.number_input("Under 1.5 FT Odds", min_value=1.0, step=0.1, value=2.9)
+over_2_5_ft = st.sidebar.number_input("Over 2.5 FT Odds", min_value=1.0, step=0.1, value=2.0)
+under_2_5_ft = st.sidebar.number_input("Under 2.5 FT Odds", min_value=1.0, step=0.1, value=1.8)
+
+# Correct Score Odds (Fulltime)
+st.sidebar.subheader("Correct Score Odds (Fulltime)")
+correct_score_odds_fulltime = {}
+for i in range(5):
+    for j in range(5):
+        score = f"{i}:{j}"
+        correct_score_odds_fulltime[score] = st.sidebar.number_input(f"FT Odds for {score}", value=10.0, step=0.01)
+correct_score_odds_fulltime["Other"] = st.sidebar.number_input("FT Odds for scores exceeding 4:4", value=50.0, step=0.01)
+
+# Correct Score Odds (Halftime)
+st.sidebar.subheader("Correct Score Odds (Halftime)")
+correct_score_odds_halftime = {}
+for i in range(3):
+    for j in range(3):
+        ht_score = f"{i}:{j}"
+        correct_score_odds_halftime[ht_score] = st.sidebar.number_input(f"HT Odds for {ht_score}", value=10.0, step=0.01)
+correct_score_odds_halftime["Other"] = st.sidebar.number_input("HT Odds for scores exceeding 2:2", value=50.0, step=0.01)
+
+# Calculate Probabilities for HT/FT based on Odds
 ht_probs = [1 / ht_home, 1 / ht_draw, 1 / ht_away]
 ft_probs = [1 / ft_home, 1 / ft_draw, 1 / ft_away]
 
-# Calculate margins for HT and FT
+# Calculate Margins for HT and FT
 ht_margin = calculate_margin([ht_home, ht_draw, ht_away])
 ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
 
@@ -75,7 +95,23 @@ st.write(f"Fulltime Probabilities: {np.round(ft_probs, 3)}")
 st.write(f"Halftime Bookmaker Margin: {ht_margin:.2f}%")
 st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
 
-# Exact Goal Probabilities based on odds inputted for Exact Goals
+# Handle any exceptions
+try:
+    # Recommend HT/FT Correct Score based on probabilities
+    ht_prediction = np.argmax(ht_probs)
+    ft_prediction = np.argmax(ft_probs)
+    
+    ht_labels = ["Home", "Draw", "Away"]
+    ft_labels = ["Home", "Draw", "Away"]
+
+    st.subheader("Recommended HT/FT Correct Score Prediction:")
+    st.write(f"Halftime Prediction: {ht_labels[ht_prediction]}")
+    st.write(f"Fulltime Prediction: {ft_labels[ft_prediction]}")
+except Exception as e:
+    st.error(f"An error occurred: {e}")
+
+# Sidebar: Exact Goals Odds
+st.sidebar.subheader("Exact Goals Odds (0 to 6+ Goals)")
 exact_goals_odds = {
     "0 Goals": st.sidebar.number_input("Odds for 0 Goals", min_value=1.0, step=0.1, value=6.0),
     "1 Goal": st.sidebar.number_input("Odds for 1 Goal", min_value=1.0, step=0.1, value=5.5),
@@ -86,34 +122,13 @@ exact_goals_odds = {
     "6+ Goals": st.sidebar.number_input("Odds for 6+ Goals", min_value=1.0, step=0.1, value=30.0)
 }
 
-# Calculate Exact Goal Probabilities
+# Calculate Exact Goal Probabilities based on the odds inputted
 exact_goal_probs = {}
 total_odds = sum(1 / value for value in exact_goals_odds.values())
 for goal, odds in exact_goals_odds.items():
     prob = 1 / odds
     exact_goal_probs[goal] = prob / total_odds * 100
 
-# Recommendation of HT/FT Correct Score
-def recommend_correct_score(ht_probs, ft_probs):
-    # Example method of recommending based on max probabilities
-    ht_max_idx = np.argmax(ht_probs)
-    ft_max_idx = np.argmax(ft_probs)
-    ht_outcomes = ['Home', 'Draw', 'Away']
-    ft_outcomes = ['Home', 'Draw', 'Away']
-
-    recommended_ht = ht_outcomes[ht_max_idx]
-    recommended_ft = ft_outcomes[ft_max_idx]
-
-    st.subheader("Recommended HT/FT Correct Score:")
-    st.write(f"Recommended HT: {recommended_ht}")
-    st.write(f"Recommended FT: {recommended_ft}")
-
-# Call the recommendation function
-recommend_correct_score(ht_probs, ft_probs)
-
-# Handle any exceptions for calculations
-try:
-    st.subheader("Calculation Results")
-    st.write(f"Exact Goal Probabilities: {exact_goal_probs}")
-except Exception as e:
-    st.write(f"An error occurred: {e}")
+# Display Exact Goal Probabilities
+st.subheader("Exact Goal Probabilities")
+st.write(exact_goal_probs)
