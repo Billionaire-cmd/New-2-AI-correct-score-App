@@ -79,11 +79,6 @@ st.write("""
     - **Full-time Score**: Either 1:0 or 1:1 (Combined probability range: 20% to 25%)
 """)
 
-# Footer Information
-st.write("""
-    The model is based on odds adjustment and probabilities derived from bookmaker margins. The values are a result of calculated adjusted probabilities after factoring in bookmaker margins.
-""")
-
 # Sidebar for Inputs
 st.sidebar.header("Match Statistics and Inputs")
 
