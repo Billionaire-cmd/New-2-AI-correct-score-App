@@ -130,10 +130,6 @@ def main():
         btts_yes_scores = [(i, j) for i in range(1, 5) for j in range(1, 5)]
         btts_no_scores = [(i, 0) for i in range(5)] + [(0, j) for j in range(5)]
 
-# Calculate BTTS Insights
-btts_gg_ft, btts_ng_ft = calculate_btts(fulltime_probabilities)
-btts_gg_ht, btts_ng_ht = calculate_btts(halftime_probabilities)
-
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
     try:
