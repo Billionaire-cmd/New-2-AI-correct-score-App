@@ -17,6 +17,49 @@ def calculate_expected_value(prob, odds):
     """Calculate expected value."""
     return (prob * odds) - 1
 
+def main():
+    # Example Score Matrix (Replace with your actual score matrix)
+    score_matrix = {
+        (0, 0): 0.18, (1, 0): 0.10, (0, 1): 0.08, (2, 0): 0.06,
+        (0, 2): 0.05, (1, 1): 0.15, (2, 1): 0.12, (1, 2): 0.10,
+        (2, 2): 0.08, (3, 2): 0.05, (3, 3): 0.03, (4, 4): 0.01
+    }
+
+    # Calculate BTTS GG/NG Insights
+    btts_yes_scores = [(i, j) for i in range(1, 5) for j in range(1, 5)]
+    btts_no_scores = [(i, 0) for i in range(5)] + [(0, j) for j in range(5)]
+
+    # Probabilities for BTTS GG
+    btts_yes_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_yes_scores) * 100
+    btts_yes_top_scores = sorted(
+        {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_yes_scores}.items(),
+        key=lambda x: x[1],
+        reverse=True,
+    )
+
+    # Probabilities for BTTS NG
+    btts_no_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_no_scores) * 100
+    btts_no_top_scores = sorted(
+        {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_no_scores}.items(),
+        key=lambda x: x[1],
+        reverse=True,
+    )
+
+    # Display BTTS GG/NG Insights
+    st.title("BTTS GG/NG Insights")
+    st.write(f"**BTTS GG (Yes) Probability:** {btts_yes_prob:.2f}%")
+    st.write("Top Correct Scores for BTTS GG (Yes):")
+    for score, prob in btts_yes_top_scores[:5]:  # Top 5 scores
+        st.write(f"  - {score}: {prob * 100:.2f}%")
+
+    st.write(f"**BTTS NG (No) Probability:** {btts_no_prob:.2f}%")
+    st.write("Top Correct Scores for BTTS NG (No):")
+    for score, prob in btts_no_top_scores[:5]:  # Top 5 scores
+        st.write(f"  - {score}: {prob * 100:.2f}%")
+
+if __name__ == "__main__":
+    main()
+
 # App Title and Introduction
 st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
 st.markdown("""
