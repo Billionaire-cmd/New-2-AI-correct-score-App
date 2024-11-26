@@ -160,20 +160,20 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-# Predefined score matrix options
+
+# Predefined score matrix options with stringified keys
 templates = {
     "Balanced Game": {
-        (0, 0): 0.12, (1, 0): 0.10, (0, 1): 0.10, (1, 1): 0.15,
-        (2, 1): 0.08, (1, 2): 0.08, (2, 2): 0.06, (3, 3): 0.03,
+        "0,0": 0.12, "1,0": 0.10, "0,1": 0.10, "1,1": 0.15,
+        "2,1": 0.08, "1,2": 0.08, "2,2": 0.06, "3,3": 0.03,
     },
     "High-scoring Game": {
-        (1, 0): 0.08, (0, 1): 0.08, (2, 1): 0.12, (1, 2): 0.12,
-        (3, 2): 0.10, (2, 3): 0.10, (3, 3): 0.08, (4, 3): 0.05,
+        "1,0": 0.08, "0,1": 0.08, "2,1": 0.12, "1,2": 0.12,
+        "3,2": 0.10, "2,3": 0.10, "3,3": 0.08, "4,3": 0.05,
     },
     "Low-scoring Game": {
-        (0, 0): 0.30, (1, 0): 0.15, (0, 1): 0.15, (1, 1): 0.25,
-        (2, 1): 0.05, (1, 2): 0.05, (2, 2): 0.02, (3, 3): 0.01,
+        "0,0": 0.30, "1,0": 0.15, "0,1": 0.15, "1,1": 0.25,
+        "2,1": 0.05, "1,2": 0.05, "2,2": 0.02, "3,3": 0.01,
     }
 }
 
@@ -183,6 +183,8 @@ template_choice = st.selectbox("Choose a predefined score matrix:", ["Custom Inp
 if template_choice != "Custom Input":
     score_matrix = templates[template_choice]
     st.write(f"Using predefined template: **{template_choice}**")
+    # Convert string keys back to tuples for internal processing
+    score_matrix = {tuple(map(int, key.split(','))): value for key, value in score_matrix.items()}
     st.write(score_matrix)
 else:
     # Custom input fields as before
