@@ -99,53 +99,6 @@ st.sidebar.write(f"4 goals: {odds_4}")
 st.sidebar.write(f"5 goals: {odds_5}")
 st.sidebar.write(f"6+ goals: {odds_6_plus}")
 
-# Calculate adjusted probabilities based on user input for exact goals odds
-# You can replace the logic below with actual probability calculations or model
-if exact_goals_odds == "1":
-    ht_probability = 31.54
-    ft_scores = ["1:0", "1:1"]
-    ft_probability_range = "20% to 25%"
-elif exact_goals_odds == "2":
-    ht_probability = 28.00
-    ft_scores = ["2:0", "2:1"]
-    ft_probability_range = "18% to 22%"
-elif exact_goals_odds == "3":
-    ht_probability = 25.00
-    ft_scores = ["3:0", "3:1"]
-    ft_probability_range = "15% to 18%"
-elif exact_goals_odds == "4":
-    ht_probability = 22.00
-    ft_scores = ["4:0", "4:1"]
-    ft_probability_range = "12% to 16%"
-elif exact_goals_odds == "5":
-    ht_probability = 18.00
-    ft_scores = ["5:0", "5:1"]
-    ft_probability_range = "10% to 14%"
-else:
-    ht_probability = 15.00
-    ft_scores = ["6+"]
-    ft_probability_range = "5% to 10%"
-
-# Displaying probabilities and recommendations
-st.write(f"The adjusted probability for this outcome is: **{ht_probability}%**")
-st.write(f"\nThe **Most Likely FT Score** with an 80% probability is: **{', '.join(ft_scores)}**")
-st.write(f"The combined probabilities for these outcomes are: **{ft_probability_range}**")
-
-# Displaying recommendation
-st.subheader("Recommended Correct Score")
-st.write("""
-    Based on the probabilities and odds, the **recommended correct score** would be:
-    
-    - **Halftime Score**: 0:0 (Highest probability: 31.54%)
-    - **Full-time Score**: Either 1:0 or 1:1 (Combined probability range: 20% to 25%)
-""")
-
-# Displaying Odds
-st.write("### Halftime/Fulltime Odds:")
-for key, value in ht_ft_odds.items():
-    st.write(f"{key}: {value}")
-
-
 # Betting Odds for HT and FT
 st.sidebar.subheader("Halftime Odds")
 ht_home = st.sidebar.number_input("Halftime Home Odds", min_value=1.0, step=0.1, value=2.5)
