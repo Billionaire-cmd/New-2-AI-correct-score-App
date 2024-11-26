@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 from scipy.stats import poisson
+import matplotlib.pyplot as plt
 
 # Function to Calculate Poisson Probabilities
 def calculate_poisson_prob(lambda_, max_goals=4):
@@ -146,47 +147,12 @@ if st.button("Predict Probabilities and Insights"):
         sorted_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)
         sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)
 
-        # BTTS Probabilities
-        btts_yes_prob = sum(score_matrix[i][j] for i in range(1,5) for j in range(1,5)) * 100
-        btts_no_prob = 100 - btts_yes_prob
+        # Display Predictions
+        st.subheader("Fulltime Correct Score Predictions")
+        st.write(sorted_fulltime_scores[:5])
 
-        # Over/Under 2.5 Goals Probabilities (Fulltime)
-        over_2_5_prob = sum(score_matrix[i][j] for i in range(3,5) for j in range(5)) * 100
-        under_2_5_prob = 100 - over_2_5_prob
+        st.subheader("Halftime Correct Score Predictions")
+        st.write(sorted_halftime_scores[:5])
 
-        # Over/Under 1.5 Goals Probabilities (Halftime)
-        over_1_5_ht_prob = sum(halftime_score_matrix[i][j] for i in range(2,3) for j in range(3)) * 100
-        under_1_5_ht_prob = 100 - over_1_5_ht_prob
-
-        # Over/Under 1.5 Goals Probabilities (Fulltime)
-        over_1_5_ft_prob = sum(score_matrix[i][j] for i in range(2,5) for j in range(5)) * 100
-        under_1_5_ft_prob = 100 - over_1_5_ft_prob
-
-        # Match Outcome Probabilities
-        home_win_prob = sum(score_matrix[i][j] for i in range(1,5) for j in range(0,i)) * 100
-        draw_prob = sum(score_matrix[i][i] for i in range(5)) * 100
-        away_win_prob = 100 - home_win_prob - draw_prob
-
-        # Display Probabilities and Insights
-        st.subheader("Match Predictions Based on Poisson Probabilities")
-        st.write("Fulltime Score Probabilities (Top 5):")
-        for score, prob in sorted_fulltime_scores[:5]:
-            st.write(f"{score}: {prob*100:.2f}%")
-
-        st.write("Halftime Score Probabilities (Top 3):")
-        for score, prob in sorted_halftime_scores[:3]:
-            st.write(f"{score}: {prob*100:.2f}%")
-
-        st.write(f"BTTS Yes Probability: {btts_yes_prob:.2f}%")
-        st.write(f"BTTS No Probability: {btts_no_prob:.2f}%")
-        st.write(f"Over 2.5 Goals (Fulltime) Probability: {over_2_5_prob:.2f}%")
-        st.write(f"Under 2.5 Goals (Fulltime) Probability: {under_2_5_prob:.2f}%")
-        st.write(f"Over 1.5 Goals (Halftime) Probability: {over_1_5_ht_prob:.2f}%")
-        st.write(f"Under 1.5 Goals (Halftime) Probability: {under_1_5_ht_prob:.2f}%")
-        st.write(f"Over 1.5 Goals (Fulltime) Probability: {over_1_5_ft_prob:.2f}%")
-        st.write(f"Under 1.5 Goals (Fulltime) Probability: {under_1_5_ft_prob:.2f}%")
-        st.write(f"Home Win Probability: {home_win_prob:.2f}%")
-        st.write(f"Draw Probability: {draw_prob:.2f}%")
-        st.write(f"Away Win Probability: {away_win_prob:.2f}%")
     except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
+        st.error(f"An error occurred: {e}")
