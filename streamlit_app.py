@@ -19,7 +19,8 @@ def calculate_expected_value(prob, odds):
 
 # App Title and Introduction
 st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
-st.markdownPredictor ome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
+st.markdown("""
+Welcome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
 This app uses advanced statistical models, including the Poisson distribution, betting odds, and team statistics, 
 to predict realistic halftime and full-time correct scores for football matches.  
 It is designed to enhance your betting strategies by providing precise calculations for maximum ROI.
@@ -159,7 +160,7 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"\n**Over/Under 1.5 Goals (Halftime):**")
         st.write(f"  - Over 1.5 Goals: {over_1_5_ht_prob:.2f}%")
         st.write(f"  - Under 1.5 Goals: {under_1_5_ht_prob:.2f}%")
-
+    
         # Display Final Recommendations
         st.subheader("Final Recommendation")
 
@@ -205,5 +206,6 @@ st.write("Top Correct Scores for BTTS NG (No):")
 for score, prob in btts_no_top_scores[:5]:  # Top 5 scores
     st.write(f"  - {score}: {prob * 100:.2f}%")
 
+    
     except Exception as e:
         st.error(f"Error in prediction: {e}")
