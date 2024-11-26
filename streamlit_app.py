@@ -64,9 +64,70 @@ def main():    # Example Score Matrix (Replace with your actual score matrix)
     st.write("Top Correct Scores for BTTS NG (No):")
     for score, prob in btts_no_top_scores[:5]:  # Top 5 scores
         st.write(f"  - {score}: {prob * 100:.2f}%")
+    
+def main():
+    st.title("BTTS GG/NG Insights")
+
+    # Input for Score Matrix
+    st.header("Input Score Matrix")
+    st.write("Enter probabilities for each scoreline as a decimal (e.g., 0.18 for 18%). Leave blank for scores not applicable.")
+
+    # Create user input fields for the score matrix
+    score_matrix = {}
+    for i in range(5):
+        for j in range(5):
+            key = f"Score {i}:{j}"
+            value = st.text_input(f"Probability for {key}:", value="", key=f"score_{i}_{j}")
+            if value:
+                try:
+                    score_matrix[(i, j)] = float(value)
+                except ValueError:
+                    st.warning(f"Invalid input for {key}. Skipping this scoreline.")
+
+    # Show inputted score matrix
+    if score_matrix:
+        st.subheader("Your Inputted Score Matrix:")
+        st.write(score_matrix)
+    else:
+        st.warning("Please input at least one probability.")
+
+    # Only proceed if the score matrix is not empty
+    if score_matrix:
+        # Calculate BTTS GG/NG Insights
+        btts_yes_scores = [(i, j) for i in range(1, 5) for j in range(1, 5)]
+        btts_no_scores = [(i, 0) for i in range(5)] + [(0, j) for j in range(5)]
+
+        # Probabilities for BTTS GG
+        btts_yes_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_yes_scores) * 100
+        btts_yes_top_scores = sorted(
+            {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_yes_scores}.items(),
+            key=lambda x: x[1],
+            reverse=True,
+        )
+
+        # Probabilities for BTTS NG
+        btts_no_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_no_scores) * 100
+        btts_no_top_scores = sorted(
+            {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_no_scores}.items(),
+            key=lambda x: x[1],
+            reverse=True,
+        )
+
+        # Display BTTS GG/NG Insights
+        st.subheader("BTTS GG/NG Results")
+        st.write(f"**BTTS GG (Yes) Probability:** {btts_yes_prob:.2f}%")
+        st.write("Top Correct Scores for BTTS GG (Yes):")
+
+                for score, prob in btts_yes_top_scores[:5]:  # Top 5 scores
+            st.write(f"  - {score}: {prob * 100:.2f}%")
+
+        st.write(f"**BTTS NG (No) Probability:** {btts_no_prob:.2f}%")
+        st.write("Top Correct Scores for BTTS NG (No):")
+        for score, prob in btts_no_top_scores[:5]:  # Top 5 scores
+            st.write(f"  - {score}: {prob * 100:.2f}%")
 
 if __name__ == "__main__":
-    main()
+    main()  
     
 # Sidebar for Inputs
 st.sidebar.header("Match Statistics and Inputs")
