@@ -235,7 +235,114 @@ if st.button("Predict Probabilities and Insights"):
         # Fulltime Correct Score Recommendation
         top_fulltime_score = sorted_fulltime_scores[0]  # Get the top FT score
         st.write(f"**Fulltime Correct Score Recommendation:** {top_fulltime_score[0]} "
-                 f"(Probability: {top_fulltime_score[1] * 100:.2f}%)")
+                 f"(Probability: {top_fulltime_score[1] * 100:.2f}%)")  
 
-    except Exception as e:
+# Predefined score matrix options with stringified keys for serialization
+templates = {
+    "Balanced Game": {
+        "0,0": 0.12, "1,0": 0.10, "0,1": 0.10, "1,1": 0.15,
+        "2,1": 0.08, "1,2": 0.08, "2,2": 0.06, "3,3": 0.03,
+    },
+    "High-scoring Game": {
+        "1,0": 0.08, "0,1": 0.08, "2,1": 0.12, "1,2": 0.12,
+        "3,2": 0.10, "2,3": 0.10, "3,3": 0.08, "4,3": 0.05,
+    },
+    "Low-scoring Game": {
+        "0,0": 0.30, "1,0": 0.15, "0,1": 0.15, "1,1": 0.25,
+        "2,1": 0.05, "1,2": 0.05, "2,2": 0.02, "3,3": 0.01,
+    }
+}
+
+# Allow users to choose or customize the score matrix
+template_choice = st.selectbox("Choose a predefined score matrix:", ["Custom Input"] + list(templates.keys()))
+
+if template_choice != "Custom Input":
+    score_matrix = templates[template_choice]
+    st.write(f"Using predefined template: **{template_choice}**")
+    st.write(score_matrix)
+else:
+    st.write("Input your custom score matrix below:")
+    # Custom input logic for the score matrix
+    custom_matrix = {}
+    for i in range(5):  # Allow input for up to 5 scores, adjust as needed
+        x = st.number_input(f"Enter first score for match {i + 1} (0 to 4):", min_value=0, max_value=4, key=f"x{i}")
+        y = st.number_input(f"Enter second score for match {i + 1} (0 to 4):", min_value=0, max_value=4, key=f"y{i}")
+        prob = st.number_input(f"Enter probability for score ({x}, {y}):", min_value=0.0, max_value=1.0, step=0.01, key=f"prob{i}")
+        custom_matrix[(x, y)] = prob
+    score_matrix = custom_matrix
+
+# Convert the custom score matrix to a format compatible with serialization if needed
+score_matrix_str_keys = {f"{x},{y}": prob for (x, y), prob in score_matrix.items()}
+
+# Display as bar chart
+st.subheader("BTTS GG/NG Probabilities Comparison")
+
+# Sample probabilities for BTTS (Yes/No), adjust as needed
+btts_yes_prob = 0.60  # Replace with actual logic
+btts_no_prob = 0.40  # Replace with actual logic
+
+data = {
+    "Category": ["BTTS GG (Yes)", "BTTS NG (No)"],
+    "Probability": [btts_yes_prob, btts_no_prob]
+}
+df_btts = pd.DataFrame(data)
+st.bar_chart(df_btts.set_index("Category"))
+
+# Highlight the most likely outcomes
+most_likely_scores = sorted(score_matrix.items(), key=lambda x: x[1], reverse=True)[:3]
+st.subheader("Most Likely Outcomes")
+for (score, prob) in most_likely_scores:
+    st.write(f"Score: {score[0]}:{score[1]} - Probability: {prob * 100:.2f}%")
+
+# Additional insights
+total_prob = sum(score_matrix.values())
+st.subheader("Insights on Inputted Probabilities")
+st.write(f"Total Probability Distributed: {total_prob * 100:.2f}%")
+if total_prob < 1:
+    st.warning("Probabilities do not sum up to 100%. Consider adjusting your input.")
+elif total_prob > 1:
+    st.warning("Probabilities exceed 100%. Consider adjusting your input.")
+
+# Highlight high-probability scores
+high_prob_scores = {score: prob for score, prob in score_matrix.items() if prob > 0.1}
+if high_prob_scores:
+    st.write("High-probability scores (>10%):")
+    for score, prob in high_prob_scores.items():
+        st.write(f"  - {score[0]}:{score[1]} - {prob * 100:.2f}%")
+
+# Odds Input for Additional Analysis
+st.header("Odds Input for Additional Analysis")
+odds_btts_yes = st.number_input("Enter odds for BTTS GG (Yes):", min_value=1.0)
+odds_btts_no = st.number_input("Enter odds for BTTS NG (No):", min_value=1.0)
+
+if odds_btts_yes and odds_btts_no:
+    ev_yes = (btts_yes_prob / 100) * odds_btts_yes - 1
+    ev_no = (btts_no_prob / 100) * odds_btts_no - 1
+
+    st.write(f"Expected Value for BTTS GG (Yes): {ev_yes:.2f}")
+    st.write(f"Expected Value for BTTS NG (No): {ev_no:.2f}")
+
+    if ev_yes > ev_no:
+        st.success("BTTS GG (Yes) has better value.")
+    elif ev_no > ev_yes:
+        st.success("BTTS NG (No) has better value.")
+    else:
+        st.info("Both outcomes have equal value.")
+
+# Tabs for different sections
+tab1, tab2, tab3 = st.tabs(["Input", "Insights", "Visualization"])
+
+with tab1:
+    st.write("Input your data here...")
+    # You can place the custom input logic here
+
+with tab2:
+    st.write("Insights will be shown here...")
+    # Add insights logic here
+
+with tab3:
+    st.write("Visualization will be shown here...")
+    # You can place your visualizations here
+    
+except Exception as e:
         st.error(f"Error in prediction: {e}")
