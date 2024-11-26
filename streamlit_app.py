@@ -149,23 +149,6 @@ if st.button("Calculate Probabilities"):
     ft_away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
     ft_matrix = np.outer(ft_home_probs, ft_away_probs)
 
- # Function to calculate the HT/FT recommendation for Draw/Draw outcome
-def calculate_ht_ft_draw_recommendation(ht_matrix, ft_matrix):
-    """
-    Analyzes HT/FT matrix to provide recommendation based on HT/FT Draw/Draw probabilities.
-    """
-    # Get the maximum probability for HT/FT Draw/Draw from both matrices
-    ht_draw_draw_prob = ht_matrix[1, 1]
-    ft_draw_draw_prob = ft_matrix[1, 1]
-    
-    # Provide recommendation if both are high probability
-    if ht_draw_draw_prob > 0.15 and ft_draw_draw_prob > 0.15:  # Adjust threshold as needed
-        recommendation = "HT/FT Draw/Draw seems likely based on probabilities and analysis."
-    else:
-        recommendation = "HT/FT Draw/Draw is less likely based on probabilities."
-
-    return recommendation, ht_draw_draw_prob, ft_draw_draw_prob
-
 # Prediction Logic
 if st.button("Calculate HT/FT Draw/Draw Recommendation"):
     # Calculate Halftime and Fulltime Probabilities
