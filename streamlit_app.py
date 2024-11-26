@@ -155,7 +155,3 @@ if st.button("Predict Probabilities and Insights"):
 
     except Exception as e:
         st.error(f"Error in prediction: {str(e)}")
-
-
-    except Exception as e:
-        st.error(f"Error in prediction: {str(e)}")
