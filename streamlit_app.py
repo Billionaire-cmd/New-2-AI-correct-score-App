@@ -212,44 +212,6 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"#### Over 2.5 Goals Probability: {over_2_5_prob * 100:.2f}%")
         st.write(f"#### Under 2.5 Goals Probability: {under_2_5_prob * 100:.2f}%")
 
-def poisson_probability(lam, k):
-    """
-    Calculate Poisson probability for a given lambda (mean goals) and k (number of goals).
-    """
-    return (lam**k * np.exp(-lam)) / math.factorial(k)
-
-def calculate_full_time_correct_score(home_mean, away_mean):
-    """
-    Calculate and recommend Full-time Correct Score for a football match using Poisson distribution.
-    """
-    max_goals = 4  # We assume the maximum goals to be 4 for simplicity, this can be adjusted
-
-    score_probabilities = {}
-    
-    # Calculate Poisson probabilities for each scoreline
-    for home_goals in range(max_goals + 1):
-        for away_goals in range(max_goals + 1):
-            home_prob = poisson_probability(home_mean, home_goals)
-            away_prob = poisson_probability(away_mean, away_goals)
-            score_probabilities[f"{home_goals}-{away_goals}"] = home_prob * away_prob
-
-    # Sort the scorelines by probability in descending order
-    sorted_scores = sorted(score_probabilities.items(), key=lambda x: x[1], reverse=True)
-    
-    # Display the top 5 most likely scorelines
-    recommendations = []
-    for score, prob in sorted_scores[:5]:
-        recommendations.append(f"{score} - Probability: {prob*100:.2f}%")
-    
-    return recommendations
-
-# Example input: average goals for home team and away team (mean values)
-home_mean_goals = 1.5  # Example: Home Team average goals scored per match
-away_mean_goals = 1.2  # Example: Away Team average goals scored per match
-
-# Get Full-time Correct Score recommendations
-correct_score_recommendations = calculate_full_time_correct_score(home_mean_goals, away_mean_goals)
-
 # Display Recommendations for Full-time Correct Score
 for recommendation in correct_score_recommendations:
     st.write(recommendation)
