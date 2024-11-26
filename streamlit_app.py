@@ -19,8 +19,7 @@ def calculate_expected_value(prob, odds):
 
 # App Title and Introduction
 st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
-st.markdown("""
-Welcome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
+st.markdownPredictor ome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
 This app uses advanced statistical models, including the Poisson distribution, betting odds, and team statistics, 
 to predict realistic halftime and full-time correct scores for football matches.  
 It is designed to enhance your betting strategies by providing precise calculations for maximum ROI.
