@@ -236,6 +236,6 @@ if st.button("Predict Probabilities and Insights"):
         top_fulltime_score = sorted_fulltime_scores[0]  # Get the top FT score
         st.write(f"**Fulltime Correct Score Recommendation:** {top_fulltime_score[0]} "
                  f"(Probability: {top_fulltime_score[1] * 100:.2f}%)")  
-    
-except Exception as e:
+    except Exception as e:
         st.error(f"Error in prediction: {e}")
+
