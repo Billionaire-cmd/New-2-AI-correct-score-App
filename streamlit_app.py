@@ -212,38 +212,5 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"#### Over 2.5 Goals Probability: {over_2_5_prob * 100:.2f}%")
         st.write(f"#### Under 2.5 Goals Probability: {under_2_5_prob * 100:.2f}%")
    
-# Number of goals considered (max goals per team)
-max_goals = 5
-
-# Create a matrix for the full-time score probabilities
-score_matrix = np.zeros((max_goals, max_goals))
-
-# Calculate Poisson probabilities for each possible full-time score combination
-for home_goals in range(max_goals):
-    for away_goals in range(max_goals):
-        score_matrix[home_goals, away_goals] = poisson_probability(home_lambda, home_goals) * poisson_probability(away_lambda, away_goals)
-
-# Function to calculate the most likely full-time score
-def full_time_correct_score_recommendation(score_matrix):
-    # Find the most probable correct scores
-    max_prob = np.max(score_matrix)
-    best_scores = np.argwhere(score_matrix == max_prob)
-    recommended_scores = []
-
-    for score in best_scores:
-        home_goals, away_goals = score[0], score[1]
-        recommended_scores.append(f"{home_goals}-{away_goals}")
-
-    return recommended_scores, max_prob * 100  # Returning the score(s) and the probability
-
-# Get recommendations for the Full-time Correct Score
-recommended_scores, max_prob_percentage = full_time_correct_score_recommendation(score_matrix)
-
-# Display the Full-time Correct Score Recommendation
-st.write("### Full-time Correct Score Recommendation:")
-
-for score in recommended_scores:
-    st.write(f"Recommended Score: {score} with Probability: {max_prob_percentage:.2f}%")
- 
     except Exception as e:
         st.error(f"Error in prediction: {str(e)}")
