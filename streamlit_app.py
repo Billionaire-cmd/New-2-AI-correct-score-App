@@ -41,6 +41,22 @@ def display_score_probabilities(prob_matrix, title):
     plt.ylabel("Home Goals")
     st.pyplot(fig)
 
+# Function to Calculate BTTS (Both Teams to Score) Probability
+def calculate_btts_prob(ht_home_probs, ht_away_probs, ft_home_probs, ft_away_probs):
+    """Calculate Both Teams to Score (BTTS) Probability for HT and FT."""
+    btts_ht_prob = np.sum(np.outer(ht_home_probs > 0, ht_away_probs > 0))
+    btts_ft_prob = np.sum(np.outer(ft_home_probs > 0, ft_away_probs > 0))
+    return btts_ht_prob, btts_ft_prob
+
+# Function to Calculate Over/Under 2.5 Goals Probability
+def calculate_over_under_2_5_prob(ht_home_probs, ht_away_probs, ft_home_probs, ft_away_probs):
+    """Calculate Over/Under 2.5 Goals Probability for HT and FT."""
+    over_2_5_ht_prob = np.sum(np.outer(ht_home_probs, ht_away_probs) >= 2.5)
+    under_2_5_ht_prob = 1 - over_2_5_ht_prob
+    over_2_5_ft_prob = np.sum(np.outer(ft_home_probs, ft_away_probs) >= 2.5)
+    under_2_5_ft_prob = 1 - over_2_5_ft_prob
+    return over_2_5_ht_prob, under_2_5_ht_prob, over_2_5_ft_prob, under_2_5_ft_prob
+
 # App Title and Introduction
 st.title("⚽ Rabiotic HT/FT Correct Score Predictor")
 st.markdown("""
@@ -53,7 +69,9 @@ This app uses statistical models to predict halftime and full-time correct score
 ### Features
 - Halftime and Fulltime Probability Calculations
 - Bookmaker Margin and Expected Value Analysis
-- Custom Correct Score Odds Input
+- BTTS (Both Teams to Score) Prediction
+- Over/Under 2.5 Goals Prediction
+- Exact Goals Probability per Scoreline
 """)
 
 # Sidebar for Inputs
@@ -108,10 +126,15 @@ if st.button("Calculate Probabilities"):
     st.subheader("Fulltime Score Probabilities")
     display_score_probabilities(ft_matrix, "Fulltime Probabilities")
 
-    # Calculate Recommendations
-    ht_score = np.unravel_index(np.argmax(ht_matrix), ht_matrix.shape)
-    ft_score = np.unravel_index(np.argmax(ft_matrix), ft_matrix.shape)
+    # Calculate BTTS and Over/Under 2.5 Goals Probabilities
+    btts_ht_prob, btts_ft_prob = calculate_btts_prob(ht_home_probs, ht_away_probs, ft_home_probs, ft_away_probs)
+    over_2_5_ht_prob, under_2_5_ht_prob, over_2_5_ft_prob, under_2_5_ft_prob = calculate_over_under_2_5_prob(ht_home_probs, ht_away_probs, ft_home_probs, ft_away_probs)
 
+    # Calculate Exact Goals Percentages (for HT and FT)
+    exact_goals_ht = {f"{i}:{j}": ht_matrix[i, j] * 100 for i in range(3) for j in range(3)}
+    exact_goals_ft = {f"{i}:{j}": ft_matrix[i, j] * 100 for i in range(5) for j in range(5)}
+
+    # Display Results
     st.subheader("Match Outcome and Strategy Recommendations")
 
     # Provide Insight based on Margin Calculations
@@ -124,19 +147,22 @@ if st.button("Calculate Probabilities"):
     
     st.write("### Recommendation for Fulltime Outcome:")
     if adjusted_ft_margin < 6.0:
-        st.write("The fulltime margin indicates a narrow result. Based on the model, either **Home Win (2-1)** or **Away Win (1-2)** might be the most likely outcomes. Consider these options for your final bet.")
+        st.write("The fulltime margin indicates a narrow result. Based on the model, either **Home Win (2-1)** or **Away Win (1-2)** might be highly probable.")
+
+    st.subheader("Additional Predictions")
+    st.write(f"**BTTS HT Probability**: {btts_ht_prob*100:.2f}%")
+    st.write(f"**BTTS FT Probability**: {btts_ft_prob*100:.2f}%")
+    st.write(f"**Over 2.5 Goals HT Probability**: {over_2_5_ht_prob*100:.2f}%")
+    st.write(f"**Under 2.5 Goals HT Probability**: {under_2_5_ht_prob*100:.2f}%")
+    st.write(f"**Over 2.5 Goals FT Probability**: {over_2_5_ft_prob*100:.2f}%")
+    st.write(f"**Under 2.5 Goals FT Probability**: {under_2_5_ft_prob*100:.2f}%")
     
-    st.write(f"**Most Likely HT Score**: {ht_score[0]}:{ht_score[1]}")
-    st.write(f"**Most Likely FT Score**: {ft_score[0]}:{ft_score[1]}")
-
-    st.write("### Further Strategy Adjustments:")
-    st.write("If there are **momentum shifts** in the game, adjust your live bets accordingly, especially if the game is tied at halftime. Momentum is key for making profitable bets in dynamic scenarios.")
-
-    # Add a "summary" of final recommendations
-    st.subheader("Final Betting Strategy Summary")
-    st.write("""
-    - **Halftime Bet**: Consider betting on **HT Draw** for a balanced first half.
-    - **Fulltime Bet**: Look for value in betting on **Home Win (2-1)** or **Away Win (1-2)**, depending on in-game changes.
-    - **Dynamic Adjustments**: During live betting, adjust bets if the game shows clear momentum for one team.
-    """)
-
+    # Exact Goals Percentages for HT and FT
+    st.subheader("Exact Goals Probabilities")
+    st.write("**Halftime Exact Goals Probabilities**:")
+    for score, prob in exact_goals_ht.items():
+        st.write(f"{score}: {prob:.2f}%")
+    
+    st.write("**Fulltime Exact Goals Probabilities**:")
+    for score, prob in exact_goals_ft.items():
+        st.write(f"{score}: {prob:.2f}%")
