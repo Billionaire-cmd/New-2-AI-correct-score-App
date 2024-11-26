@@ -74,6 +74,25 @@ st.sidebar.subheader("BTTS (Both Teams To Score) Inputs")
 btts_gg_odds = st.sidebar.number_input("BTTS GG Odds (Both Teams To Score)", min_value=1.0, value=1.9, step=0.1)
 btts_ng_odds = st.sidebar.number_input("BTTS NG Odds (No Goal for One or Both)", min_value=1.0, value=2.0, step=0.1)
 
+# Sidebar for Over/Under 2.5 Inputs
+st.sidebar.subheader("Over/Under 2.5 Goals Inputs")
+over_2_5_odds = st.sidebar.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.8, step=0.1)
+under_2_5_odds = st.sidebar.number_input("Under 2.5 Goals Odds", min_value=1.0, value=2.0, step=0.1)
+
+# Display Over/Under 2.5 Information
+st.subheader("Over/Under 2.5 Goals Odds")
+st.write(f"**Over 2.5 Goals Odds**: {over_2_5_odds}")
+st.write(f"**Under 2.5 Goals Odds**: {under_2_5_odds}")
+
+# Calculation: Based on odds, calculate and display the likelihood of Over 2.5 and Under 2.5
+# Example: Calculate the implied probability of Over 2.5 and Under 2.5
+prob_over_2_5 = 1 / over_2_5_odds * 100  # Convert odds to percentage probability
+prob_under_2_5 = 1 / under_2_5_odds * 100  # Convert odds to percentage probability
+
+# Display Calculated Probabilities
+st.write(f"**Implied Probability for Over 2.5 Goals**: {prob_over_2_5:.2f}%")
+st.write(f"**Implied Probability for Under 2.5 Goals**: {prob_under_2_5:.2f}%")
+
 # Display BTTS Information
 st.subheader("BTTS (Both Teams To Score) Odds")
 st.write(f"**BTTS GG Odds** (Both Teams To Score): {btts_gg_odds}")
