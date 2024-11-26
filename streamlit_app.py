@@ -211,6 +211,7 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"#### Under 1.5 Goals Probability: {under_1_5_prob * 100:.2f}%")
         st.write(f"#### Over 2.5 Goals Probability: {over_2_5_prob * 100:.2f}%")
         st.write(f"#### Under 2.5 Goals Probability: {under_2_5_prob * 100:.2f}%")
+
 def poisson_probability(lam, k):
     """
     Calculate Poisson probability for a given lambda (mean goals) and k (number of goals).
