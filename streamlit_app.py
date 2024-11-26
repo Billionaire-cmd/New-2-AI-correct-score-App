@@ -108,9 +108,6 @@ ft_probs = calculate_probabilities([ft_home, ft_draw, ft_away])
 ht_margin = calculate_margin([ht_home, ht_draw, ht_away])
 ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
 
-# Display HT/FT probabilities and margins
-st.write(f"Halftime Probabilities: {np.round(ht_probs, 3)}")
-st.write(f"Fulltime Probabilities: {np.round(ft_probs, 3)}")
 
 # Halftime/Fulltime Correct Score Recommendation
 
