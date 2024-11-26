@@ -180,5 +180,5 @@ if st.button("Predict Probabilities and Insights"):
         for score, prob in halftime_moderate.items():
             st.write(f"{score}: Probability {prob*100:.2f}%")
 
-    Exception as e:
+    except Exception as e:
         st.error(f"Error in prediction: {str(e)}")
