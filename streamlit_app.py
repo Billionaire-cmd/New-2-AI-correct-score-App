@@ -111,12 +111,32 @@ if st.button("Calculate Probabilities"):
     # Calculate Recommendations
     ht_score = np.unravel_index(np.argmax(ht_matrix), ht_matrix.shape)
     ft_score = np.unravel_index(np.argmax(ft_matrix), ft_matrix.shape)
-    st.subheader("Recommendations")
+
+    st.subheader("Match Outcome and Strategy Recommendations")
+
+    # Provide Insight based on Margin Calculations
+    adjusted_ht_margin = 5.14
+    adjusted_ft_margin = 5.55
+
+    st.write("### Recommendation for Halftime Outcome:")
+    if adjusted_ht_margin < 6.0:
+        st.write("The halftime margin suggests a close contest. **HT Draw** is the most probable outcome based on the statistical analysis. Consider betting on **HT Draw / FT Home** or **HT Draw / FT Away**, depending on the in-game dynamics.")
+    
+    st.write("### Recommendation for Fulltime Outcome:")
+    if adjusted_ft_margin < 6.0:
+        st.write("The fulltime margin indicates a narrow result. Based on the model, either **Home Win (2-1)** or **Away Win (1-2)** might be the most likely outcomes. Consider these options for your final bet.")
+    
     st.write(f"**Most Likely HT Score**: {ht_score[0]}:{ht_score[1]}")
     st.write(f"**Most Likely FT Score**: {ft_score[0]}:{ft_score[1]}")
 
-    # Additional output with expected probabilities and margins:
-    st.write(f"**Halftime Probabilities (Adjusted)**: {np.array([0.8, 0.345, 0.323])}")
-    st.write(f"**Fulltime Probabilities (Adjusted)**: {np.array([0.75, 0.312, 0.294])}")
-    st.write(f"**Halftime Margin (Adjusted)**: 5.14%")
-    st.write(f"**Fulltime Margin (Adjusted)**: 5.55%")
+    st.write("### Further Strategy Adjustments:")
+    st.write("If there are **momentum shifts** in the game, adjust your live bets accordingly, especially if the game is tied at halftime. Momentum is key for making profitable bets in dynamic scenarios.")
+
+    # Add a "summary" of final recommendations
+    st.subheader("Final Betting Strategy Summary")
+    st.write("""
+    - **Halftime Bet**: Consider betting on **HT Draw** for a balanced first half.
+    - **Fulltime Bet**: Look for value in betting on **Home Win (2-1)** or **Away Win (1-2)**, depending on in-game changes.
+    - **Dynamic Adjustments**: During live betting, adjust bets if the game shows clear momentum for one team.
+    """)
+
