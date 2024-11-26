@@ -65,19 +65,6 @@ ft_probability_range = "20% to 25% (combined)"
 
 # Displaying the results
 st.write(f"The **Most Likely HT Score** with a 90% probability is: **{ht_score}**")
-st.write(f"The adjusted probability for this outcome is: **{ht_probability}%**")
-
-st.write(f"\nThe **Most Likely FT Score** with an 80% probability is: **{', '.join(ft_scores)}**")
-st.write(f"The combined probabilities for these outcomes are: **{ft_probability_range}**")
-
-# Displaying recommendation
-st.subheader("Recommended Correct Score")
-st.write("""
-    Based on the probabilities and odds, the **recommended correct score** would be:
-    
-    - **Halftime Score**: 0:0 (Highest probability: 31.54%)
-    - **Full-time Score**: Either 1:0 or 1:1 (Combined probability range: 20% to 25%)
-""")
 
 # Sidebar for Inputs
 st.sidebar.header("Match Statistics and Inputs")
