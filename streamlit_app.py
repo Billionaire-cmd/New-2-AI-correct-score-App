@@ -149,32 +149,6 @@ if st.button("Calculate Probabilities"):
     ft_away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
     ft_matrix = np.outer(ft_home_probs, ft_away_probs)
 
-# Prediction Logic
-if st.button("Calculate HT/FT Draw/Draw Recommendation"):
-    # Calculate Halftime and Fulltime Probabilities
-    ht_home_probs = calculate_poisson_prob(avg_goals_home / 2, max_goals=2)
-    ht_away_probs = calculate_poisson_prob(avg_goals_away / 2, max_goals=2)
-    ht_matrix = np.outer(ht_home_probs, ht_away_probs)
-
-    ft_home_probs = calculate_poisson_prob(avg_goals_home, max_goals=4)
-    ft_away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
-    ft_matrix = np.outer(ft_home_probs, ft_away_probs)
-
-    # Display Heatmaps
-    st.subheader("Halftime Score Probabilities")
-    display_score_probabilities(ht_matrix, "Halftime Probabilities")
-
-    st.subheader("Fulltime Score Probabilities")
-    display_score_probabilities(ft_matrix, "Fulltime Probabilities")
-
-    # HT/FT Draw/Draw Recommendation
-    recommendation, ht_draw_draw_prob, ft_draw_draw_prob = calculate_ht_ft_draw_recommendation(ht_matrix, ft_matrix)
-
-    st.subheader("HT/FT Draw/Draw Recommendation")
-    st.write(f"**HT/FT Draw/Draw Probability at Halftime**: {ht_draw_draw_prob:.2f}")
-    st.write(f"**HT/FT Draw/Draw Probability at Fulltime**: {ft_draw_draw_prob:.2f}")
-    st.write(recommendation)
-   
     # Display Heatmaps
     st.subheader("Halftime Score Probabilities")
     display_score_probabilities(ht_matrix, "Halftime Probabilities")
