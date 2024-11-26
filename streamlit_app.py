@@ -180,5 +180,37 @@ if st.button("Predict Probabilities and Insights"):
         for score, prob in halftime_moderate.items():
             st.write(f"{score}: Probability {prob*100:.2f}%")
 
+          # Fulltime Score Probabilities
+        home_win_prob = sum([score_matrix[i, j] for i in range(5) for j in range(i+1, 5)])  # Home Win (Home > Away)
+        away_win_prob = sum([score_matrix[i, j] for i in range(5) for j in range(i) ])    # Away Win (Away > Home)
+        draw_prob = sum([score_matrix[i, i] for i in range(5)])  # Draw (Home == Away)
+
+        # BTTS (Both Teams to Score) Probability (Yes: Both teams score)
+        btts_yes_prob = sum([score_matrix[i, j] for i in range(1, 5) for j in range(1, 5)])  # Home and Away both score
+        btts_no_prob = 1 - btts_yes_prob  # BTTS No: One team doesn't score
+
+        # Over/Under Goals Probabilities (Total goals > or < x)
+        over_1_5_prob = sum([score_matrix[i, j] for i in range(3, 5) for j in range(3, 5)])  # Over 1.5 Goals
+        under_1_5_prob = 1 - over_1_5_prob  # Under 1.5 Goals
+        over_2_5_prob = sum([score_matrix[i, j] for i in range(3, 5) for j in range(3, 5) if (i + j) > 2])  # Over 2.5 Goals
+        under_2_5_prob = 1 - over_2_5_prob  # Under 2.5 Goals
+
+        # Display Recommendations for Fulltime Outcomes
+        st.write("### Recommended Match Result Outcomes:")
+
+        st.write(f"#### Home Win Probability: {home_win_prob * 100:.2f}%")
+        st.write(f"#### Draw Probability: {draw_prob * 100:.2f}%")
+        st.write(f"#### Away Win Probability: {away_win_prob * 100:.2f}%")
+
+        # Display BTTS Probability
+        st.write(f"#### BTTS Yes Probability: {btts_yes_prob * 100:.2f}%")
+        st.write(f"#### BTTS No Probability: {btts_no_prob * 100:.2f}%")
+
+        # Display Over/Under Goals Probabilities
+        st.write(f"#### Over 1.5 Goals Probability: {over_1_5_prob * 100:.2f}%")
+        st.write(f"#### Under 1.5 Goals Probability: {under_1_5_prob * 100:.2f}%")
+        st.write(f"#### Over 2.5 Goals Probability: {over_2_5_prob * 100:.2f}%")
+        st.write(f"#### Under 2.5 Goals Probability: {under_2_5_prob * 100:.2f}%")
+    
     except Exception as e:
         st.error(f"Error in prediction: {str(e)}")
