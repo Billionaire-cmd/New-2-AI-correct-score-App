@@ -237,9 +237,6 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"**Fulltime Correct Score Recommendation:** {top_fulltime_score[0]} "
                  f"(Probability: {top_fulltime_score[1] * 100:.2f}%)")  
 
-# Convert the custom score matrix to a format compatible with serialization if needed
-score_matrix_str_keys = {f"{x},{y}": prob for (x, y), prob in score_matrix.items()}
-
 # Display as bar chart
 st.subheader("BTTS GG/NG Probabilities Comparison")
 
