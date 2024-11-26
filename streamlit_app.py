@@ -209,46 +209,6 @@ if st.button("Predict Probabilities and Insights"):
 def calculate_margin(odds):
     margin = sum([1 / odd for odd in odds]) - 1
     return margin * 100
-
-# Function to calculate expected value
-def calculate_expected_value(probability, odds):
-    return probability * odds - (1 - probability) * 1
-
-# Display HT/FT odds and insights
-st.subheader("Halftime/Fulltime Odds and Insights")
-
-# Probabilities for HT/FT based on odds
-ht_home = st.number_input("Home HT Odds", min_value=1.0, step=0.1, value=2.5)
-ht_draw = st.number_input("Draw HT Odds", min_value=1.0, step=0.1, value=3.0)
-ht_away = st.number_input("Away HT Odds", min_value=1.0, step=0.1, value=3.5)
-
-ft_home = st.number_input("Home FT Odds", min_value=1.0, step=0.1, value=2.8)
-ft_draw = st.number_input("Draw FT Odds", min_value=1.0, step=0.1, value=3.2)
-ft_away = st.number_input("Away FT Odds", min_value=1.0, step=0.1, value=3.6)
-
-# Probabilities for HT/FT
-ht_probs = [1 / ht_home, 1 / ht_draw, 1 / ht_away]
-ft_probs = [1 / ft_home, 1 / ft_draw, 1 / ft_away]
-
-# Calculate margins for HT and FT
-ht_margin = calculate_margin([ht_home, ht_draw, ht_away])
-ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
-
-# Display HT/FT probabilities and margins
-st.write(f"Halftime Probabilities: {np.round(ht_probs, 3)}")
-st.write(f"Fulltime Probabilities: {np.round(ft_probs, 3)}")
-st.write(f"Halftime Bookmaker Margin: {ht_margin:.2f}%")
-st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
-
-# Handle any exceptions
-try:
-    # HT/FT Odds and Expected Value Calculations
-    ht_odds = [ht_home, ht_draw, ht_away]
-    ft_odds = [ft_home, ft_draw, ft_away]
-    
-    # Calculate margins
-    ht_margin = calculate_margin(ht_odds)
-    ft_margin = calculate_margin(ft_odds)
     
     except Exception as e:
         st.error(f"Error in prediction: {e}")
