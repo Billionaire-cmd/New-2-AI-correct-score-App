@@ -175,6 +175,36 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
+        # Calculate Most Probable Match Result and Correct Score
+def most_probable_result_and_score(home_avg, away_avg):
+    # Generate Poisson probabilities
+    home_probs = calculate_poisson_prob(home_avg, max_goals=4)
+    away_probs = calculate_poisson_prob(away_avg, max_goals=4)
+    score_probs = np.outer(home_probs, away_probs)
+
+    # Calculate probabilities for Home Win, Draw, and Away Win
+    home_win_prob = np.sum(np.tril(score_probs, k=-1))
+    draw_prob = np.sum(np.diag(score_probs))
+    away_win_prob = np.sum(np.triu(score_probs, k=1))
+
+    # Identify most probable correct score
+    max_prob_idx = np.unravel_index(np.argmax(score_probs), score_probs.shape)
+    most_likely_score = f"{max_prob_idx[0]}:{max_prob_idx[1]}"
+    most_likely_score_prob = score_probs[max_prob_idx] * 100
+
+    # Determine the most probable result
+    result_probs = {"Home Win": home_win_prob, "Draw": draw_prob, "Away Win": away_win_prob}
+    most_probable_result = max(result_probs, key=result_probs.get)
+
+    return most_probable_result, result_probs[most_probable_result] * 100, most_likely_score, most_likely_score_prob
+
+    # Predict and Display
+   if st.button("Predict Most Probable Match Result and Score"):
+        result, result_prob, score, score_prob = most_probable_result_and_score(avg_goals_home, avg_goals_away)
+        st.subheader("Prediction Summary")
+        st.write(f"**Most Probable Result**: {result} ({result_prob:.2f}%)")
+        st.write(f"**Most Likely Correct Score**: {score} ({score_prob:.2f}%)")
+
         # Identify High and Moderate Realistic Outcomes for Fulltime and Halftime
         top_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)[:5]
         top_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)[:5]
