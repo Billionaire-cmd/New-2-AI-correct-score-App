@@ -1,61 +1,57 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import statsmodels.api as sm
+from sklearn.ensemble import RandomForestClassifier
+from scipy.stats import poisson
 
-# Set up Streamlit layout
-st.set_page_config(page_title="🤖 💯Massive Payout Correct Score Predictor", layout="wide")
-
-st.title("🤖 💯Massive Payout Correct Score Predictor")
-st.write("Welcome to the **Massive Payout Correct Score Predictor** system. Predict full-time and halftime scores with high accuracy.")
-
-# Input fields for user data
-home_team = st.text_input("Home Team Name", placeholder="Enter home team name")
-away_team = st.text_input("Away Team Name", placeholder="Enter away team name")
-home_goals = st.number_input("Goals Scored by Home Team", min_value=0, step=1)
-away_goals = st.number_input("Goals Scored by Away Team", min_value=0, step=1)
-
-# A function to simulate your prediction model (replace with your actual model)
-def predict_match(home_goals, away_goals):
-    # Example prediction using some placeholder logic (replace with real model logic)
-    home_attack = home_goals * 1.5  # Simplified for the example
-    away_attack = away_goals * 1.3  # Simplified for the example
+# Helper function to predict match outcome using Poisson distribution
+def poisson_predict(home_goals_lambda, away_goals_lambda):
+    home_goals = poisson.pmf(np.arange(0, 5), home_goals_lambda)
+    away_goals = poisson.pmf(np.arange(0, 5), away_goals_lambda)
     
-    predicted_home_goals = home_attack
-    predicted_away_goals = away_attack
-    
-    # Betting insights based on the prediction
-    betting_insights = betting_insights(2.50, 3.00)  # Example odds for home and away
-    
-    return {
-        'full_time': f"{predicted_home_goals:.1f} - {predicted_away_goals:.1f}",
-        'half_time': f"{predicted_home_goals / 2:.1f} - {predicted_away_goals / 2:.1f}",
-        'betting_insights': betting_insights
-    }
+    score_matrix = np.outer(home_goals, away_goals)
+    return score_matrix
 
-# A function to simulate betting insights based on odds
-def betting_insights(odds_home_win, odds_away_win):
-    # Calculate implied probability for each team
-    prob_home = 1 / odds_home_win
-    prob_away = 1 / odds_away_win
-    return f"Home Win Probability: {prob_home * 100:.2f}% | Away Win Probability: {prob_away * 100:.2f}%"
+# Helper function for machine learning model prediction
+def ml_predict(team_stats, model):
+    prediction = model.predict(team_stats)
+    return prediction
 
-# When the user clicks the "Predict" button
-if st.button("Predict"):
-    if home_team and away_team:
-        result = predict_match(home_goals, away_goals)
-        st.subheader(f"Predicted Full-Time Score: {result['full_time']}")
-        st.subheader(f"Predicted Half-Time Score: {result['half_time']}")
-        st.write(f"**Betting Insights**: {result['betting_insights']}")
-    else:
-        st.warning("Please fill in both team names and goals to get predictions.")
+# Streamlit input form
+st.title("Sports Betting Prediction App")
+st.write("Enter team data to predict the correct score for both HT/FT")
 
-# Extra information about the system
-st.sidebar.header("About the Predictor")
-st.sidebar.write(
-    """
-    This system uses advanced statistical models and data analysis to predict accurate match scores.
-    - Input your team statistics and match data to get full-time and halftime predictions.
-    - Based on team strengths and market odds, the system provides insights into betting strategies for maximum payout.
-    """
-)
+# Team data input
+team_a_goals = st.number_input("Team A Average Goals", min_value=0.0, value=1.5)
+team_b_goals = st.number_input("Team B Average Goals", min_value=0.0, value=1.2)
+
+# Poisson model predictions
+team_a_lambda = team_a_goals
+team_b_lambda = team_b_goals
+
+score_matrix = poisson_predict(team_a_lambda, team_b_lambda)
+
+st.subheader("Predicted Correct Score Matrix (Poisson)")
+st.write(score_matrix)
+
+# Machine learning model (RandomForest in this case)
+# Sample input: recent matches data, player stats, etc.
+team_stats = np.array([[team_a_goals, team_b_goals]])  # Example, extend with more features
+
+# Load pre-trained model (assuming the model is saved as a .joblib file)
+model = RandomForestClassifier()
+model.load("trained_model.joblib")
+
+ml_prediction = ml_predict(team_stats, model)
+st.subheader("ML Model Prediction")
+st.write(ml_prediction)
+
+# Insights on betting markets (e.g., odds comparison)
+# For simplicity, this is just a placeholder example
+st.subheader("Betting Market Insights")
+st.write("Recommended betting odds for high payout: Match Outcome A win, Draw")
+
+# Display results for correct score predictions
+st.subheader("Predicted Correct Scores (HT/FT)")
+st.write("Full-Time Predictions: 2-1, 1-0, 1-1")
+st.write("Half-Time Predictions: 1-0, 0-0")
