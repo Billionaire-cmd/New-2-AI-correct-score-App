@@ -179,7 +179,7 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
-                # Determine Most Likely Match Result
+        # Determine Most Likely Match Result
         most_likely_result = max(
             [("Home Win", home_win_prob), ("Draw", draw_prob), ("Away Win", away_win_prob)],
             key=lambda x: x[1]
