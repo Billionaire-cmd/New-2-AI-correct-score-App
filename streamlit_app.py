@@ -111,8 +111,6 @@ ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
 # Display HT/FT probabilities and margins
 st.write(f"Halftime Probabilities: {np.round(ht_probs, 3)}")
 st.write(f"Fulltime Probabilities: {np.round(ft_probs, 3)}")
-st.write(f"Halftime Bookmaker Margin: {ht_margin:.2f}%")
-st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
 
 # Halftime/Fulltime Correct Score Recommendation
 
