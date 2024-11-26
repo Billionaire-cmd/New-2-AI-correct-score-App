@@ -244,6 +244,13 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"#### Under 1.5 Goals Probability: {under_1_5_prob * 100:.2f}%")
         st.write(f"#### Over 2.5 Goals Probability: {over_2_5_prob * 100:.2f}%")
         st.write(f"#### Under 2.5 Goals Probability: {under_2_5_prob * 100:.2f}%")
-    
+  
+        # Recommend HT/FT Outcome
+        most_likely_ht_ft = max(ht_ft_probs_normalized, key=ht_ft_probs_normalized.get)
+        highest_prob = ht_ft_probs_normalized[most_likely_ht_ft]
+
+        st.subheader("HT/FT Recommendation")
+        st.write(f"Most likely HT/FT outcome: **{most_likely_ht_ft}** with a probability of **{highest_prob * 100:.2f}%**.")
+
     except Exception as e:
         st.error(f"Error in prediction: {str(e)}")
