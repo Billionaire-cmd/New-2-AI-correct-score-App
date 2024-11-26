@@ -64,6 +64,80 @@ st.sidebar.subheader("Team Statistics")
 avg_goals_home = st.sidebar.number_input("Avg Goals Scored (Home)", min_value=0.0, value=1.5, step=0.1)
 avg_goals_away = st.sidebar.number_input("Avg Goals Scored (Away)", min_value=0.0, value=1.2, step=0.1)
 
+# Function to calculate Poisson probabilities
+def calculate_poisson_prob(lam, max_goals=4):
+    """Calculate Poisson probabilities for a range of goals."""
+    probabilities = [np.exp(-lam) * (lam**k) / np.math.factorial(k) for k in range(max_goals+1)]
+    return probabilities
+
+# Function to display the score probabilities heatmap
+def display_score_probabilities(matrix, title):
+    """Display the heatmap of score probabilities."""
+    plt.figure(figsize=(6, 6))
+    plt.imshow(matrix, cmap='coolwarm', interpolation='nearest')
+    plt.title(title)
+    plt.colorbar(label='Probability')
+    plt.xlabel('Away Goals')
+    plt.ylabel('Home Goals')
+    plt.xticks(np.arange(len(matrix[0])))
+    plt.yticks(np.arange(len(matrix)))
+    st.pyplot()
+
+# Calculate Halftime Probabilities (Dividing goals by 2 for Halftime)
+ht_home_probs = calculate_poisson_prob(avg_goals_home / 2, max_goals=2)
+ht_away_probs = calculate_poisson_prob(avg_goals_away / 2, max_goals=2)
+ht_matrix = np.outer(ht_home_probs, ht_away_probs)
+
+# Calculate Fulltime Probabilities
+ft_home_probs = calculate_poisson_prob(avg_goals_home, max_goals=4)
+ft_away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
+ft_matrix = np.outer(ft_home_probs, ft_away_probs)
+
+# Function to find the best HT/FT combination
+def calculate_best_ht_ft_combination(ht_matrix, ft_matrix):
+    """
+    Finds the highest HT/FT combinations based on probabilities.
+    """
+    # Identify the index of the maximum value in the HT matrix
+    ht_max_idx = np.unravel_index(np.argmax(ht_matrix), ht_matrix.shape)
+    ft_max_idx = np.unravel_index(np.argmax(ft_matrix), ft_matrix.shape)
+    
+    # Extract HT/FT results with their probabilities
+    ht_max_prob = ht_matrix[ht_max_idx]
+    ft_max_prob = ft_matrix[ft_max_idx]
+
+    # Get HT/FT results
+    ht_result = f"HT: {ht_max_idx[0]}-{ht_max_idx[1]}"  # HT result
+    ft_result = f"FT: {ft_max_idx[0]}-{ft_max_idx[1]}"  # FT result
+    
+    # Recommendation based on highest HT/FT probabilities
+    recommendation = f"The most likely HT/FT combination is {ht_result} and {ft_result} with probabilities " \
+                     f"of {ht_max_prob:.2f} for Halftime and {ft_max_prob:.2f} for Fulltime."
+
+    return recommendation, ht_max_prob, ft_max_prob, ht_result, ft_result
+
+# Streamlit UI
+st.title("HT/FT Probability Prediction")
+
+# Button to trigger the HT/FT best combination calculation
+if st.button("Calculate HT/FT Best Combination"):
+    # Display Heatmaps for HT and FT
+    st.subheader("Halftime Score Probabilities")
+    display_score_probabilities(ht_matrix, "Halftime Probabilities")
+
+    st.subheader("Fulltime Score Probabilities")
+    display_score_probabilities(ft_matrix, "Fulltime Probabilities")
+
+    # Best HT/FT Combination
+    recommendation, ht_max_prob, ft_max_prob, ht_result, ft_result = calculate_best_ht_ft_combination(ht_matrix, ft_matrix)
+
+    # Display Recommendation
+    st.subheader("Best HT/FT Combination Recommendation")
+    st.write(f"**Best HT/FT Combination**: {ht_result} and {ft_result}")
+    st.write(f"**Halftime Probability**: {ht_max_prob:.2f}")
+    st.write(f"**Fulltime Probability**: {ft_max_prob:.2f}")
+    st.write(recommendation)
+
 # Sidebar for Average Points Inputs
 st.sidebar.subheader("Team Average Points")
 avg_points_home = st.sidebar.number_input("Avg Points (Home)", min_value=0.0, value=1.5, step=0.1)
