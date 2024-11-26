@@ -143,16 +143,11 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
-        # Sort Scores by Probability
-        sorted_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)
-        sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)
+        st.write("Fulltime Score Probabilities (Poisson):")
+        st.write(fulltime_score_probs)
 
-        # Display Predictions
-        st.subheader("Fulltime Correct Score Predictions")
-        st.write(sorted_fulltime_scores[:5])
-
-        st.subheader("Halftime Correct Score Predictions")
-        st.write(sorted_halftime_scores[:5])
+        st.write("Halftime Score Probabilities (Poisson):")
+        st.write(halftime_score_probs)
 
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        st.error(f"Error in prediction: {str(e)}")
