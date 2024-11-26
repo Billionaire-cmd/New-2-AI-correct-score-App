@@ -83,13 +83,11 @@ st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
 
 # Halftime/Fulltime Correct Score Recommendation
 # HT Score Information
-# HT Score Information
 st.subheader("Most Likely HT Score (90% Probability)")
 ht_recommendation = list(correct_score_odds_halftime.keys())[np.argmax(ht_probs)]
 ht_probability = max(ht_probs) * 100
 st.write(f"Recommended HT Score: {ht_recommendation}")
 st.write(f"Probability: {ht_probability:.2f}%")
-
 # Example probabilities for Home Win, Draw, and Away Win
 outcomes = {
     "Home Win": 0.23,  # 23% probability
