@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import poisson
 
 # --- Function Definitions ---
-# Function to Calculate Poisson Probabilities
+# Function to Calculate Poisson Probabilities for specific goals
 def calculate_poisson_prob(lambda_, max_goals=4):
     """Calculate Poisson probabilities up to max_goals."""
     return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
@@ -17,6 +17,13 @@ def calculate_margin(odds_list):
 def calculate_expected_value(prob, odds):
     """Calculate expected value."""
     return (prob * odds) - 1
+
+# Function to Calculate BTTS Probability
+def calculate_btts_probability(home_goals_prob, away_goals_prob):
+    """Calculate BTTS (Both Teams To Score) probability."""
+    btts_yes_prob = sum(h * a for h in home_goals_prob for a in away_goals_prob if h > 0 and a > 0)
+    btts_no_prob = 1 - btts_yes_prob
+    return btts_yes_prob, btts_no_prob
 
 # --- Streamlit App Layout ---
 # App Title and Introduction
@@ -66,26 +73,6 @@ under_1_5_ft = st.sidebar.number_input("Under 1.5 FT Odds", min_value=1.0, step=
 over_2_5_ft = st.sidebar.number_input("Over 2.5 FT Odds", min_value=1.0, step=0.1, value=2.0)
 under_2_5_ft = st.sidebar.number_input("Under 2.5 FT Odds", min_value=1.0, step=0.1, value=1.8)
 
-# Correct Score Odds (Fulltime)
-st.sidebar.subheader("Correct Score Odds (Fulltime)")
-correct_score_odds_fulltime = {}
-for i in range(5):
-    for j in range(5):
-        score = f"{i}:{j}"
-        correct_score_odds_fulltime[score] = st.sidebar.number_input(f"FT Odds for {score}", value=10.0, step=0.01)
-# "Other" scores for Fulltime
-correct_score_odds_fulltime["Other"] = st.sidebar.number_input("FT Odds for scores exceeding 4:4", value=50.0, step=0.01)
-
-# Correct Score Odds (Halftime)
-st.sidebar.subheader("Correct Score Odds (Halftime)")
-correct_score_odds_halftime = {}
-for i in range(3):
-    for j in range(3):
-        ht_score = f"{i}:{j}"
-        correct_score_odds_halftime[ht_score] = st.sidebar.number_input(f"HT Odds for {ht_score}", value=10.0, step=0.01)
-# "Other" scores for Halftime
-correct_score_odds_halftime["Other"] = st.sidebar.number_input("HT Odds for scores exceeding 2:2", value=50.0, step=0.01)
-
 # --- HT/FT Odds and Probabilities ---
 # Probabilities for HT/FT based on odds
 ht_probs = [1 / ht_home, 1 / ht_draw, 1 / ht_away]
@@ -120,40 +107,35 @@ for goal, odds in exact_goals_odds.items():
     prob = 1 / odds
     exact_goal_probs[goal] = prob / total_odds * 100
 
-# --- Expected Value Calculations ---
-# Handle any exceptions
-try:
-    st.subheader("Expected Value Calculations")
-    st.write("Expected Value (EV) for various betting markets:")
-    # HT/FT Odds and Expected Value Calculations
-    ht_odds = [ht_home, ht_draw, ht_away]
-    ft_odds = [ft_home, ft_draw, ft_away]
+# --- BTTS Calculation ---
+home_goals_prob = calculate_poisson_prob(avg_goals_home)
+away_goals_prob = calculate_poisson_prob(avg_goals_away)
 
-    # Calculate margins
-    ht_margin = calculate_margin(ht_odds)
-    ft_margin = calculate_margin(ft_odds)
+# BTTS (GG/NG) Probability Calculation
+btts_yes_prob, btts_no_prob = calculate_btts_probability(home_goals_prob, away_goals_prob)
 
-    st.write(f"Halftime Margin: {ht_margin:.2f}%")
-    st.write(f"Fulltime Margin: {ft_margin:.2f}%")
-    
-    # Calculate expected values for HT/FT
-    ht_ev = [calculate_expected_value(prob, odd) for prob, odd in zip(ht_probs, ht_odds)]
-    ft_ev = [calculate_expected_value(prob, odd) for prob, odd in zip(ft_probs, ft_odds)]
-    
-    st.write(f"Expected Value for Halftime: {np.round(ht_ev, 2)}")
-    st.write(f"Expected Value for Fulltime: {np.round(ft_ev, 2)}")
-except Exception as e:
-    st.write(f"An error occurred: {e}")
+# Display BTTS Probabilities
+st.write(f"BTTS (Yes) Probability: {btts_yes_prob * 100:.2f}%")
+st.write(f"BTTS (No) Probability: {btts_no_prob * 100:.2f}%")
 
-# --- Visualization Section ---
-st.subheader("Poisson Distribution of Goals")
-lambda_home = avg_goals_home
-lambda_away = avg_goals_away
+# --- Over/Under Goals Calculation ---
+# Calculate Over/Under 1.5 and 2.5 Goals for HT/FT
+def calculate_over_under_probability(over_odds, under_odds):
+    """Calculate probabilities for Over/Under 1.5 and 2.5 goals."""
+    over_prob = 1 / over_odds
+    under_prob = 1 / under_odds
+    total_prob = over_prob + under_prob
+    return over_prob / total_prob, under_prob / total_prob
 
-# Calculate Poisson Probabilities
-home_goals_prob = calculate_poisson_prob(lambda_home)
-away_goals_prob = calculate_poisson_prob(lambda_away)
+# HT and FT Over/Under probabilities
+over_1_5_ht_prob, under_1_5_ht_prob = calculate_over_under_probability(over_1_5_ht, under_1_5_ht)
+over_1_5_ft_prob, under_1_5_ft_prob = calculate_over_under_probability(over_1_5_ft, under_1_5_ft)
+over_2_5_ft_prob, under_2_5_ft_prob = calculate_over_under_probability(over_2_5_ft, under_2_5_ft)
 
-# Display Poisson Distribution Results
-st.write("Home Team Goal Probabilities:", np.round(home_goals_prob, 3))
-st.write("Away Team Goal Probabilities:", np.round(away_goals_prob, 3))
+# Display Over/Under Probabilities
+st.write(f"Over 1.5 HT Probability: {over_1_5_ht_prob * 100:.2f}%")
+st.write(f"Under 1.5 HT Probability: {under_1_5_ht_prob * 100:.2f}%")
+st.write(f"Over 1.5 FT Probability: {over_1_5_ft_prob * 100:.2f}%")
+st.write(f"Under 1.5 FT Probability: {under_1_5_ft_prob * 100:.2f}%")
+st.write(f"Over 2.5 FT Probability: {over_2_5_ft_prob * 100:.2f}%")
+st.write(f"Under 2.5 FT Probability: {under_2_5_ft_prob * 100:.2f}%")
