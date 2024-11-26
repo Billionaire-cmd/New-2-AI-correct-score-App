@@ -255,28 +255,7 @@ if odds_btts_yes and odds_btts_no:
     st.write(f"Expected Value for BTTS NG (No): {ev_no:.2f}")
 
     if ev_yes > ev_no:
-        st.success("BTTS GG (Yes) has better value.")
-    elif ev_no > ev_yes:
-        st.success("BTTS NG (No) has better value.")
-    else:
-        st.info("Both outcomes have equal value.")
 
-# Tabs for different sections
-tab1, tab2, tab3 = st.tabs(["Input", "Insights", "Visualization"])
-
-with tab1:
-    st.write("Input your data here...")
-    # You can place the custom input logic here
-
-with tab2:
-    st.write("Insights will be shown here...")
-    # Add insights logic here
-
-with tab3:
-    st.write("Visualization will be shown here...")
-    # You can place your visualizations here
-      
-        
         # Calculate Poisson Probabilities for Halftime (assuming halftime goals are ~50% of fulltime goals)
         halftime_home_avg = avg_goals_home / 2
         halftime_away_avg = avg_goals_away / 2
@@ -339,7 +318,7 @@ with tab3:
         top_halftime_score = sorted_halftime_scores[0]  # Get the top HT score
         st.write(f"**Halftime Correct Score Recommendation:** {top_halftime_score[0]} "
                  f"(Probability: {top_halftime_score[1] * 100:.2f}%)")
-
+      
         # Fulltime Correct Score Recommendation
         top_fulltime_score = sorted_fulltime_scores[0]  # Get the top FT score
         st.write(f"**Fulltime Correct Score Recommendation:** {top_fulltime_score[0]} "
