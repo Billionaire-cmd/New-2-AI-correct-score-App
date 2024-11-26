@@ -179,11 +179,14 @@ if st.button("Predict Probabilities and Insights"):
         def most_probable_result_and_score(home_avg, away_avg):
       
         # Generate Poisson probabilities
-       
-        home_probs = calculate_poisson_prob(home_avg, max_goals=4)
-        away_probs = calculate_poisson_prob(away_avg, max_goals=4)
-        score_probs = np.outer(home_probs, away_probs)
+        # Example function
+        def predict_scores(home_avg, away_avg):
+        """Predict scores using Poisson probabilities."""
+        home_probs = calculate_poisson_prob(home_avg, max_goals=4)  # Indent this line
+        away_probs = calculate_poisson_prob(away_avg, max_goals=4)  # And this one
+        return home_probs, away_probs
 
+        
         # Calculate probabilities for Home Win, Draw, and Away Win
         home_win_prob = np.sum(np.tril(score_probs, k=-1))
         draw_prob = np.sum(np.diag(score_probs))
