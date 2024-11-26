@@ -187,13 +187,13 @@ if st.button("Predict Probabilities and Insights"):
         # Determine Most Likely Match Result
         most_likely_result = max(
             [("Home Win", home_win_prob), ("Draw", draw_prob), ("Away Win", away_win_prob)],
-            key=lambda x: x[1]
+            key=lambda x: x[2]
         )
 
         # Determine Most Likely Correct Score
-        most_likely_score = max(fulltime_score_probs.items(), key=lambda x: x[x])
+        most_likely_score = max(fulltime_score_probs.items(), key=lambda x: x[2])
 
-        # Display Results
+        # Display results
         st.subheader("Match Outcome Predictions")
         st.write(f"Most Probable Match Result: {most_likely_result[0]} ({most_likely_result[1] * 100:.2f}%)")
         st.write(f"Recommended Correct Score: {most_likely_score[0]} ({most_likely_score[1] * 100:.2f}%)")
