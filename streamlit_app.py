@@ -213,48 +213,7 @@ st.subheader("BTTS GG/NG Probabilities Comparison")
 btts_yes_prob = 0.60  # Replace with actual logic
 btts_no_prob = 0.40  # Replace with actual logic
 
-data = {
-    "Category": ["BTTS GG (Yes)", "BTTS NG (No)"],
-    "Probability": [btts_yes_prob, btts_no_prob]
-}
-df_btts = pd.DataFrame(data)
-st.bar_chart(df_btts.set_index("Category"))
 
-# Highlight the most likely outcomes
-most_likely_scores = sorted(score_matrix.items(), key=lambda x: x[1], reverse=True)[:3]
-st.subheader("Most Likely Outcomes")
-for (score, prob) in most_likely_scores:
-    st.write(f"Score: {score[0]}:{score[1]} - Probability: {prob * 100:.2f}%")
-
-# Additional insights
-total_prob = sum(score_matrix.values())
-st.subheader("Insights on Inputted Probabilities")
-st.write(f"Total Probability Distributed: {total_prob * 100:.2f}%")
-if total_prob < 1:
-    st.warning("Probabilities do not sum up to 100%. Consider adjusting your input.")
-elif total_prob > 1:
-    st.warning("Probabilities exceed 100%. Consider adjusting your input.")
-
-# Highlight high-probability scores
-high_prob_scores = {score: prob for score, prob in score_matrix.items() if prob > 0.1}
-if high_prob_scores:
-    st.write("High-probability scores (>10%):")
-    for score, prob in high_prob_scores.items():
-        st.write(f"  - {score[0]}:{score[1]} - {prob * 100:.2f}%")
-
-# Odds Input for Additional Analysis
-st.header("Odds Input for Additional Analysis")
-odds_btts_yes = st.number_input("Enter odds for BTTS GG (Yes):", min_value=1.0)
-odds_btts_no = st.number_input("Enter odds for BTTS NG (No):", min_value=1.0)
-
-if odds_btts_yes and odds_btts_no:
-    ev_yes = (btts_yes_prob / 100) * odds_btts_yes - 1
-    ev_no = (btts_no_prob / 100) * odds_btts_no - 1
-
-    st.write(f"Expected Value for BTTS GG (Yes): {ev_yes:.2f}")
-    st.write(f"Expected Value for BTTS NG (No): {ev_no:.2f}")
-
-    if ev_yes > ev_no:
 
         # Calculate Poisson Probabilities for Halftime (assuming halftime goals are ~50% of fulltime goals)
         halftime_home_avg = avg_goals_home / 2
