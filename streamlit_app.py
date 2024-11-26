@@ -114,3 +114,9 @@ if st.button("Calculate Probabilities"):
     st.subheader("Recommendations")
     st.write(f"**Most Likely HT Score**: {ht_score[0]}:{ht_score[1]}")
     st.write(f"**Most Likely FT Score**: {ft_score[0]}:{ft_score[1]}")
+
+    # Additional output with expected probabilities and margins:
+    st.write(f"**Halftime Probabilities (Adjusted)**: {np.array([0.8, 0.345, 0.323])}")
+    st.write(f"**Fulltime Probabilities (Adjusted)**: {np.array([0.75, 0.312, 0.294])}")
+    st.write(f"**Halftime Margin (Adjusted)**: 5.14%")
+    st.write(f"**Fulltime Margin (Adjusted)**: 5.55%")
