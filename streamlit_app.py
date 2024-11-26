@@ -26,109 +26,6 @@ to predict realistic halftime and full-time correct scores for football matches.
 It is designed to enhance your betting strategies by providing precise calculations for maximum ROI.
 """)
 
-def main():    # Example Score Matrix (Replace with your actual score matrix)
-    score_matrix = {
-        (0, 0): 0.18, (1, 0): 0.10, (0, 1): 0.08, (2, 0): 0.06,
-        (0, 2): 0.05, (1, 1): 0.15, (2, 1): 0.12, (1, 2): 0.10,
-        (2, 2): 0.08, (3, 2): 0.05, (3, 3): 0.03, (4, 4): 0.01
-    }
-
-    # Calculate BTTS GG/NG Insights
-    btts_yes_scores = [(i, j) for i in range(1, 5) for j in range(1, 5)]
-    btts_no_scores = [(i, 0) for i in range(5)] + [(0, j) for j in range(5)]
-
-    # Probabilities for BTTS GG
-    btts_yes_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_yes_scores) * 100
-    btts_yes_top_scores = sorted(
-        {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_yes_scores}.items(),
-        key=lambda x: x[1],
-        reverse=True,
-    )
-
-    # Probabilities for BTTS NG
-    btts_no_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_no_scores) * 100
-    btts_no_top_scores = sorted(
-        {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_no_scores}.items(),
-        key=lambda x: x[1],
-        reverse=True,
-    )
-
-    # Display BTTS GG/NG Insights
-    st.title("BTTS GG/NG Insights")
-    st.write(f"**BTTS GG (Yes) Probability:** {btts_yes_prob:.2f}%")
-    st.write("Top Correct Scores for BTTS GG (Yes):")
-    for score, prob in btts_yes_top_scores[:5]:  # Top 5 scores
-        st.write(f"  - {score}: {prob * 100:.2f}%")
-
-    st.write(f"**BTTS NG (No) Probability:** {btts_no_prob:.2f}%")
-    st.write("Top Correct Scores for BTTS NG (No):")
-    for score, prob in btts_no_top_scores[:5]:  # Top 5 scores
-        st.write(f"  - {score}: {prob * 100:.2f}%")
-    
-def main():
-    st.title("BTTS GG/NG Insights")
-
-    # Input for Score Matrix
-    st.header("Input Score Matrix")
-    st.write("Enter probabilities for each scoreline as a decimal (e.g., 0.18 for 18%). Leave blank for scores not applicable.")
-
-    # Create user input fields for the score matrix
-    score_matrix = {}
-    for i in range(5):
-        for j in range(5):
-            key = f"Score {i}:{j}"
-            value = st.text_input(f"Probability for {key}:", value="", key=f"score_{i}_{j}")
-            if value:
-                try:
-                    score_matrix[(i, j)] = float(value)
-                except ValueError:
-                    st.warning(f"Invalid input for {key}. Skipping this scoreline.")
-
-    # Show inputted score matrix
-    if score_matrix:
-        st.subheader("Your Inputted Score Matrix:")
-        st.write(score_matrix)
-    else:
-        st.warning("Please input at least one probability.")
-
-    # Only proceed if the score matrix is not empty
-    if score_matrix:
-        # Calculate BTTS GG/NG Insights
-        btts_yes_scores = [(i, j) for i in range(1, 5) for j in range(1, 5)]
-        btts_no_scores = [(i, 0) for i in range(5)] + [(0, j) for j in range(5)]
-
-        # Probabilities for BTTS GG
-        btts_yes_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_yes_scores) * 100
-        btts_yes_top_scores = sorted(
-            {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_yes_scores}.items(),
-            key=lambda x: x[1],
-            reverse=True,
-        )
-
-        # Probabilities for BTTS NG
-        btts_no_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_no_scores) * 100
-        btts_no_top_scores = sorted(
-            {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_no_scores}.items(),
-            key=lambda x: x[1],
-            reverse=True,
-        )
-
-        # Display BTTS GG/NG Insights
-        st.subheader("BTTS GG/NG Results")
-        st.write(f"**BTTS GG (Yes) Probability:** {btts_yes_prob:.2f}%")
-        st.write("Top Correct Scores for BTTS GG (Yes):")
-
-                for score, prob in btts_yes_top_scores[:5]:  # Top 5 scores
-            st.write(f"  - {score}: {prob * 100:.2f}%")
-
-        st.write(f"**BTTS NG (No) Probability:** {btts_no_prob:.2f}%")
-        st.write("Top Correct Scores for BTTS NG (No):")
-        for score, prob in btts_no_top_scores[:5]:  # Top 5 scores
-            st.write(f"  - {score}: {prob * 100:.2f}%")
-
-if __name__ == "__main__":
-    main()  
-    
 # Sidebar for Inputs
 st.sidebar.header("Match Statistics and Inputs")
 
@@ -201,6 +98,69 @@ def calculate_expected_value(prob, odds):
     """Calculate expected value."""
     return (prob * odds) - 1
 
+def main():
+    st.title("BTTS GG/NG Insights")
+
+    # Input for Score Matrix
+    st.header("Input Score Matrix")
+    st.write("Enter probabilities for each scoreline as a decimal (e.g., 0.18 for 18%). Leave blank for scores not applicable.")
+
+    # Create user input fields for the score matrix
+    score_matrix = {}
+    for i in range(5):
+        for j in range(5):
+            key = f"Score {i}:{j}"
+            value = st.text_input(f"Probability for {key}:", value="", key=f"score_{i}_{j}")
+            if value:
+                try:
+                    score_matrix[(i, j)] = float(value)
+                except ValueError:
+                    st.warning(f"Invalid input for {key}. Skipping this scoreline.")
+
+    # Show inputted score matrix
+    if score_matrix:
+        st.subheader("Your Inputted Score Matrix:")
+        st.write(score_matrix)
+    else:
+        st.warning("Please input at least one probability.")
+
+    # Only proceed if the score matrix is not empty
+    if score_matrix:
+        # Calculate BTTS GG/NG Insights
+        btts_yes_scores = [(i, j) for i in range(1, 5) for j in range(1, 5)]
+        btts_no_scores = [(i, 0) for i in range(5)] + [(0, j) for j in range(5)]
+
+        # Probabilities for BTTS GG
+        btts_yes_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_yes_scores) * 100
+        btts_yes_top_scores = sorted(
+            {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_yes_scores}.items(),
+            key=lambda x: x[1],
+            reverse=True,
+        )
+
+        # Probabilities for BTTS NG
+        btts_no_prob = sum(score_matrix.get((i, j), 0) for i, j in btts_no_scores) * 100
+        btts_no_top_scores = sorted(
+            {f"{i}:{j}": score_matrix.get((i, j), 0) for i, j in btts_no_scores}.items(),
+            key=lambda x: x[1],
+            reverse=True,
+        )
+
+        # Display BTTS GG/NG Insights
+        st.subheader("BTTS GG/NG Results")
+        st.write(f"**BTTS GG (Yes) Probability:** {btts_yes_prob:.2f}%")
+        st.write("Top Correct Scores for BTTS GG (Yes):")
+        for score, prob in btts_yes_top_scores[:5]:  # Top 5 scores
+            st.write(f"  - {score}: {prob * 100:.2f}%")
+
+        st.write(f"**BTTS NG (No) Probability:** {btts_no_prob:.2f}%")
+        st.write("Top Correct Scores for BTTS NG (No):")
+        for score, prob in btts_no_top_scores[:5]:  # Top 5 scores
+            st.write(f"  - {score}: {prob * 100:.2f}%")
+
+if __name__ == "__main__":
+    main()
+    
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
     try:
@@ -263,7 +223,7 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"\n**Over/Under 1.5 Goals (Halftime):**")
         st.write(f"  - Over 1.5 Goals: {over_1_5_ht_prob:.2f}%")
         st.write(f"  - Under 1.5 Goals: {under_1_5_ht_prob:.2f}%")
-    
+
         # Display Final Recommendations
         st.subheader("Final Recommendation")
 
@@ -276,6 +236,6 @@ if st.button("Predict Probabilities and Insights"):
         top_fulltime_score = sorted_fulltime_scores[0]  # Get the top FT score
         st.write(f"**Fulltime Correct Score Recommendation:** {top_fulltime_score[0]} "
                  f"(Probability: {top_fulltime_score[1] * 100:.2f}%)")
-    
+
     except Exception as e:
         st.error(f"Error in prediction: {e}")
