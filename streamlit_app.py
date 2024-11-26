@@ -129,27 +129,6 @@ def recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, cor
 
 recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime)
 
-# Exact Goals Odds Calculation (Optional)
-st.sidebar.subheader("Exact Goals Odds (0 to 6+ Goals)")
-exact_goals_odds = {
-    "0 Goals": st.sidebar.number_input("Odds for 0 Goals", min_value=1.0, step=0.1, value=6.0),
-    "1 Goal": st.sidebar.number_input("Odds for 1 Goal", min_value=1.0, step=0.1, value=5.5),
-    "2 Goals": st.sidebar.number_input("Odds for 2 Goals", min_value=1.0, step=0.1, value=4.0),
-    "3 Goals": st.sidebar.number_input("Odds for 3 Goals", min_value=1.0, step=0.1, value=3.0),
-    "4 Goals": st.sidebar.number_input("Odds for 4 Goals", min_value=1.0, step=0.1, value=2.5),
-    "5 Goals": st.sidebar.number_input("Odds for 5 Goals", min_value=1.0, step=0.1, value=15.0),
-    "6+ Goals": st.sidebar.number_input("Odds for 6+ Goals", min_value=1.0, step=0.1, value=30.0)
-}
-
-# Calculate Exact Goal Probabilities
-exact_goal_probs = {}
-total_odds = sum(1 / value for value in exact_goals_odds.values())
-for goal, odds in exact_goals_odds.items():
-    prob = 1 / odds
-    exact_goal_probs[goal] = prob / total_odds * 100
-
-# Display Exact Goal Probabilities
-st.write(f"Exact Goal Probabilities: {exact_goal_probs}")
 
 # Button to predict probabilities and insights
 if st.button("Predict Probabilities and Insights"):
