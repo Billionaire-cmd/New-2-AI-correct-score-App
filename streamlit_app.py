@@ -212,9 +212,5 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"#### Over 2.5 Goals Probability: {over_2_5_prob * 100:.2f}%")
         st.write(f"#### Under 2.5 Goals Probability: {under_2_5_prob * 100:.2f}%")
 
-# Display Recommendations for Full-time Correct Score
-for recommendation in correct_score_recommendations:
-    st.write(recommendation)
- 
     except Exception as e:
         st.error(f"Error in prediction: {str(e)}")
