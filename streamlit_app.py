@@ -134,17 +134,6 @@ def main():
 btts_gg_ft, btts_ng_ft = calculate_btts(fulltime_probabilities)
 btts_gg_ht, btts_ng_ht = calculate_btts(halftime_probabilities)
 
-# Display BTTS Insights
-st.subheader("BTTS Insights (Fulltime)")
-st.write(f"Probability of BTTS GG (Both Teams to Score): {btts_gg_ft:.2%}")
-st.write(f"Probability of BTTS NG (One or Both Teams Fail to Score): {btts_ng_ft:.2%}")
-visualize_btts(btts_gg_ft, btts_ng_ft)
-
-st.subheader("BTTS Insights (Halftime)")
-st.write(f"Probability of BTTS GG (Both Teams to Score): {btts_gg_ht:.2%}")
-st.write(f"Probability of BTTS NG (One or Both Teams Fail to Score): {btts_ng_ht:.2%}")
-visualize_btts(btts_gg_ht, btts_ng_ht)
-
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
     try:
