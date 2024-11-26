@@ -146,20 +146,6 @@ ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
        # Displaying recommendation
        st.subheader("Recommended Correct Score")
        st.write("""
-       Based on the probabilities and odds, the **recommended correct score** would be:
-    
-       - **Halftime Score**: 0:0 (Highest probability: 31.54%)
-       - **Full-time Score**: Either 1:0 or 1:1 (Combined probability range: 20% to 25%)
-       """)
-
-       # Footer Information
-       st.write("""
-       The model is based on odds adjustment and probabilities derived from bookmaker margins. The values are a result of calculated adjusted probabilities after factoring in bookmaker margins.
-       """)
-
-       # Run the app
-       if __name__ == "__main__":
-       st.write("Enjoy using this app for football predictions!")
 
 # Halftime/Fulltime Correct Score Recommendation
 
