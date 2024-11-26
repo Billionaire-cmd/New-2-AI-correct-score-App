@@ -34,38 +34,6 @@ st.write("""
     The probabilities for each outcome are derived from the odds, and here we will display the most likely outcomes for **HT** and **FT** scores.
 """)
 
-# Sidebar for Exact Goals Odds Input
-st.sidebar.header("Enter Exact Goals Odds")
-exact_goals_odds = {
-    "0 Goals": st.sidebar.number_input("Odds for 0 Goals", min_value=1.0, step=0.1, value=6.0),
-    "1 Goal": st.sidebar.number_input("Odds for 1 Goal", min_value=1.0, step=0.1, value=5.5),
-    "2 Goals": st.sidebar.number_input("Odds for 2 Goals", min_value=1.0, step=0.1, value=4.0),
-    "3 Goals": st.sidebar.number_input("Odds for 3 Goals", min_value=1.0, step=0.1, value=3.0),
-    "4 Goals": st.sidebar.number_input("Odds for 4 Goals", min_value=1.0, step=0.1, value=2.5),
-    "5 Goals": st.sidebar.number_input("Odds for 5 Goals", min_value=1.0, step=0.1, value=15.0),
-    "6+ Goals": st.sidebar.number_input("Odds for 6+ Goals", min_value=1.0, step=0.1, value=30.0)
-}
-
-# Display Exact Goals Odds
-st.sidebar.subheader("Current Exact Goals Odds")
-for goal, odds in exact_goals_odds.items():
-    st.sidebar.write(f"{goal}: {odds} odds")
-
-# Information for HT and FT Scores
-
-# HT Score Information
-st.subheader("Most Likely HT Score (90% Probability)")
-ht_score = "0:0"
-ht_probability = 31.54
-
-# FT Score Information
-st.subheader("Most Likely FT Score (80% Probability)")
-ft_scores = ["1:0", "1:1"]
-ft_probability_range = "20% to 25% (combined)"
-
-# Displaying the results
-st.write(f"The **Most Likely HT Score** with a 90% probability is: **{ht_score}**")
-
 # Sidebar for Inputs
 st.sidebar.header("Match Statistics and Inputs")
 
