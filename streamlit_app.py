@@ -191,7 +191,7 @@ if st.button("Predict Probabilities and Insights"):
         )
 
         # Determine Most Likely Correct Score
-        most_likely_score = max(fulltime_score_probs.items(), key=lambda x: x[1])
+        most_likely_score = max(fulltime_score_probs.items(), key=lambda x: x[x])
 
         # Display Results
         st.subheader("Match Outcome Predictions")
