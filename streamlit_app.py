@@ -150,12 +150,7 @@ total_odds = sum(1 / value for value in exact_goals_odds.values())
 for goal, odds in exact_goals_odds.items():
     prob = 1 / odds
     exact_goal_probs[goal] = prob / total_odds * 100
-    # Display Results
-    st.subheader("Predicted Match Result")
-    st.write(f"**Most Probable Outcome:** {result}")
-    st.write(f"**Most Likely Correct Score:** {score}")
-    st.write(f"**Probability of {score}:** {probability:.2f}%")
-
+    
 # Display Exact Goal Probabilities
 st.write(f"Exact Goal Probabilities: {exact_goal_probs}")
 
