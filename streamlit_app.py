@@ -64,25 +64,6 @@ st.sidebar.subheader("Team Statistics")
 avg_goals_home = st.sidebar.number_input("Avg Goals Scored (Home)", min_value=0.0, value=1.5, step=0.1)
 avg_goals_away = st.sidebar.number_input("Avg Goals Scored (Away)", min_value=0.0, value=1.2, step=0.1)
 
-# Function to calculate Poisson probabilities
-def calculate_poisson_prob(lam, max_goals=4):
-    """Calculate Poisson probabilities for a range of goals."""
-    probabilities = [np.exp(-lam) * (lam**k) / np.math.factorial(k) for k in range(max_goals+1)]
-    return probabilities
-
-# Function to display the score probabilities heatmap
-def display_score_probabilities(matrix, title):
-    """Display the heatmap of score probabilities."""
-    plt.figure(figsize=(6, 6))
-    plt.imshow(matrix, cmap='coolwarm', interpolation='nearest')
-    plt.title(title)
-    plt.colorbar(label='Probability')
-    plt.xlabel('Away Goals')
-    plt.ylabel('Home Goals')
-    plt.xticks(np.arange(len(matrix[0])))
-    plt.yticks(np.arange(len(matrix)))
-    st.pyplot()
-
 # Calculate Halftime Probabilities (Dividing goals by 2 for Halftime)
 ht_home_probs = calculate_poisson_prob(avg_goals_home / 2, max_goals=2)
 ht_away_probs = calculate_poisson_prob(avg_goals_away / 2, max_goals=2)
