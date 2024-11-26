@@ -42,7 +42,7 @@ def display_score_probabilities(prob_matrix, title):
     st.pyplot(fig)
 
 # App Title and Introduction
-st.title("⚽ Rabiotic HT/FT Correct Score Predictor")
+st.title("💯💯💯🤖 Rabiotic HT/FT Correct Score Predictor pro")
 st.markdown("""
 Welcome to the **Rabiotic HT/FT Correct Score Predictor**!  
 This app uses statistical models to predict halftime and full-time correct scores based on:
