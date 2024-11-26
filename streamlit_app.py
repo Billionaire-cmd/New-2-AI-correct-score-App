@@ -143,6 +143,14 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
+        # Identify High and Moderate Realistic Outcomes for Fulltime
+        fulltime_high = {score: prob for score, prob in fulltime_score_probs.items() if prob > 0.30}
+        fulltime_moderate = {score: prob for score, prob in fulltime_score_probs.items() if 0.20 < prob <= 0.30}
+
+        # Identify High and Moderate Realistic Outcomes for Halftime
+        halftime_high = {score: prob for score, prob in halftime_score_probs.items() if prob > 0.30}
+        halftime_moderate = {score: prob for score, prob in halftime_score_probs.items() if 0.20 < prob <= 0.30}
+
         # Display Fulltime Score Probabilities as text
         st.write("### Fulltime Score Probabilities (Poisson):")
         fulltime_score_text = "\n".join([f"Score {score}: Probability {prob*100:.2f}%" for score, prob in fulltime_score_probs.items()])
@@ -152,6 +160,29 @@ if st.button("Predict Probabilities and Insights"):
         st.write("### Halftime Score Probabilities (Poisson):")
         halftime_score_text = "\n".join([f"Score {score}: Probability {prob*100:.2f}%" for score, prob in halftime_score_probs.items()])
         st.write(halftime_score_text)
+
+        # Display Recommendations
+        st.write("### Recommended Moderate and High Realistic Outcomes:")
+
+        st.write("#### High Realistic Fulltime Scores:")
+        for score, prob in fulltime_high.items():
+            st.write(f"{score}: Probability {prob*100:.2f}%")
+
+        st.write("#### Moderate Fulltime Scores:")
+        for score, prob in fulltime_moderate.items():
+            st.write(f"{score}: Probability {prob*100:.2f}%")
+
+        st.write("#### High Realistic Halftime Scores:")
+        for score, prob in halftime_high.items():
+            st.write(f"{score}: Probability {prob*100:.2f}%")
+
+        st.write("#### Moderate Halftime Scores:")
+        for score, prob in halftime_moderate.items():
+            st.write(f"{score}: Probability {prob*100:.2f}%")
+
+    except Exception as e:
+        st.error(f"Error in prediction: {str(e)}")
+
 
     except Exception as e:
         st.error(f"Error in prediction: {str(e)}")
