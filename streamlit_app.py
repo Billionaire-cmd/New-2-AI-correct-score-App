@@ -115,20 +115,6 @@ st.write(f"Halftime Bookmaker Margin: {ht_margin:.2f}%")
 st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
 
 # Halftime/Fulltime Correct Score Recommendation
-def recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime):
-    """Recommend the most probable HT/FT correct score."""
-    best_ht_score = max(ht_probs)
-    best_ft_score = max(ft_probs)
-    
-    ht_recommendation = list(correct_score_odds_halftime.keys())[np.argmax(ht_probs)]
-    ft_recommendation = list(correct_score_odds_fulltime.keys())[np.argmax(ft_probs)]
-    
-    st.subheader("Recommended Correct Score")
-    st.write(f"Most likely HT score: {ht_recommendation} with a probability of {best_ht_score*100:.2f}%")
-    st.write(f"Most likely FT score: {ft_recommendation} with a probability of {best_ft_score*100:.2f}%")
-
-recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime)
-
 
 # Button to predict probabilities and insights
 if st.button("Predict Probabilities and Insights"):
