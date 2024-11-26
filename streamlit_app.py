@@ -176,8 +176,6 @@ if st.button("Predict Probabilities and Insights"):
         halftime_score_probs["Other"] = halftime_other_prob
 
         # Calculate Most Probable Match Result and Correct Score
-        def most_probable_result_and_score(home_avg, away_avg):
-      
         # Generate Poisson probabilities
         # Example function
         def predict_scores(home_avg, away_avg):
