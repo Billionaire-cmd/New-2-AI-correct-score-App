@@ -70,6 +70,53 @@ def calculate_probabilities(odds_list):
 ht_probs = calculate_probabilities([ht_home, ht_draw, ht_away])
 ft_probs = calculate_probabilities([ft_home, ft_draw, ft_away])
 
+# Calculate Margins for HT and FT
+ht_margin = calculate_margin([ht_home, ht_draw, ht_away])
+ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
+
+# Display HT/FT probabilities and margins
+st.write(f"Halftime Probabilities: {np.round(ht_probs, 3)}")
+st.write(f"Fulltime Probabilities: {np.round(ft_probs, 3)}")
+st.write(f"Halftime Bookmaker Margin: {ht_margin:.2f}%")
+st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
+
+# Halftime/Fulltime Correct Score Recommendation
+def recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime):
+    """Recommend the most probable HT/FT correct score."""
+    best_ht_score = max(ht_probs)
+    best_ft_score = max(ft_probs)
+    
+    ht_recommendation = list(correct_score_odds_halftime.keys())[np.argmax(ht_probs)]
+    ft_recommendation = list(correct_score_odds_fulltime.keys())[np.argmax(ft_probs)]
+    
+    st.subheader("Recommended Correct Score")
+    st.write(f"Most likely HT score: {ht_recommendation} with a probability of {best_ht_score*100:.2f}%")
+    st.write(f"Most likely FT score: {ft_recommendation} with a probability of {best_ft_score*100:.2f}%")
+
+recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime)
+
+# Exact Goals Odds Calculation (Optional)
+st.sidebar.subheader("Exact Goals Odds (0 to 6+ Goals)")
+exact_goals_odds = {
+    "0 Goals": st.sidebar.number_input("Odds for 0 Goals", min_value=1.0, step=0.1, value=6.0),
+    "1 Goal": st.sidebar.number_input("Odds for 1 Goal", min_value=1.0, step=0.1, value=5.5),
+    "2 Goals": st.sidebar.number_input("Odds for 2 Goals", min_value=1.0, step=0.1, value=4.0),
+    "3 Goals": st.sidebar.number_input("Odds for 3 Goals", min_value=1.0, step=0.1, value=3.0),
+    "4 Goals": st.sidebar.number_input("Odds for 4 Goals", min_value=1.0, step=0.1, value=2.5),
+    "5 Goals": st.sidebar.number_input("Odds for 5 Goals", min_value=1.0, step=0.1, value=15.0),
+    "6+ Goals": st.sidebar.number_input("Odds for 6+ Goals", min_value=1.0, step=0.1, value=30.0)
+}
+
+# Calculate Exact Goal Probabilities
+exact_goal_probs = {}
+total_odds = sum(1 / value for value in exact_goals_odds.values())
+for goal, odds in exact_goals_odds.items():
+    prob = 1 / odds
+    exact_goal_probs[goal] = prob / total_odds * 100
+
+# Display Exact Goal Probabilities
+st.write(f"Exact Goal Probabilities: {exact_goal_probs}")
+
 # Button to predict probabilities and insights
 if st.button("Predict Probabilities and Insights"):
     try:
