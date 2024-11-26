@@ -179,6 +179,20 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
+        # Calculate Poisson Probabilities for Fulltime
+        fulltime_home_probs = calculate_poisson_prob(avg_goals_home, max_goals=4)
+        fulltime_away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
+        score_matrix = np.outer(fulltime_home_probs, fulltime_away_probs)
+
+        # Calculate Fulltime Score Probabilities
+        fulltime_score_probs = {f"{i}:{j}": score_matrix[i, j] for i in range(5) for j in range(5)}
+        fulltime_other_prob = 1 - sum(fulltime_score_probs.values())
+        fulltime_score_probs["Other"] = fulltime_other_prob
+
+        # Aggregate Probabilities for Fulltime Outcomes
+        home_win_prob = sum(fulltime_score_probs[f"{i}:{j}"] for i in range(5) for j in range(5) if i > j)
+        draw_prob = sum(fulltime_score_probs[f"{i}:{i}"] for i in range(5))
+        away_win_prob = sum(fulltime_score_probs[f"{i}:{j}"] for i in range(5) for j in range(5) if i < j)
         # Determine Most Likely Match Result
         most_likely_result = max(
             [("Home Win", home_win_prob), ("Draw", draw_prob), ("Away Win", away_win_prob)],
