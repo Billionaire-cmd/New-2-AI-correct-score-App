@@ -53,74 +53,83 @@ st.sidebar.subheader("BTTS GG/NG Odds")
 btts_gg = st.sidebar.number_input("BTTS (Yes) Odds", min_value=1.0, step=0.1, value=1.8)
 btts_ng = st.sidebar.number_input("BTTS (No) Odds", min_value=1.0, step=0.1, value=1.9)
 
-# Over/Under Odds (Halftime)
 st.sidebar.subheader("Over/Under Odds (Halftime)")
 over_1_5_ht = st.sidebar.number_input("Over 1.5 HT Odds", min_value=1.0, step=0.1, value=2.5)
 under_1_5_ht = st.sidebar.number_input("Under 1.5 HT Odds", min_value=1.0, step=0.1, value=1.6)
 
-# Over/Under Odds (Fulltime)
 st.sidebar.subheader("Over/Under Odds (Fulltime)")
 over_1_5_ft = st.sidebar.number_input("Over 1.5 FT Odds", min_value=1.0, step=0.1, value=1.4)
 under_1_5_ft = st.sidebar.number_input("Under 1.5 FT Odds", min_value=1.0, step=0.1, value=2.9)
 over_2_5_ft = st.sidebar.number_input("Over 2.5 FT Odds", min_value=1.0, step=0.1, value=2.0)
 under_2_5_ft = st.sidebar.number_input("Under 2.5 FT Odds", min_value=1.0, step=0.1, value=1.8)
 
-# Correct Score Odds (Fulltime)
+# Correct Score Odds (Fulltime and Halftime)
 st.sidebar.subheader("Correct Score Odds (Fulltime)")
 correct_score_odds_fulltime = {}
 for i in range(5):
     for j in range(5):
         score = f"{i}:{j}"
         correct_score_odds_fulltime[score] = st.sidebar.number_input(f"FT Odds for {score}", value=10.0, step=0.01)
-# "Other" scores for Fulltime
+
 correct_score_odds_fulltime["Other"] = st.sidebar.number_input("FT Odds for scores exceeding 4:4", value=50.0, step=0.01)
 
-# Correct Score Odds (Halftime)
 st.sidebar.subheader("Correct Score Odds (Halftime)")
 correct_score_odds_halftime = {}
 for i in range(3):
     for j in range(3):
         ht_score = f"{i}:{j}"
         correct_score_odds_halftime[ht_score] = st.sidebar.number_input(f"HT Odds for {ht_score}", value=10.0, step=0.01)
-# "Other" scores for Halftime
+
 correct_score_odds_halftime["Other"] = st.sidebar.number_input("HT Odds for scores exceeding 2:2", value=50.0, step=0.01)
 
-# Function to Calculate Probabilities based on Odds
-def calculate_probabilities(odds_home, odds_draw, odds_away):
-    home_prob = 1 / odds_home
-    draw_prob = 1 / odds_draw
-    away_prob = 1 / odds_away
-    total_prob = home_prob + draw_prob + away_prob
-    return home_prob / total_prob, draw_prob / total_prob, away_prob / total_prob
+# Calculate Probabilities from Odds
+ht_probs = [1 / ht_home, 1 / ht_draw, 1 / ht_away]
+ft_probs = [1 / ft_home, 1 / ft_draw, 1 / ft_away]
 
-# HT/FT Probabilities
-ht_home_prob, ht_draw_prob, ht_away_prob = calculate_probabilities(ht_home, ht_draw, ht_away)
-ft_home_prob, ft_draw_prob, ft_away_prob = calculate_probabilities(ft_home, ft_draw, ft_away)
+# Normalize Probabilities
+ht_prob_sum = sum(ht_probs)
+ft_prob_sum = sum(ft_probs)
+ht_probs_normalized = [round(prob / ht_prob_sum, 3) for prob in ht_probs]
+ft_probs_normalized = [round(prob / ft_prob_sum, 3) for prob in ft_probs]
 
-# Display HT/FT Probabilities and Margins
-st.write(f"Halftime Probabilities: Home {ht_home_prob:.3f}, Draw {ht_draw_prob:.3f}, Away {ht_away_prob:.3f}")
-st.write(f"Fulltime Probabilities: Home {ft_home_prob:.3f}, Draw {ft_draw_prob:.3f}, Away {ft_away_prob:.3f}")
-
-# Bookmaker Margin Calculations
+# Calculate Margins
 ht_margin = calculate_margin([ht_home, ht_draw, ht_away])
 ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
 
+# Display Results
+st.write(f"Halftime Probabilities (Normalized): {ht_probs_normalized}")
+st.write(f"Fulltime Probabilities (Normalized): {ft_probs_normalized}")
 st.write(f"Halftime Bookmaker Margin: {ht_margin:.2f}%")
 st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
 
-# Recommendation for HT/FT Correct Score
-# Assuming a simple model where the best odds are recommended
-if max(ht_home_prob, ht_draw_prob, ht_away_prob) == ht_home_prob:
-    st.write("Recommended Halftime Correct Score: Home leads (e.g., 1:0)")
-elif max(ht_home_prob, ht_draw_prob, ht_away_prob) == ht_draw_prob:
-    st.write("Recommended Halftime Correct Score: Draw (e.g., 0:0)")
-else:
-    st.write("Recommended Halftime Correct Score: Away leads (e.g., 0:1)")
+# Recommendation: Halftime/Full-time Correct Score
+st.subheader("Recommended Halftime/Full-time Correct Score")
+# Logic to determine the best recommended score based on probabilities
+best_ht_score = max(ht_probs_normalized)
+best_ft_score = max(ft_probs_normalized)
 
-if max(ft_home_prob, ft_draw_prob, ft_away_prob) == ft_home_prob:
-    st.write("Recommended Fulltime Correct Score: Home wins (e.g., 2:1)")
-elif max(ft_home_prob, ft_draw_prob, ft_away_prob) == ft_draw_prob:
-    st.write("Recommended Fulltime Correct Score: Draw (e.g., 1:1)")
+if best_ht_score == ht_probs_normalized[0]:
+    ht_result = "Home Team Leads"
+elif best_ht_score == ht_probs_normalized[1]:
+    ht_result = "Draw"
 else:
-    st.write("Recommended Fulltime Correct Score: Away wins (e.g., 1:2)")
+    ht_result = "Away Team Leads"
+
+if best_ft_score == ft_probs_normalized[0]:
+    ft_result = "Home Team Wins"
+elif best_ft_score == ft_probs_normalized[1]:
+    ft_result = "Draw"
+else:
+    ft_result = "Away Team Wins"
+
+st.write(f"Recommended Halftime Prediction: {ht_result}")
+st.write(f"Recommended Fulltime Prediction: {ft_result}")
+
+# Additional Expected Value Calculations
+st.subheader("Expected Value of Predictions")
+ht_expected_value = calculate_expected_value(ht_probs_normalized[0], ht_home)
+ft_expected_value = calculate_expected_value(ft_probs_normalized[0], ft_home)
+
+st.write(f"Expected Value for Halftime Home Prediction: {ht_expected_value:.2f}")
+st.write(f"Expected Value for Fulltime Home Prediction: {ft_expected_value:.2f}")
 
