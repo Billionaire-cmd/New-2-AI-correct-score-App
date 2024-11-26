@@ -16,7 +16,7 @@ def calculate_margin(odds_list):
 # Function to Calculate Expected Value
 def calculate_expected_value(prob, odds):
     """Calculate expected value."""
-    return (prob * odds) - 1
+    return (prob * odds) - 1) * 100
 
 # App Title and Introduction
 st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
