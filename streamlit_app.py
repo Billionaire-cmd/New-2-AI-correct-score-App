@@ -83,15 +83,24 @@ st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
 
 # Halftime/Fulltime Correct Score Recommendation
 # HT Score Information
+# HT Score Information
 st.subheader("Most Likely HT Score (90% Probability)")
 ht_recommendation = list(correct_score_odds_halftime.keys())[np.argmax(ht_probs)]
-best_ht_score = max(ht_probs)
-st.write(f"The most likely halftime score is {ht_recommendation} with a probability of {best_ht_score * 100:.2f}%.")
+ht_probability = max(ht_probs) * 100
+st.write(f"Recommended HT Score: {ht_recommendation}")
+st.write(f"Probability: {ht_probability:.2f}%")
 
-# FT Score Probability Range
+# FT Score Information
+st.subheader("Most Likely FT Score")
+ft_recommendation = list(correct_score_odds_fulltime.keys())[np.argmax(ft_probs)]
+ft_probability = max(ft_probs) * 100
+st.write(f"Recommended FT Score: {ft_recommendation}")
+st.write(f"Probability: {ft_probability:.2f}%")
+
+# FT Probability Range
 ft_probability_range = "20% to 25% (combined)"
-st.subheader("FT Score Probability Range")
-st.write(f"The fulltime score probabilities fall within the range: {ft_probability_range}.")
+st.subheader("Fulltime Probability Range")
+st.write(f"Combined FT Probability Range: {ft_probability_range}")
 
 # Exact Goals Odds Calculation (Optional)
 st.sidebar.subheader("Exact Goals Odds (0 to 6+ Goals)")
