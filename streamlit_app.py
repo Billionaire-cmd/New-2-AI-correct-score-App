@@ -107,6 +107,7 @@ ft_probs = calculate_probabilities([ft_home, ft_draw, ft_away])
 # Calculate Margins for HT and FT
 ht_margin = calculate_margin([ht_home, ht_draw, ht_away])
 ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
+
 # Sidebar for Exact Goals Odds Input
         st.sidebar.header("Enter Exact Goals Odds")
         exact_goals_odds = {
