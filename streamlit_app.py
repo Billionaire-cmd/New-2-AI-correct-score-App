@@ -70,49 +70,99 @@ def calculate_probabilities(odds_list):
 ht_probs = calculate_probabilities([ht_home, ht_draw, ht_away])
 ft_probs = calculate_probabilities([ft_home, ft_draw, ft_away])
 
-# Calculate Margins for HT and FT
-ht_margin = calculate_margin([ht_home, ht_draw, ht_away])
-ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
+# Predict Probabilities and Insights Button
+if st.button("Predict Probabilities and Insights"):
+    try:
+        # Calculate Poisson Probabilities for Fulltime
+        fulltime_home_probs = calculate_poisson_prob(avg_goals_home, max_goals=4)
+        fulltime_away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
+        score_matrix = np.outer(fulltime_home_probs, fulltime_away_probs)
 
-# Display HT/FT probabilities and margins
-st.write(f"Halftime Probabilities: {np.round(ht_probs, 3)}")
-st.write(f"Fulltime Probabilities: {np.round(ft_probs, 3)}")
-st.write(f"Halftime Bookmaker Margin: {ht_margin:.2f}%")
-st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
+        # Calculate Poisson Probabilities for Halftime (assuming halftime goals are ~50% of fulltime goals)
+        halftime_home_avg = avg_goals_home / 2
+        halftime_away_avg = avg_goals_away / 2
+        halftime_home_probs = calculate_poisson_prob(halftime_home_avg, max_goals=2)
+        halftime_away_probs = calculate_poisson_prob(halftime_away_avg, max_goals=2)
+        halftime_score_matrix = np.outer(halftime_home_probs, halftime_away_probs)
 
-# Halftime/Fulltime Correct Score Recommendation
-def recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime):
-    """Recommend the most probable HT/FT correct score."""
-    best_ht_score = max(ht_probs)
-    best_ft_score = max(ft_probs)
-    
-    ht_recommendation = list(correct_score_odds_halftime.keys())[np.argmax(ht_probs)]
-    ft_recommendation = list(correct_score_odds_fulltime.keys())[np.argmax(ft_probs)]
-    
-    st.subheader("Recommended Correct Score")
-    st.write(f"Most likely HT score: {ht_recommendation} with a probability of {best_ht_score*100:.2f}%")
-    st.write(f"Most likely FT score: {ft_recommendation} with a probability of {best_ft_score*100:.2f}%")
+        # Calculate Fulltime Score Probabilities
+        fulltime_score_probs = {f"{i}:{j}": score_matrix[i, j] for i in range(5) for j in range(5)}
+        fulltime_other_prob = 1 - sum(fulltime_score_probs.values())
+        fulltime_score_probs["Other"] = fulltime_other_prob
 
-recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime)
+        # Calculate Halftime Score Probabilities
+        halftime_score_probs = {f"{i}:{j}": halftime_score_matrix[i, j] for i in range(3) for j in range(3)}
+        halftime_other_prob = 1 - sum(halftime_score_probs.values())
+        halftime_score_probs["Other"] = halftime_other_prob
 
-# Exact Goals Odds Calculation (Optional)
-st.sidebar.subheader("Exact Goals Odds (0 to 6+ Goals)")
-exact_goals_odds = {
-    "0 Goals": st.sidebar.number_input("Odds for 0 Goals", min_value=1.0, step=0.1, value=6.0),
-    "1 Goal": st.sidebar.number_input("Odds for 1 Goal", min_value=1.0, step=0.1, value=5.5),
-    "2 Goals": st.sidebar.number_input("Odds for 2 Goals", min_value=1.0, step=0.1, value=4.0),
-    "3 Goals": st.sidebar.number_input("Odds for 3 Goals", min_value=1.0, step=0.1, value=3.0),
-    "4 Goals": st.sidebar.number_input("Odds for 4 Goals", min_value=1.0, step=0.1, value=2.5),
-    "5 Goals": st.sidebar.number_input("Odds for 5 Goals", min_value=1.0, step=0.1, value=15.0),
-    "6+ Goals": st.sidebar.number_input("Odds for 6+ Goals", min_value=1.0, step=0.1, value=30.0)
-}
+        # Sort Scores by Probability
+        sorted_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)
+        sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)
 
-# Calculate Exact Goal Probabilities
-exact_goal_probs = {}
-total_odds = sum(1 / value for value in exact_goals_odds.values())
-for goal, odds in exact_goals_odds.items():
-    prob = 1 / odds
-    exact_goal_probs[goal] = prob / total_odds * 100
+        # BTTS Probabilities
+        btts_yes_prob = sum(score_matrix[i][j] for i in range(1, 5) for j in range(1, 5)) * 100
+        btts_no_prob = 100 - btts_yes_prob
 
-# Display Exact Goal Probabilities
-st.write(f"Exact Goal Probabilities: {exact_goal_probs}")
+        # Over/Under 2.5 Goals Probabilities (Fulltime)
+        over_2_5_prob = sum(score_matrix[i][j] for i in range(3, 5) for j in range(5)) * 100
+        under_2_5_prob = 100 - over_2_5_prob
+
+        # Over/Under 1.5 Goals Probabilities (Halftime)
+        over_1_5_ht_prob = sum(halftime_score_matrix[i][j] for i in range(2, 3) for j in range(3)) * 100
+        under_1_5_ht_prob = 100 - over_1_5_ht_prob
+
+        # Over/Under 1.5 Goals Probabilities (Fulltime)
+        over_1_5_ft_prob = sum(score_matrix[i][j] for i in range(2, 5) for j in range(5)) * 100
+        under_1_5_ft_prob = 100 - over_1_5_ft_prob
+
+        # Match Outcome Probabilities
+        home_win_prob = sum(score_matrix[i][j] for i in range(1, 5) for j in range(0, i)) * 100
+        draw_prob = sum(score_matrix[i][i] for i in range(5)) * 100
+        away_win_prob = 100 - home_win_prob - draw_prob
+
+        # Bookmaker's Margins
+        margin_btts = calculate_margin([btts_yes_prob, btts_no_prob])
+        margin_over_under_2_5 = calculate_margin([over_2_5_prob, under_2_5_prob])
+        margin_over_under_1_5_ht = calculate_margin([over_1_5_ht_prob, under_1_5_ht_prob])
+        margin_over_under_1_5_ft = calculate_margin([over_1_5_ft_prob, under_1_5_ft_prob])
+        margin_match_outcomes = calculate_margin([home_win_prob, draw_prob, away_win_prob])
+
+        # Expected Values for Betting Markets
+        btts_yes_ev = calculate_expected_value(btts_yes_prob / 100, btts_yes_prob)
+        btts_no_ev = calculate_expected_value(btts_no_prob / 100, btts_no_prob)
+
+        # Show the insights in the Streamlit app
+        st.subheader("Fulltime Score Probabilities")
+        st.write(sorted_fulltime_scores)
+
+        st.subheader("Halftime Score Probabilities")
+        st.write(sorted_halftime_scores)
+
+        st.subheader("BTTS Probabilities")
+        st.write(f"BTTS Yes: {btts_yes_prob}%")
+        st.write(f"BTTS No: {btts_no_prob}%")
+
+        st.subheader("Over/Under 2.5 Goals (Fulltime) Probabilities")
+        st.write(f"Over 2.5 Goals: {over_2_5_prob}%")
+        st.write(f"Under 2.5 Goals: {under_2_5_prob}%")
+
+        st.subheader("Over/Under 1.5 Goals (Halftime) Probabilities")
+        st.write(f"Over 1.5 Goals: {over_1_5_ht_prob}%")
+        st.write(f"Under 1.5 Goals: {under_1_5_ht_prob}%")
+
+        st.subheader("Match Outcome Probabilities")
+        st.write(f"Home Win: {home_win_prob}%")
+        st.write(f"Draw: {draw_prob}%")
+        st.write(f"Away Win: {away_win_prob}%")
+
+        st.subheader("Expected Value (EV) and Betting Margins")
+        st.write(f"Expected Value (BTTS Yes): {btts_yes_ev}")
+        st.write(f"Expected Value (BTTS No): {btts_no_ev}")
+        st.write(f"Margin BTTS: {margin_btts}%")
+        st.write(f"Margin Over/Under 2.5 Goals: {margin_over_under_2_5}%")
+        st.write(f"Margin Over/Under 1.5 Goals (HT): {margin_over_under_1_5_ht}%")
+        st.write(f"Margin Over/Under 1.5 Goals (FT): {margin_over_under_1_5_ft}%")
+        st.write(f"Margin Match Outcomes: {margin_match_outcomes}%")
+
+    except Exception as e:
+        st.error(f"Error: {e}")
