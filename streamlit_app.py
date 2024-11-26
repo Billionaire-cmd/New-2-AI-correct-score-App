@@ -179,30 +179,5 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
-        # Aggregate Probabilities for Fulltime Outcomes
-        home_win_prob = sum(fulltime_score_probs[f"{i}:{j}"] for i in range(5) for j in range(5) if i > j)
-        draw_prob = sum(fulltime_score_probs[f"{i}:{i}"] for i in range(5))
-        away_win_prob = sum(fulltime_score_probs[f"{i}:{j}"] for i in range(5) for j in range(5) if i < j)
-
-        # Determine Most Likely Match Result
-        most_likely_result = max(
-            [("Home Win", home_win_prob), ("Draw", draw_prob), ("Away Win", away_win_prob)],
-            key=lambda x: x[2]
-        )
-
-        # Determine Most Likely Correct Score
-        most_likely_score = max(fulltime_score_probs.items(), key=lambda x: x[2])
-
-        # Display results
-        st.subheader("Match Outcome Predictions")
-        st.write(f"Most Probable Match Result: {most_likely_result[0]} ({most_likely_result[1] * 100:.2f}%)")
-        st.write(f"Recommended Correct Score: {most_likely_score[0]} ({most_likely_score[1] * 100:.2f}%)")
-
-        # Display Fulltime Score Probabilities
-        st.subheader("Top Fulltime Score Predictions")
-        top_fulltime_scores = sorted(fulltime_score_probs.items(), key=lambda x: x[1], reverse=True)[:5]
-        for score, prob in top_fulltime_scores:
-            st.write(f"{score}: {prob * 100:.2f}%")
-         
     except Exception as e:
         st.error(f"Error: {str(e)}")
