@@ -22,35 +22,6 @@ def calculate_poisson_prob(lambda_, max_goals=5):
     """Calculate Poisson probabilities up to max_goals."""
     return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
 
-# Function to Predict Most Probable Match Result
-def predict_match_result(avg_home, avg_away):
-    """Predict most probable result and score based on average goals."""
-    home_probs = calculate_poisson_prob(avg_home)
-    away_probs = calculate_poisson_prob(avg_away)
-    
-    # Calculate score matrix
-    score_matrix = np.outer(home_probs, away_probs)
-    
-    # Most likely correct score
-    max_prob_idx = np.unravel_index(score_matrix.argmax(), score_matrix.shape)
-    most_likely_score = f"{max_prob_idx[0]}:{max_prob_idx[1]}"
-    most_likely_prob = score_matrix[max_prob_idx] * 100
-
-    # Aggregate probabilities for outcomes
-    home_win_prob = np.sum(np.tril(score_matrix, -1)) * 100
-    draw_prob = np.sum(np.diag(score_matrix)) * 100
-    away_win_prob = np.sum(np.triu(score_matrix, 1)) * 100
-
-    # Determine most probable outcome
-    if home_win_prob > max(draw_prob, away_win_prob):
-        result = "Home Win"
-    elif away_win_prob > max(draw_prob, home_win_prob):
-        result = "Away Win"
-    else:
-        result = "Draw"
-
-    return result, most_likely_score, most_likely_prob
-
 # App Title and Introduction
 st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
 st.markdown("""
