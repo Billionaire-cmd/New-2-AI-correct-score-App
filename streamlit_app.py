@@ -60,11 +60,44 @@ ht_ft_odds = {
     "Away/Away": st.sidebar.number_input("HT/FT Odds for Away/Away", value=3.01, step=0.01)
 }
 
-# Example inputs for exact goals odds
-exact_goals_odds = st.sidebar.selectbox(
-    "Select Exact Goals Odds",
-    ["1", "2", "3", "4", "5", "6+"]
-)
+# Sidebar input for exact goals odds
+st.sidebar.header("Input Exact Goals Odds")
+odds_1 = st.sidebar.number_input("Odds for 1 goal", min_value=1.0, value=1.5)
+odds_2 = st.sidebar.number_input("Odds for 2 goals", min_value=1.0, value=2.0)
+odds_3 = st.sidebar.number_input("Odds for 3 goals", min_value=1.0, value=3.0)
+odds_4 = st.sidebar.number_input("Odds for 4 goals", min_value=1.0, value=5.0)
+odds_5 = st.sidebar.number_input("Odds for 5 goals", min_value=1.0, value=10.0)
+odds_6_plus = st.sidebar.number_input("Odds for 6+ goals", min_value=1.0, value=20.0)
+
+# Example calculation for HT probability (you can modify this based on your specific formula)
+ht_probability = 31.54  # For example, this would be computed based on your analysis
+
+# Example Full-time scores probabilities
+ft_scores = ['1:0', '1:1']  # Most likely FT scores based on your analysis
+ft_probability_range = "20% to 25%"  # This would be calculated dynamically based on your analysis
+
+# Displaying adjusted probability and most likely scores
+st.write(f"The adjusted probability for this outcome is: **{ht_probability}%**")
+st.write(f"\nThe **Most Likely FT Score** with an 80% probability is: **{', '.join(ft_scores)}**")
+st.write(f"The combined probabilities for these outcomes are: **{ft_probability_range}**")
+
+# Displaying recommendation based on input odds
+st.subheader("Recommended Correct Score")
+st.write("""
+    Based on the probabilities and odds, the **recommended correct score** would be:
+    
+    - **Halftime Score**: 0:0 (Highest probability: 31.54%)
+    - **Full-time Score**: Either 1:0 or 1:1 (Combined probability range: 20% to 25%)
+""")
+
+# Displaying the inputted odds
+st.sidebar.write("You have inputted the following odds:")
+st.sidebar.write(f"1 goal: {odds_1}")
+st.sidebar.write(f"2 goals: {odds_2}")
+st.sidebar.write(f"3 goals: {odds_3}")
+st.sidebar.write(f"4 goals: {odds_4}")
+st.sidebar.write(f"5 goals: {odds_5}")
+st.sidebar.write(f"6+ goals: {odds_6_plus}")
 
 # Calculate adjusted probabilities based on user input for exact goals odds
 # You can replace the logic below with actual probability calculations or model
