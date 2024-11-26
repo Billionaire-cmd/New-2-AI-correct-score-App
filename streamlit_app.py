@@ -17,6 +17,15 @@ def calculate_expected_value(prob, odds):
     """Calculate expected value."""
     return (prob * odds) - 1
 
+# Function to calculate bookmaker margin
+def calculate_margin(odds):
+    margin = sum([1 / odd for odd in odds]) - 1
+    return margin * 100
+
+# Function to calculate expected value
+def calculate_expected_value(probability, odds):
+    return probability * odds - (1 - probability) * 1
+
 # App Title and Introduction
 st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
 st.markdown("""
