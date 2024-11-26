@@ -130,6 +130,21 @@ def main():
         btts_yes_scores = [(i, j) for i in range(1, 5) for j in range(1, 5)]
         btts_no_scores = [(i, 0) for i in range(5)] + [(0, j) for j in range(5)]
 
+# Calculate BTTS Insights
+btts_gg_ft, btts_ng_ft = calculate_btts(fulltime_probabilities)
+btts_gg_ht, btts_ng_ht = calculate_btts(halftime_probabilities)
+
+# Display BTTS Insights
+st.subheader("BTTS Insights (Fulltime)")
+st.write(f"Probability of BTTS GG (Both Teams to Score): {btts_gg_ft:.2%}")
+st.write(f"Probability of BTTS NG (One or Both Teams Fail to Score): {btts_ng_ft:.2%}")
+visualize_btts(btts_gg_ft, btts_ng_ft)
+
+st.subheader("BTTS Insights (Halftime)")
+st.write(f"Probability of BTTS GG (Both Teams to Score): {btts_gg_ht:.2%}")
+st.write(f"Probability of BTTS NG (One or Both Teams Fail to Score): {btts_ng_ht:.2%}")
+visualize_btts(btts_gg_ht, btts_ng_ht)
+
 # Predict Probabilities and Insights
 if st.button("Predict Probabilities and Insights"):
     try:
@@ -205,22 +220,7 @@ if st.button("Predict Probabilities and Insights"):
         top_fulltime_score = sorted_fulltime_scores[0]  # Get the top FT score
         st.write(f"**Fulltime Correct Score Recommendation:** {top_fulltime_score[0]} "
                  f"(Probability: {top_fulltime_score[1] * 100:.2f}%)")  
-        # Calculate BTTS Insights
-btts_gg_ft, btts_ng_ft = calculate_btts(fulltime_probabilities)
-btts_gg_ht, btts_ng_ht = calculate_btts(halftime_probabilities)
-
-# Display BTTS Insights
-st.subheader("BTTS Insights (Fulltime)")
-st.write(f"Probability of BTTS GG (Both Teams to Score): {btts_gg_ft:.2%}")
-st.write(f"Probability of BTTS NG (One or Both Teams Fail to Score): {btts_ng_ft:.2%}")
-visualize_btts(btts_gg_ft, btts_ng_ft)
-
-st.subheader("BTTS Insights (Halftime)")
-st.write(f"Probability of BTTS GG (Both Teams to Score): {btts_gg_ht:.2%}")
-st.write(f"Probability of BTTS NG (One or Both Teams Fail to Score): {btts_ng_ht:.2%}")
-visualize_btts(btts_gg_ht, btts_ng_ht)
-
-   
+        
     except Exception as e:
         st.error(f"Error in prediction: {e}")
 
