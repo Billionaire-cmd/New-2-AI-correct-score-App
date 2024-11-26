@@ -64,6 +64,16 @@ st.sidebar.subheader("Team Statistics")
 avg_goals_home = st.sidebar.number_input("Avg Goals Scored (Home)", min_value=0.0, value=1.5, step=0.1)
 avg_goals_away = st.sidebar.number_input("Avg Goals Scored (Away)", min_value=0.0, value=1.2, step=0.1)
 
+# Sidebar for Average Points Inputs
+st.sidebar.subheader("Team Average Points")
+avg_points_home = st.sidebar.number_input("Avg Points (Home)", min_value=0.0, value=1.5, step=0.1)
+avg_points_away = st.sidebar.number_input("Avg Points (Away)", min_value=0.0, value=1.2, step=0.1)
+
+# Display Average Points Information
+st.subheader("Team Average Points")
+st.write(f"**Home Team Average Points**: {avg_points_home}")
+st.write(f"**Away Team Average Points**: {avg_points_away}")
+
 # Odds Inputs
 st.sidebar.subheader("Odds")
 ht_home = st.sidebar.number_input("HT Home Win Odds", min_value=1.0, value=2.5, step=0.1)
