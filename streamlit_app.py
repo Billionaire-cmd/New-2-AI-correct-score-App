@@ -90,6 +90,34 @@ ht_probability = max(ht_probs) * 100
 st.write(f"Recommended HT Score: {ht_recommendation}")
 st.write(f"Probability: {ht_probability:.2f}%")
 
+# Example probabilities for Home Win, Draw, and Away Win
+outcomes = {
+    "Home Win": 0.23,  # 23% probability
+    "Draw": 0.18,      # 18% probability
+    "Away Win": 0.22   # 22% probability
+}
+
+# Define the probability range
+lower_bound = 0.20  # 20%
+upper_bound = 0.25  # 25%
+
+# Find outcomes within the range
+def find_outcomes_in_range(outcomes, lower_bound, upper_bound):
+    results_in_range = {outcome: prob for outcome, prob in outcomes.items() 
+                        if lower_bound <= prob <= upper_bound}
+    return results_in_range
+
+# Get the outcomes within the range
+results_in_range = find_outcomes_in_range(outcomes, lower_bound, upper_bound)
+
+# Display results
+if results_in_range:
+    print("Outcomes within 20% to 25% probability range:")
+    for outcome, prob in results_in_range.items():
+        print(f"- {outcome}: {prob * 100:.2f}%")
+else:
+    print("No outcomes found within the 20% to 25% probability range.")
+
 # FT Score Information
 st.subheader("Most Likely FT Score")
 ft_recommendation = list(correct_score_odds_fulltime.keys())[np.argmax(ft_probs)]
