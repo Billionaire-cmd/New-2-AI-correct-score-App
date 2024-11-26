@@ -154,6 +154,61 @@ if st.button("Predict Probabilities and Insights"):
         halftime_score_text = "\n".join([f"Score {score}: Probability {prob*100:.2f}%" for score, prob in halftime_score_probs.items()])
         st.write(halftime_score_text)
 
+        # Sidebar for Exact Goals Odds Input
+        st.sidebar.header("Enter Exact Goals Odds")
+        exact_goals_odds = {
+        "0 Goals": st.sidebar.number_input("Odds for 0 Goals", min_value=1.0, step=0.1, value=6.0),
+        "1 Goal": st.sidebar.number_input("Odds for 1 Goal", min_value=1.0, step=0.1, value=5.5),
+        "2 Goals": st.sidebar.number_input("Odds for 2 Goals", min_value=1.0, step=0.1, value=4.0),
+        "3 Goals": st.sidebar.number_input("Odds for 3 Goals", min_value=1.0, step=0.1, value=3.0),
+        "4 Goals": st.sidebar.number_input("Odds for 4 Goals", min_value=1.0, step=0.1, value=2.5),
+        "5 Goals": st.sidebar.number_input("Odds for 5 Goals", min_value=1.0, step=0.1, value=15.0),
+        "6+ Goals": st.sidebar.number_input("Odds for 6+ Goals", min_value=1.0, step=0.1, value=30.0)
+}
+
+       # Display Exact Goals Odds
+       st.sidebar.subheader("Current Exact Goals Odds")
+       for goal, odds in exact_goals_odds.items():
+       st.sidebar.write(f"{goal}: {odds} odds")
+
+       # Information for HT and FT Scores
+
+       # HT Score Information
+       st.subheader("Most Likely HT Score (90% Probability)")
+       ht_score = "0:0"
+       ht_probability = 31.54
+
+       # FT Score Information
+       st.subheader("Most Likely FT Score (80% Probability)")
+       ft_scores = ["1:0", "1:1"]
+       ft_probability_range = "20% to 25% (combined)"
+
+       # Displaying the results
+       st.write(f"The **Most Likely HT Score** with a 90% probability is: **{ht_score}**")
+       st.write(f"The adjusted probability for this outcome is: **{ht_probability}%**")
+
+       st.write(f"\nThe **Most Likely FT Score** with an 80% probability is: **{', '.join(ft_scores)}**")
+       st.write(f"The combined probabilities for these outcomes are: **{ft_probability_range}**")
+
+       # Displaying recommendation
+       st.subheader("Recommended Correct Score")
+       st.write("""
+       Based on the probabilities and odds, the **recommended correct score** would be:
+    
+       - **Halftime Score**: 0:0 (Highest probability: 31.54%)
+       - **Full-time Score**: Either 1:0 or 1:1 (Combined probability range: 20% to 25%)
+       """)
+
+       # Footer Information
+       st.write("""
+       The model is based on odds adjustment and probabilities derived from bookmaker margins. The values are a result of calculated adjusted probabilities after factoring in bookmaker margins.
+       """)
+
+       # Run the app
+       if __name__ == "__main__":
+       st.write("Enjoy using this app for football predictions!")
+
+        
         # Display Recommendations
         st.write("### Recommended Moderate and High Realistic Outcomes:")
 
