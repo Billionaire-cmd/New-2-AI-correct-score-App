@@ -38,6 +38,27 @@ avg_goals_away = st.sidebar.number_input("Average Goals Scored by Away Team", mi
 avg_points_home = st.sidebar.number_input("Average Points for Home Team", min_value=0.0, step=0.1, value=1.8)
 avg_points_away = st.sidebar.number_input("Average Points for Away Team", min_value=0.0, step=0.1, value=1.5)
 
+# HT/FT Odds Inputs
+st.sidebar.subheader("Halftime/Fulltime (HT/FT) Odds")
+
+ht_ft_odds = {
+    "Home/Away": st.sidebar.number_input("HT/FT Odds for Home/Away", value=24.12, step=0.01),
+    "Home/Home": st.sidebar.number_input("HT/FT Odds for Home/Home", value=14.52, step=0.01),
+    "Home/Draw": st.sidebar.number_input("HT/FT Odds for Home/Draw", value=5.13, step=0.01),
+    "Draw/Home": st.sidebar.number_input("HT/FT Odds for Draw/Home", value=6.08, step=0.01),
+    "Draw/Draw": st.sidebar.number_input("HT/FT Odds for Draw/Draw", value=5.27, step=0.01),
+    "Draw/Away": st.sidebar.number_input("HT/FT Odds for Draw/Away", value=7.77, step=0.01),
+    "Away/Home": st.sidebar.number_input("HT/FT Odds for Away/Home", value=33.53, step=0.01),
+    "Away/Draw": st.sidebar.number_input("HT/FT Odds for Away/Draw", value=14.26, step=0.01),
+    "Away/Away": st.sidebar.number_input("HT/FT Odds for Away/Away", value=3.01, step=0.01)
+}
+
+# Displaying Odds
+st.write("### Halftime/Fulltime Odds:")
+for key, value in ht_ft_odds.items():
+    st.write(f"{key}: {value}")
+
+
 # Betting Odds for HT and FT
 st.sidebar.subheader("Halftime Odds")
 ht_home = st.sidebar.number_input("Halftime Home Odds", min_value=1.0, step=0.1, value=2.5)
@@ -62,6 +83,18 @@ def get_correct_score_odds(prefix, max_goals, half_time=True):
 
 correct_score_odds_halftime = get_correct_score_odds("HT", 3)
 correct_score_odds_fulltime = get_correct_score_odds("FT", 5, half_time=False)
+
+# Calculate HT/FT Probabilities
+ht_ft_probs = {key: 1 / value for key, value in ht_ft_odds.items()}
+
+# Normalize Probabilities (to sum up to 1)
+total_prob = sum(ht_ft_probs.values())
+ht_ft_probs_normalized = {key: prob / total_prob for key, prob in ht_ft_probs.items()}
+
+# Display HT/FT Probabilities
+st.write("### HT/FT Probabilities:")
+for key, prob in ht_ft_probs_normalized.items():
+    st.write(f"{key}: {prob * 100:.2f}%")
 
 # Calculate Probabilities for HT/FT based on odds
 def calculate_probabilities(odds_list):
@@ -211,6 +244,6 @@ if st.button("Predict Probabilities and Insights"):
         st.write(f"#### Under 1.5 Goals Probability: {under_1_5_prob * 100:.2f}%")
         st.write(f"#### Over 2.5 Goals Probability: {over_2_5_prob * 100:.2f}%")
         st.write(f"#### Under 2.5 Goals Probability: {under_2_5_prob * 100:.2f}%")
-   
+    
     except Exception as e:
         st.error(f"Error in prediction: {str(e)}")
