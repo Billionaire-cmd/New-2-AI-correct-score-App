@@ -62,12 +62,8 @@ ht_ft_odds = {
 
 # Displaying the inputted odds
 st.sidebar.write("You have inputted the following odds:")
-st.sidebar.write(f"1 goal: {odds_1}")
-st.sidebar.write(f"2 goals: {odds_2}")
-st.sidebar.write(f"3 goals: {odds_3}")
-st.sidebar.write(f"4 goals: {odds_4}")
-st.sidebar.write(f"5 goals: {odds_5}")
-st.sidebar.write(f"6+ goals: {odds_6_plus}")
+for key, value in ht_ft_odds.items():
+    st.sidebar.write(f"{key}: {value}")
 
 # Betting Odds for HT and FT
 st.sidebar.subheader("Halftime Odds")
@@ -118,8 +114,6 @@ ft_probs = calculate_probabilities([ft_home, ft_draw, ft_away])
 ht_margin = calculate_margin([ht_home, ht_draw, ht_away])
 ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
 
-# Halftime/Fulltime Correct Score Recommendation
-
 # Button to predict probabilities and insights
 if st.button("Predict Probabilities and Insights"):
     try:
@@ -153,43 +147,15 @@ if st.button("Predict Probabilities and Insights"):
         halftime_high = {score: prob for score, prob in halftime_score_probs.items() if prob > 0.30}
         halftime_moderate = {score: prob for score, prob in halftime_score_probs.items() if 0.20 < prob <= 0.30}
 
-        # Display Fulltime Score Probabilities as text
-        st.write("### Fulltime Score Probabilities (Poisson):")
-        fulltime_score_text = "\n".join([f"Score {score}: Probability {prob*100:.2f}%" for score, prob in fulltime_score_probs.items()])
-        st.write(fulltime_score_text)
+        # Display Realistic Fulltime Predictions
+        st.write("### Realistic Fulltime Predictions:")
+        st.write("**High Probability Scores:**", fulltime_high)
+        st.write("**Moderate Probability Scores:**", fulltime_moderate)
 
-        # Display Halftime Score Probabilities as text
-        st.write("### Halftime Score Probabilities (Poisson):")
-        halftime_score_text = "\n".join([f"Score {score}: Probability {prob*100:.2f}%" for score, prob in halftime_score_probs.items()])
-        st.write(halftime_score_text)
-
-        
-        
-        # Display Recommendations
-        st.write("### Recommended Moderate and High Realistic Outcomes:")
-
-        st.write("#### High Realistic Fulltime Scores:")
-        for score, prob in fulltime_high.items():
-            st.write(f"{score}: Probability {prob*100:.2f}%")
-
-        st.write("#### Moderate Fulltime Scores:")
-        for score, prob in fulltime_moderate.items():
-            st.write(f"{score}: Probability {prob*100:.2f}%")
-
-        st.write("#### High Realistic Halftime Scores:")
-        for score, prob in halftime_high.items():
-            st.write(f"{score}: Probability {prob*100:.2f}%")
-
-        st.write("#### Moderate Halftime Scores:")
-        for score, prob in halftime_moderate.items():
-            st.write(f"{score}: Probability {prob*100:.2f}%")
-
-        # Recommend HT/FT Outcome
-        most_likely_ht_ft = max(ht_ft_probs_normalized, key=ht_ft_probs_normalized.get)
-        highest_prob = ht_ft_probs_normalized[most_likely_ht_ft]
-
-        st.subheader("HT/FT Recommendation")
-        st.write(f"Most likely HT/FT outcome: **{most_likely_ht_ft}** with a probability of **{highest_prob * 100:.2f}%**.")
-
+        # Display Realistic Halftime Predictions
+        st.write("### Realistic Halftime Predictions:")
+        st.write("**High Probability Scores:**", halftime_high)
+        st.write("**Moderate Probability Scores:**", halftime_moderate)
     except Exception as e:
-        st.error(f"Error in prediction: {str(e)}")
+        st.write(f"Error in predictions: {e}")
+
