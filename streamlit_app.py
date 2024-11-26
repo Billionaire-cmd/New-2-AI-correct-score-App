@@ -17,11 +17,6 @@ def calculate_expected_value(prob, odds):
     """Calculate expected value."""
     return (prob * odds) - 1
 
-# Function to calculate probabilities from odds
-def calculate_probabilities(odds_list):
-    """Calculate probabilities based on odds."""
-    return [1 / odds for odds in odds_list]
-
 # App Title and Introduction
 st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
 st.markdown("""
@@ -68,10 +63,14 @@ correct_score_odds_halftime = get_correct_score_odds("HT", 3)
 correct_score_odds_fulltime = get_correct_score_odds("FT", 5, half_time=False)
 
 # Calculate Probabilities for HT/FT based on odds
+def calculate_probabilities(odds_list):
+    """Calculate probabilities based on odds."""
+    return [1 / odds for odds in odds_list]
+
 ht_probs = calculate_probabilities([ht_home, ht_draw, ht_away])
 ft_probs = calculate_probabilities([ft_home, ft_draw, ft_away])
 
-# When the button is clicked, predict probabilities and show insights
+# Button to predict probabilities and insights
 if st.button("Predict Probabilities and Insights"):
     try:
         # Calculate Poisson Probabilities for Fulltime
@@ -101,54 +100,46 @@ if st.button("Predict Probabilities and Insights"):
         sorted_halftime_scores = sorted(halftime_score_probs.items(), key=lambda x: x[1], reverse=True)
 
         # BTTS Probabilities
-        btts_yes_prob = sum(score_matrix[i][j] for i in range(1, 5) for j in range(1, 5)) * 100
+        btts_yes_prob = sum(score_matrix[i][j] for i in range(1,5) for j in range(1,5)) * 100
         btts_no_prob = 100 - btts_yes_prob
 
         # Over/Under 2.5 Goals Probabilities (Fulltime)
-        over_2_5_prob = sum(score_matrix[i][j] for i in range(3, 5) for j in range(5)) * 100
+        over_2_5_prob = sum(score_matrix[i][j] for i in range(3,5) for j in range(5)) * 100
         under_2_5_prob = 100 - over_2_5_prob
 
         # Over/Under 1.5 Goals Probabilities (Halftime)
-        over_1_5_ht_prob = sum(halftime_score_matrix[i][j] for i in range(2, 3) for j in range(3)) * 100
+        over_1_5_ht_prob = sum(halftime_score_matrix[i][j] for i in range(2,3) for j in range(3)) * 100
         under_1_5_ht_prob = 100 - over_1_5_ht_prob
 
         # Over/Under 1.5 Goals Probabilities (Fulltime)
-        over_1_5_ft_prob = sum(score_matrix[i][j] for i in range(2, 5) for j in range(5)) * 100
+        over_1_5_ft_prob = sum(score_matrix[i][j] for i in range(2,5) for j in range(5)) * 100
         under_1_5_ft_prob = 100 - over_1_5_ft_prob
 
         # Match Outcome Probabilities
-        home_win_prob = sum(score_matrix[i][j] for i in range(1, 5) for j in range(0, i)) * 100
+        home_win_prob = sum(score_matrix[i][j] for i in range(1,5) for j in range(0,i)) * 100
         draw_prob = sum(score_matrix[i][i] for i in range(5)) * 100
         away_win_prob = 100 - home_win_prob - draw_prob
 
-        # Bookmaker's Margins
-        margin_btts = calculate_margin([btts_yes_prob, btts_no_prob])
-        margin_over_under_2_5 = calculate_margin([over_2_5_prob, under_2_5_prob])
-        margin_over_under_1_5_ht = calculate_margin([over_1_5_ht_prob, under_1_5_ht_prob])
-        margin_over_under_1_5_ft = calculate_margin([over_1_5_ft_prob, under_1_5_ft_prob])
-        margin_match_outcomes = calculate_margin([home_win_prob, draw_prob, away_win_prob])
+        # Display Probabilities and Insights
+        st.subheader("Match Predictions Based on Poisson Probabilities")
+        st.write("Fulltime Score Probabilities (Top 5):")
+        for score, prob in sorted_fulltime_scores[:5]:
+            st.write(f"{score}: {prob*100:.2f}%")
 
-        # Display Insights and Value Bets
-        st.subheader("Predicted Probabilities")
-        st.write(f"**Fulltime Score Probabilities**: {sorted_fulltime_scores}")
-        st.write(f"**Halftime Score Probabilities**: {sorted_halftime_scores}")
-        st.write(f"**BTTS Yes Probability**: {btts_yes_prob}%")
-        st.write(f"**BTTS No Probability**: {btts_no_prob}%")
-        st.write(f"**Over 2.5 Goals Probability**: {over_2_5_prob}%")
-        st.write(f"**Under 2.5 Goals Probability**: {under_2_5_prob}%")
-        st.write(f"**Over 1.5 Goals (Halftime) Probability**: {over_1_5_ht_prob}%")
-        st.write(f"**Under 1.5 Goals (Halftime) Probability**: {under_1_5_ht_prob}%")
-        st.write(f"**Over 1.5 Goals (Fulltime) Probability**: {over_1_5_ft_prob}%")
-        st.write(f"**Under 1.5 Goals (Fulltime) Probability**: {under_1_5_ft_prob}%")
-        st.write(f"**Home Win Probability**: {home_win_prob}%")
-        st.write(f"**Draw Probability**: {draw_prob}%")
-        st.write(f"**Away Win Probability**: {away_win_prob}%")
-        st.write(f"**Bookmaker Margin (BTTS)**: {margin_btts}%")
-        st.write(f"**Bookmaker Margin (Over/Under 2.5)**: {margin_over_under_2_5}%")
-        st.write(f"**Bookmaker Margin (Over/Under 1.5 HT)**: {margin_over_under_1_5_ht}%")
-        st.write(f"**Bookmaker Margin (Over/Under 1.5 FT)**: {margin_over_under_1_5_ft}%")
-        st.write(f"**Bookmaker Margin (Match Outcomes)**: {margin_match_outcomes}%")
+        st.write("Halftime Score Probabilities (Top 3):")
+        for score, prob in sorted_halftime_scores[:3]:
+            st.write(f"{score}: {prob*100:.2f}%")
 
+        st.write(f"BTTS Yes Probability: {btts_yes_prob:.2f}%")
+        st.write(f"BTTS No Probability: {btts_no_prob:.2f}%")
+        st.write(f"Over 2.5 Goals (Fulltime) Probability: {over_2_5_prob:.2f}%")
+        st.write(f"Under 2.5 Goals (Fulltime) Probability: {under_2_5_prob:.2f}%")
+        st.write(f"Over 1.5 Goals (Halftime) Probability: {over_1_5_ht_prob:.2f}%")
+        st.write(f"Under 1.5 Goals (Halftime) Probability: {under_1_5_ht_prob:.2f}%")
+        st.write(f"Over 1.5 Goals (Fulltime) Probability: {over_1_5_ft_prob:.2f}%")
+        st.write(f"Under 1.5 Goals (Fulltime) Probability: {under_1_5_ft_prob:.2f}%")
+        st.write(f"Home Win Probability: {home_win_prob:.2f}%")
+        st.write(f"Draw Probability: {draw_prob:.2f}%")
+        st.write(f"Away Win Probability: {away_win_prob:.2f}%")
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
-
