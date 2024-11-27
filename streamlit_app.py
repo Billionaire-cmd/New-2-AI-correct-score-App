@@ -90,14 +90,14 @@ def calculate_predictions():
     st.subheader("Halftime Correct Score Predictions")
     for home_goals, away_goals, prob in ht_results:
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
-        adjusted_prob_percent = adjusted_prob * 100  # Adjusted probability as percentage
-        st.write(f"HT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}, Adjusted for Over 2.5: {adjusted_prob_percent:.2f}%")
+        adjusted_prob_percentage = adjusted_prob * 100  # Convert to percentage
+        st.write(f"HT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}, Adjusted for Over 2.5: {adjusted_prob_percentage:.2f}%")
 
     st.subheader("Full-time Correct Score Predictions")
     for home_goals, away_goals, prob in ft_results:
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
-        adjusted_prob_percent = adjusted_prob * 100  # Adjusted probability as percentage
-        st.write(f"FT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}, Adjusted for Over 2.5: {adjusted_prob_percent:.2f}%")
+        adjusted_prob_percentage = adjusted_prob * 100  # Convert to percentage
+        st.write(f"FT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}, Adjusted for Over 2.5: {adjusted_prob_percentage:.2f}%")
 
     # Final recommendation output
     st.subheader("Final Recommendations")
