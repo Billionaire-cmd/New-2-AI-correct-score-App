@@ -78,5 +78,12 @@ def app():
     st.write(f"Implied Probability from FT Odds (1-2): {implied_probability(ft_odds['1-2'])*100:.2f}%")
     st.write(f"Implied Probability for Over 2.5 Goals: {implied_probability(over_2_5_odds)*100:.2f}%")
 
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
+
 if __name__ == "__main__":
     app()
