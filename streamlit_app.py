@@ -54,6 +54,12 @@ ft_correct_scores = {
     "0:2": st.sidebar.number_input("FT Odds for 0:2", value=20.77),
 }
 
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
 # Helper Function: Poisson Probability
 def poisson_probability(lam, x):
     return poisson.pmf(x, lam)
