@@ -2,88 +2,86 @@ import streamlit as st
 import numpy as np
 from scipy.stats import poisson
 
-# Function to calculate Poisson probability
-def poisson_prob(lmbda, k):
-    return poisson.pmf(k, lmbda)
+# Define the function to calculate Poisson probabilities
+def poisson_prob(lambda_rate, k):
+    return poisson.pmf(k, lambda_rate)
 
-# Function to calculate odds implied probability
-def implied_probability(odds):
+# Function to calculate the odds-based probabilities
+def odds_to_prob(odds):
     return 1 / odds
 
-# Main function to calculate match probabilities
-def calculate_match_probabilities(home_avg_goals, away_avg_goals, ht_odds, ft_odds, over_2_5_odds, under_2_5_odds):
-    # Calculate halftime and full-time probabilities for 0-2 scores based on Poisson distribution
-    home_lambda_ht = home_avg_goals / 2  # Halftime goals approximation
-    away_lambda_ht = away_avg_goals / 2  # Halftime goals approximation
-    
-    home_lambda_ft = home_avg_goals     # Full-time goals approximation
-    away_lambda_ft = away_avg_goals     # Full-time goals approximation
-    
-    # Poisson probabilities for 0 goals for Home and 2 goals for Away (Halftime and Full-time)
-    prob_0_home_ht = poisson_prob(home_lambda_ht, 0)
-    prob_2_away_ht = poisson_prob(away_lambda_ht, 2)
+# Main function to calculate and display predictions
+def calculate_predictions():
+    # User input: Team A and Team B stats
+    team_a_home_goals = st.number_input("Team A Average Goals Scored (Home)", min_value=0.0, value=1.50)
+    team_b_away_goals = st.number_input("Team B Average Goals Scored (Away)", min_value=0.0, value=1.30)
+    team_a_home_conceded = st.number_input("Team A Average Goals Conceded (Home)", min_value=0.0, value=1.30)
+    team_b_away_conceded = st.number_input("Team B Average Goals Conceded (Away)", min_value=0.0, value=1.50)
 
-    prob_0_home_ft = poisson_prob(home_lambda_ft, 0)
-    prob_2_away_ft = poisson_prob(away_lambda_ft, 2)
-    
-    # Implied probabilities for HT and FT odds
-    implied_prob_ht_0_2 = implied_probability(ht_odds['0-2'])
-    implied_prob_ft_1_2 = implied_probability(ft_odds['1-2'])
-    
-    # Over/Under 2.5 Goals Implied Probabilities
-    implied_prob_over_2_5 = implied_probability(over_2_5_odds)
-    implied_prob_under_2_5 = implied_probability(under_2_5_odds)
-    
-    # Combining the probabilities (HT and FT for Team B's Away Win with 1-2 and 0-2 halftime score)
-    ht_probability = prob_0_home_ht * prob_2_away_ht  # HT result probability for 0-2
-    ft_probability = prob_0_home_ft * prob_2_away_ft  # FT result probability for 1-2
-    
-    # Final probabilities combining HT, FT, and other odds
-    final_ht_ft_probability = ht_probability * ft_probability
-    final_over_2_5_probability = final_ht_ft_probability * implied_prob_over_2_5
-    
-    return final_ht_ft_probability, final_over_2_5_probability
+    # User input: Odds for HT and FT outcomes
+    ht_home_win_odds = st.number_input("HT Home Win Odds", min_value=0.0, value=2.40)
+    ht_draw_odds = st.number_input("HT Draw Odds", min_value=0.0, value=2.10)
+    ht_away_win_odds = st.number_input("HT Away Win Odds", min_value=0.0, value=4.50)
+    ft_home_win_odds = st.number_input("FT Home Win Odds", min_value=0.0, value=1.80)
+    ft_draw_odds = st.number_input("FT Draw Odds", min_value=0.0, value=3.50)
+    ft_away_win_odds = st.number_input("FT Away Win Odds", min_value=0.0, value=3.90)
 
-# Streamlit App UI
-def app():
-    st.title("Football Match Prediction: Halftime and Full-time Correct Score")
-    
-    # Sidebar Inputs
-    st.sidebar.header("Enter Match Statistics and Odds")
-    
-    home_avg_goals = st.sidebar.number_input("Avg Goals Scored by Home Team", value=1.50)
-    away_avg_goals = st.sidebar.number_input("Avg Goals Scored by Away Team", value=1.30)
-    
-    ht_odds = {
-        '0-2': st.sidebar.number_input("HT Odds for 0-2", value=26.08)
-    }
-    ft_odds = {
-        '1-2': st.sidebar.number_input("FT Odds for 1-2", value=13.21)
-    }
-    
-    over_2_5_odds = st.sidebar.number_input("Over 2.5 Goals Odds", value=1.87)
-    under_2_5_odds = st.sidebar.number_input("Under 2.5 Goals Odds", value=1.80)
-    
-    # Calculate probabilities
-    ht_ft_probability, over_2_5_probability = calculate_match_probabilities(
-        home_avg_goals, away_avg_goals, ht_odds, ft_odds, over_2_5_odds, under_2_5_odds
-    )
-    
-    # Display Results
-    st.header("Prediction Results")
-    st.write(f"Probability of Halftime & Full-time Correct Score (0-2 HT, 1-2 FT): {ht_ft_probability*100:.2f}%")
-    st.write(f"Probability of Over 2.5 Goals: {over_2_5_probability*100:.2f}%")
-    
-    st.write(f"Implied Probability from HT Odds (0-2): {implied_probability(ht_odds['0-2'])*100:.2f}%")
-    st.write(f"Implied Probability from FT Odds (1-2): {implied_probability(ft_odds['1-2'])*100:.2f}%")
-    st.write(f"Implied Probability for Over 2.5 Goals: {implied_probability(over_2_5_odds)*100:.2f}%")
+    # User input: Over/Under 2.5 Goals and BTTS
+    over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=0.0, value=1.87)
+    under_2_5_odds = st.number_input("Under 2.5 Goals Odds", min_value=0.0, value=1.80)
+    btts_gg_odds = st.number_input("BTTS GG Odds", min_value=0.0, value=1.77)
+    btts_ng_odds = st.number_input("BTTS NG Odds", min_value=0.0, value=1.83)
 
-# Add a submit button to the sidebar
-with st.sidebar:
-    st.markdown("### Submit Prediction")
-    if st.button("Submit Prediction"):
-        st.success("Prediction submitted! Results will be displayed below.")
+    # Calculate Poisson probabilities for HT (halftime)
+    team_a_ht_goal_rate = team_a_home_goals / 2  # Approximate halftime goals
+    team_b_ht_goal_rate = team_b_away_goals / 2  # Approximate halftime goals
 
+    team_a_ht_0_goals = poisson_prob(team_a_ht_goal_rate, 0)  # Team A scoring 0 goals
+    team_b_ht_2_goals = poisson_prob(team_b_ht_goal_rate, 2)  # Team B scoring 2 goals
+
+    # Calculate the probability of a 0-2 halftime scoreline (Team A 0, Team B 2)
+    poisson_0_2_ht = team_a_ht_0_goals * team_b_ht_2_goals
+
+    # Calculate odds-based probabilities
+    ht_0_2_odds = 26.08
+    ht_0_2_prob = odds_to_prob(ht_0_2_odds)
+
+    # Display HT Prediction Results
+    st.subheader("Halftime Correct Score Prediction")
+    st.write(f"Poisson-based probability of HT 0-2 (Team A 0, Team B 2): {poisson_0_2_ht:.4f}")
+    st.write(f"Odds-based probability of HT 0-2: {ht_0_2_prob:.4f}")
+
+    # Calculate Full-time probability for 1-2 scoreline
+    team_a_ft_goal_rate = team_a_home_goals  # Full-time goal rate
+    team_b_ft_goal_rate = team_b_away_goals  # Full-time goal rate
+
+    team_a_ft_1_goals = poisson_prob(team_a_ft_goal_rate, 1)  # Team A scoring 1 goal
+    team_b_ft_2_goals = poisson_prob(team_b_ft_goal_rate, 2)  # Team B scoring 2 goals
+
+    # Calculate the probability of a 1-2 full-time scoreline (Team A 1, Team B 2)
+    poisson_1_2_ft = team_a_ft_1_goals * team_b_ft_2_goals
+
+    # Display FT Prediction Results
+    st.subheader("Full-time Correct Score Prediction")
+    st.write(f"Poisson-based probability of FT 1-2 (Team A 1, Team B 2): {poisson_1_2_ft:.4f}")
+
+    # Combine the calculated probabilities and odds to provide a final result
+    st.write(f"Combined Halftime 0-2 Probability: {poisson_0_2_ht * 100:.2f}%")
+    st.write(f"Combined Full-time 1-2 Probability: {poisson_1_2_ft * 100:.2f}%")
+
+    # Conclusion based on inputs
+    st.subheader("Conclusion")
+    st.write("Based on the provided inputs, the predicted halftime score of 0-2 and full-time score of 1-2 are statistically reasonable with the following probabilities:")
+    st.write(f"HT 0-2: {poisson_0_2_ht * 100:.2f}% (Poisson), {ht_0_2_prob * 100:.2f}% (Odds-based)")
+    st.write(f"FT 1-2: {poisson_1_2_ft * 100:.2f}% (Poisson)")
+
+# Create the app layout
+def main():
+    st.title("Football Match Prediction: Halftime & Full-time Correct Score")
+    st.sidebar.header("Enter Match Inputs")
+    
+    # Call the function to calculate predictions
+    calculate_predictions()
 
 if __name__ == "__main__":
-    app()
+    main()
