@@ -65,6 +65,10 @@ def calculate_predictions():
         ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
         ft_results.append((home_goals, away_goals, ft_prob))
 
+    # Final recommendation for the highest probability HT and FT scoreline
+    highest_ht_prob = max(ht_results, key=lambda x: x[2])  # HT scoreline with the highest probability
+    highest_ft_prob = max(ft_results, key=lambda x: x[2])  # FT scoreline with the highest probability
+
     # Display HT and FT predictions
     st.subheader("Halftime Correct Score Predictions")
     for home_goals, away_goals, prob in ht_results:
@@ -73,6 +77,11 @@ def calculate_predictions():
     st.subheader("Full-time Correct Score Predictions")
     for home_goals, away_goals, prob in ft_results:
         st.write(f"FT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}")
+
+    # Final recommendation output
+    st.subheader("Final Recommendations")
+    st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]:.4f}")
+    st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]:.4f}")
 
     # Combine odds for each scoreline and display the odds-based probability
     st.subheader("Odds-based Probabilities for Correct Scorelines")
