@@ -125,8 +125,8 @@ def calculate_predictions():
     st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]*100:.2f}%")
     st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]*100:.2f}%")
     st.subheader("Final Recommendations")
-    st.write(f"HT 0-2: Poisson Probability: {ht_0_2_prob:.4f}, Adjusted: {adjust_for_over_2_5_goals(over_2_5_odds, ht_0_2_prob):.2f}%")
-    st.write(f"FT 1-2: Poisson Probability: {ft_1_2_prob:.4f}, Adjusted: {adjust_for_over_2_5_goals(over_2_5_odds, ft_1_2_prob):.2f}%")
+    st.write(f"HT 0-0: Poisson Probability: {ht_0_0_prob:.4f}, Adjusted: {adjust_for_over_2_5_goals(over_2_5_odds, ht_0_2_prob):.2f}%")
+    st.write(f"FT 0-1: Poisson Probability: {ft_1_1_prob:.4f}, Adjusted: {adjust_for_over_2_5_goals(over_2_5_odds, ft_1_2_prob):.2f}%")
 
 # Add a submit button to the sidebar
 with st.sidebar:
