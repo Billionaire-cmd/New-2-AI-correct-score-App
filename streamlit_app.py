@@ -43,7 +43,7 @@ def calculate_predictions():
     ht_odds_2_0 = st.number_input("HT Odds for 2:0", min_value=0.0, value=22.00)
     ht_odds_2_1 = st.number_input("HT Odds for 2:1", min_value=0.0, value=32.00)
     ht_odds_2_2 = st.number_input("HT Odds for 2:2", min_value=0.0, value=91.00)
-    ht_odds_other = st.number_input("HT Odds for Other Scores", min_value=0.0, value=17.50.00)
+    ht_odds_other = st.number_input("HT Odds for Other Scores", min_value=0.0, value=17.50) 
     
     # User input: FT Odds for outcomes
     ft_odds_0_0 = st.number_input("FT Odds for 0:0", min_value=0.0, value=12.00)
