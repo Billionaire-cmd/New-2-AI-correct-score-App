@@ -33,8 +33,6 @@ def calculate_predictions():
     team_a_home_conceded = st.number_input("Team A Average Goals Conceded (Home)", min_value=0.0, value=1.50)
     team_b_away_conceded = st.number_input("Team B Average Goals Conceded (Away)", min_value=0.0, value=2.00)
 
-# Main function to calculate and display predictions
-def calculate_predictions():
     # Sidebar inputs
     st.sidebar.subheader("Odds Inputs")
     # Halftime odds inputs
