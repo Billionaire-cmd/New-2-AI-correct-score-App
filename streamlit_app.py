@@ -93,7 +93,7 @@ def calculate_predictions():
         implied_ht_prob = implied_prob(ht_odds_0_0)  # For example, use HT odds for 0:0
         st.write(f"HT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}, Adjusted for Over 2.5: {adjusted_prob:.4f}")
 
-    st.subheader("🤖 🤖 🤖💯 Full-time Correct Score Predictions")
+    st.subheader("Full-time Correct Score Predictions")
     for home_goals, away_goals, prob in ft_results:
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
         implied_ft_prob = implied_prob(ft_odds_0_0)  # For example, use FT odds for 0:0
