@@ -73,6 +73,8 @@ def calculate_predictions():
 
     # User input: Over 2.5 Goals Odds
     over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)  # Example: 1.87
+
+    # User input: Under 2.5 Goals Odds
     under_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)  # Example: 1.87
     
     # Generate all possible scorelines (for both HT and FT)
