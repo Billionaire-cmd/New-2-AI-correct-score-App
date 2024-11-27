@@ -50,6 +50,12 @@ ft_odds_0_2 = st.sidebar.number_input("FT Odds for 0:2", min_value=0.0, value=20
 st.sidebar.subheader("HT/FT Prediction")
 ht_ft_outcome = st.sidebar.selectbox("Select HT/FT Outcome", ["Home/Home", "Home/Draw", "Home/Away", "Draw/Home", "Draw/Draw", "Draw/Away", "Away/Home", "Away/Draw", "Away/Away"])
 
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
 # Function to calculate expected score
 def calculate_expected_goals(avg_goals_home, avg_goals_away):
     expected_home_goals = poisson.pmf(np.arange(0, 6), avg_goals_home)
