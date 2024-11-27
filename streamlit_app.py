@@ -64,7 +64,7 @@ def calculate_predictions():
     ft_odds_2_1 = st.number_input("FT Odds for 2:4", min_value=0.0, value=8.63)
     ft_odds_2_1 = st.number_input("FT Odds for 3:3", min_value=0.0, value=8.63)
     ft_odds_2_1 = st.number_input("FT Odds for 3:4", min_value=0.0, value=8.63)
-    ft_odds_2_1 = st.number_input("FT Odds for 4:4", min_value=0.0, value=8.63)
+    ft_odds_2_1 = st.number_input("FT Odds for 4:4", min_value=0.0, value=8.64)
     ft_odds_other = st.number_input("FT Odds for Other Scores", min_value=0.0, value=31.65)  # Other FT odds
 
     # User input: Over 2.5 Goals Odds
