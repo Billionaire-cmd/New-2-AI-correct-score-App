@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # Page configuration
 st.set_page_config(page_title="💯💯💯🤖Rabiotic HT/FT Correct Score Predictor", layout="centered")
 st.markdown("""
-# 💯💯💯🤖Rabiotic HT/FT Correct Score Predictor
+# 🤖🤖🤖Rabiotic HT/FT Correct Score Predictor
 
 Welcome to the **Rabiotic HT/FT Correct Score Predictor**!  
 This app uses statistical models to predict halftime and full-time correct scores based on:
