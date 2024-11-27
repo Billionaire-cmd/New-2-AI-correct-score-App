@@ -145,7 +145,7 @@ with st.sidebar:
 
 # Create the app layout
 def main():
-    st.title("Football Match Prediction: All Halftime & Full-time Correct Scorelines")
+    st.title("🤖🤖🤖 💯💯💯 Rabiotic Halftime/Full-time Predictor pro")                                              Predictor pro: All Halftime & Full-time Correct Scorelines")
     st.sidebar.header("Enter Match Inputs")
     calculate_predictions()
 
