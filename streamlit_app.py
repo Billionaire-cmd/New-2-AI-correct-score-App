@@ -75,6 +75,12 @@ def calculate_predictions():
     st.write(f"HT 0-2: {poisson_0_2_ht * 100:.2f}% (Poisson), {ht_0_2_prob * 100:.2f}% (Odds-based)")
     st.write(f"FT 1-2: {poisson_1_2_ft * 100:.2f}% (Poisson)")
 
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
 # Create the app layout
 def main():
     st.title("Football Match Prediction: Halftime & Full-time Correct Score")
