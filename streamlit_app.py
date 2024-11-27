@@ -136,7 +136,30 @@ def calculate_predictions():
     st.subheader("Final Recommendations")
     st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]*100:.2f}%")
     st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]*100:.2f}%")
-    
+
+# Final recommendation output with match outcome
+st.subheader("Final Recommendations")
+
+# Determine halftime outcome
+if highest_ht_prob[0] > highest_ht_prob[1]:
+    ht_outcome = "Home win"
+elif highest_ht_prob[0] < highest_ht_prob[1]:
+    ht_outcome = "Away win"
+else:
+    ht_outcome = "Draw"
+
+# Determine full-time outcome
+if highest_ft_prob[0] > highest_ft_prob[1]:
+    ft_outcome = "Home win"
+elif highest_ft_prob[0] < highest_ft_prob[1]:
+    ft_outcome = "Away win"
+else:
+    ft_outcome = "Draw"
+
+# Display recommendations
+st.write(f"Most likely halftime scoreline: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} ({highest_ht_prob[2]:.4f}), Outcome: {ht_outcome}")
+st.write(f"Most likely full-time scoreline: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} ({highest_ft_prob[2]:.4f}), Outcome: {ft_outcome}")
+
 # Add a submit button to the sidebar
 with st.sidebar:
     st.markdown("### Submit Prediction")
