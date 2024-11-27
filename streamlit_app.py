@@ -136,8 +136,8 @@ def calculate_predictions():
     st.subheader("Final Recommendations")
     st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]*100:.2f}%")
     st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]*100:.2f}%")
+   
     st.subheader("Final Recommendations")
-
 # Determine halftime outcome
 if highest_ht_prob[0] > highest_ht_prob[1]:
     ht_outcome = "Home win"
