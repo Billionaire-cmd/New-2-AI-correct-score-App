@@ -3,9 +3,9 @@ import numpy as np
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
 
-# App Title and Introduction
-st.title("💯💯💯🤖 Rabiotic HT/FT Correct Score Predictor Pro")
-st.markdown("""
+# Sidebar section
+st.sidebar.title("💯💯💯🤖Rabiotic HT/FT Correct Score Predictor Pro")
+st.sidebar.markdown("""
 Welcome to the **Rabiotic HT/FT Correct Score Predictor**!  
 This app uses statistical models to predict halftime and full-time correct scores based on:
 - Poisson distribution
@@ -13,120 +13,73 @@ This app uses statistical models to predict halftime and full-time correct score
 - Team statistics
 """)
 
-# Sidebar Inputs
-st.sidebar.header("Match Inputs")
-st.sidebar.subheader("Team Statistics")
-avg_goals_home = st.sidebar.number_input("Avg Goals Scored (Home)", value=1.50)
-avg_goals_away = st.sidebar.number_input("Avg Goals Scored (Away)", value=1.30)
-avg_points_home = st.sidebar.number_input("Avg Points (Home)", value=1.50)
-avg_points_away = st.sidebar.number_input("Avg Points (Away)", value=1.30)
+# Sidebar match inputs
+st.sidebar.markdown("### Match Inputs")
 
-st.sidebar.subheader("BTTS (Both Teams To Score) Inputs")
-btts_gg_odds = st.sidebar.number_input("BTTS GG Odds (Both Teams To Score)", value=1.77)
-btts_ng_odds = st.sidebar.number_input("BTTS NG Odds (No Goal for One or Both)", value=1.83)
+# Team statistics inputs
+avg_goals_home = st.sidebar.number_input("Avg Goals Scored (Home)", value=1.50, step=0.1)
+avg_goals_away = st.sidebar.number_input("Avg Goals Scored (Away)", value=1.30, step=0.1)
+avg_points_home = st.sidebar.number_input("Avg Points (Home)", value=1.50, step=0.1)
+avg_points_away = st.sidebar.number_input("Avg Points (Away)", value=1.30, step=0.1)
 
-st.sidebar.subheader("Over/Under 2.5 Goals Inputs")
-over_2_5_odds = st.sidebar.number_input("Over 2.5 Goals Odds", value=1.87)
-under_2_5_odds = st.sidebar.number_input("Under 2.5 Goals Odds", value=1.80)
+# Odds inputs
+btts_gg_odds = st.sidebar.number_input("BTTS GG Odds (Both Teams To Score)", value=1.77, step=0.01)
+btts_ng_odds = st.sidebar.number_input("BTTS NG Odds (No Goal for One or Both)", value=1.83, step=0.01)
+over_2_5_goals_odds = st.sidebar.number_input("Over 2.5 Goals Odds", value=1.87, step=0.01)
+under_2_5_goals_odds = st.sidebar.number_input("Under 2.5 Goals Odds", value=1.80, step=0.01)
 
-st.sidebar.subheader("Odds")
-ht_home_win_odds = st.sidebar.number_input("HT Home Win Odds", value=2.40)
-ht_draw_odds = st.sidebar.number_input("HT Draw Odds", value=2.10)
-ht_away_win_odds = st.sidebar.number_input("HT Away Win Odds", value=4.50)
-ft_home_win_odds = st.sidebar.number_input("FT Home Win Odds", value=1.80)
-ft_draw_odds = st.sidebar.number_input("FT Draw Odds", value=3.50)
-ft_away_win_odds = st.sidebar.number_input("FT Away Win Odds", value=3.90)
+# HT/FT Odds inputs
+ht_home_win_odds = st.sidebar.number_input("HT Home Win Odds", value=2.40, step=0.01)
+ht_draw_odds = st.sidebar.number_input("HT Draw Odds", value=2.10, step=0.01)
+ht_away_win_odds = st.sidebar.number_input("HT Away Win Odds", value=4.50, step=0.01)
+ft_home_win_odds = st.sidebar.number_input("FT Home Win Odds", value=1.80, step=0.01)
+ft_draw_odds = st.sidebar.number_input("FT Draw Odds", value=3.50, step=0.01)
+ft_away_win_odds = st.sidebar.number_input("FT Away Win Odds", value=3.90, step=0.01)
 
-st.sidebar.subheader("HT Correct Score Odds")
-ht_correct_scores = {
-    "0:0": st.sidebar.number_input("HT Odds for 0:0", value=2.58),
-    "0:1": st.sidebar.number_input("HT Odds for 0:1", value=5.84),
-    "0:2": st.sidebar.number_input("HT Odds for 0:2", value=26.08),
-    "1:0": st.sidebar.number_input("HT Odds for 1:0", value=3.63),
-    "1:1": st.sidebar.number_input("HT Odds for 1:1", value=8.07),
-    "1:2": st.sidebar.number_input("HT Odds for 1:2", value=36.39),
-}
-
-st.sidebar.subheader("FT Correct Score Odds")
-ft_correct_scores = {
-    "0:0": st.sidebar.number_input("FT Odds for 0:0", value=10.41),
-    "1:2": st.sidebar.number_input("FT Odds for 1:2", value=13.21),
-    "0:2": st.sidebar.number_input("FT Odds for 0:2", value=20.77),
-}
-
-# Add a submit button to the sidebar
+# Submit prediction button
 with st.sidebar:
     st.markdown("### Submit Prediction")
     if st.button("Submit Prediction"):
         st.success("Prediction submitted! Results will be displayed below.")
 
-# Helper Function: Poisson Probability
-def poisson_probability(lam, x):
-    return poisson.pmf(x, lam)
+        # Calculate Poisson distribution probabilities for halftime and full-time scores
+        avg_goals_home_ft = avg_goals_home
+        avg_goals_away_ft = avg_goals_away
+        avg_goals_home_ht = avg_goals_home / 2  # Approximate for HT
+        avg_goals_away_ht = avg_goals_away / 2  # Approximate for HT
 
-# Calculate Expected Goals
-st.header("Expected Goals")
-home_goal_rate = avg_goals_home * (avg_points_home / avg_points_away)
-away_goal_rate = avg_goals_away * (avg_points_away / avg_points_home)
+        # Halftime Poisson probabilities
+        ht_home_prob = poisson.pmf([0, 1, 2, 3, 4], avg_goals_home_ht)
+        ht_away_prob = poisson.pmf([0, 1, 2, 3, 4], avg_goals_away_ht)
 
-st.write(f"Expected Goals for Home Team: **{home_goal_rate:.2f}**")
-st.write(f"Expected Goals for Away Team: **{away_goal_rate:.2f}**")
+        # Full-time Poisson probabilities
+        ft_home_prob = poisson.pmf([0, 1, 2, 3, 4], avg_goals_home_ft)
+        ft_away_prob = poisson.pmf([0, 1, 2, 3, 4], avg_goals_away_ft)
 
-# Generate Probabilities for HT and FT Scores
-st.header("Halftime and Full-Time Score Probabilities")
+        # Display probabilities
+        st.subheader("HT/FT Correct Score Prediction")
+        st.write(f"**Halftime Prediction (Home/Away)**:")
+        st.write(f"Home Team: {ht_home_prob}")
+        st.write(f"Away Team: {ht_away_prob}")
 
-# Generate Score Ranges
-score_range = range(0, 4)
-home_probs = [poisson_probability(home_goal_rate / 2, x) for x in score_range]
-away_probs = [poisson_probability(away_goal_rate / 2, x) for x in score_range]
+        st.write(f"**Fulltime Prediction (Home/Away)**:")
+        st.write(f"Home Team: {ft_home_prob}")
+        st.write(f"Away Team: {ft_away_prob}")
 
-# Display Probabilities in Table Format
-st.subheader("Halftime Score Probabilities")
-ht_probabilities = []
-for h in score_range:
-    row = []
-    for a in score_range:
-        prob = home_probs[h] * away_probs[a]
-        row.append(prob)
-    ht_probabilities.append(row)
+        # Visualize the results
+        fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+        ax[0].bar([0, 1, 2, 3, 4], ht_home_prob, label='Home', alpha=0.6)
+        ax[0].bar([0, 1, 2, 3, 4], ht_away_prob, label='Away', alpha=0.6)
+        ax[0].set_title("Halftime Score Probability")
+        ax[0].set_xlabel("Goals Scored")
+        ax[0].set_ylabel("Probability")
+        ax[0].legend()
 
-st.write("Halftime Probabilities Matrix")
-st.table(ht_probabilities)
+        ax[1].bar([0, 1, 2, 3, 4], ft_home_prob, label='Home', alpha=0.6)
+        ax[1].bar([0, 1, 2, 3, 4], ft_away_prob, label='Away', alpha=0.6)
+        ax[1].set_title("Fulltime Score Probability")
+        ax[1].set_xlabel("Goals Scored")
+        ax[1].set_ylabel("Probability")
+        ax[1].legend()
 
-# Calculate Full-Time Probabilities
-home_probs_ft = [poisson_probability(home_goal_rate, x) for x in score_range]
-away_probs_ft = [poisson_probability(away_goal_rate, x) for x in score_range]
-
-st.subheader("Full-Time Score Probabilities")
-ft_probabilities = []
-for h in score_range:
-    row = []
-    for a in score_range:
-        prob = home_probs_ft[h] * away_probs_ft[a]
-        row.append(prob)
-    ft_probabilities.append(row)
-
-st.write("Full-Time Probabilities Matrix")
-st.table(ft_probabilities)
-
-# Plotting Score Distributions
-st.header("Score Distributions")
-fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-ax[0].bar(score_range, home_probs, color="blue", alpha=0.7, label="Home HT Goals")
-ax[0].bar(score_range, away_probs, color="red", alpha=0.7, label="Away HT Goals")
-ax[0].set_title("Halftime Goal Distribution")
-ax[0].legend()
-
-ax[1].bar(score_range, home_probs_ft, color="blue", alpha=0.7, label="Home FT Goals")
-ax[1].bar(score_range, away_probs_ft, color="red", alpha=0.7, label="Away FT Goals")
-ax[1].set_title("Full-Time Goal Distribution")
-ax[1].legend()
-
-st.pyplot(fig)
-
-# HT/FT Outcome Prediction
-st.header("HT/FT Outcome Prediction")
-ht_away_away_prob = ht_probabilities[0][2] * ft_probabilities[1][2]  # Prob for HT 0-2, FT 1-2
-st.write(f"Probability of HT/FT (Away/Away, 0-2/1-2): **{ht_away_away_prob:.5f}**")
-
-st.markdown("**Thank you for using the Rabiotic HT/FT Correct Score Predictor Pro!**")
+        st.pyplot(fig)
