@@ -10,6 +10,21 @@ def poisson_prob(lambda_rate, k):
 def odds_to_prob(odds):
     return 1 / odds
 
+# Generate all possible scorelines for both HT and FT
+def generate_scorelines(max_goals=5):
+    scorelines = []
+    for home_goals in range(max_goals + 1):
+        for away_goals in range(max_goals + 1):
+            scorelines.append((home_goals, away_goals))
+    return scorelines
+
+# Function to get the highest probability scoreline
+def get_highest_probability_scoreline(scorelines, prob_list):
+    max_prob = max(prob_list)
+    max_index = prob_list.index(max_prob)
+    best_scoreline = scorelines[max_index]
+    return best_scoreline, max_prob
+
 # Main function to calculate and display predictions
 def calculate_predictions():
     # User input: Team A and Team B stats
@@ -81,13 +96,13 @@ def calculate_predictions():
         ft_odds_prob = odds_to_prob(ft_odds)
         st.write(f"FT {home_goals}-{away_goals}: Odds-based Probability: {ft_odds_prob:.4f}")
 
-# Create the app layout
-def main():
-    st.title("Football Match Prediction: All Halftime & Full-time Correct Scorelines")
-    st.sidebar.header("Enter Match Inputs")
-    
-    # Call the function to calculate predictions
-    calculate_predictions()
+    # Get the highest probability HT scoreline
+    best_ht_scoreline, ht_max_prob = get_highest_probability_scoreline(ht_scorelines, [prob for _, _, prob in ht_results])
 
-if __name__ == "__main__":
-    main()
+    # Get the highest probability FT scoreline
+    best_ft_scoreline, ft_max_prob = get_highest_probability_scoreline(ft_scorelines, [prob for _, _, prob in ft_results])
+
+    # Display the highest probability scorelines and their probabilities
+    st.subheader("Final Recommendations")
+    st.write(f"The most statistically probable Halftime scoreline is HT {best_ht_scoreline[0]}-{best_ht_scoreline[1]} with a Poisson Probability of {ht_max_prob:.4f}.")
+    st.write(f"The most statistically probable Full-time scoreline is FT {best_ft_scoreline[0]}-{best_ft_scoreline[1]} with a Poisson Probability of {ft_max_prob:.4f}.")
