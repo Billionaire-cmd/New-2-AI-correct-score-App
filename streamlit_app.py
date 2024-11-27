@@ -33,6 +33,20 @@ def calculate_predictions():
     team_a_home_conceded = st.number_input("Team A Average Goals Conceded (Home)", min_value=0.0, value=1.50)
     team_b_away_conceded = st.number_input("Team B Average Goals Conceded (Away)", min_value=0.0, value=2.00)
 
+# Main function to calculate and display predictions
+def calculate_predictions():
+    # Sidebar inputs
+    st.sidebar.subheader("Odds Inputs")
+    # Halftime odds inputs
+    ht_home_odds = st.sidebar.number_input("HT Home Odds", min_value=0.0, value=4.10)
+    ht_draw_odds = st.sidebar.number_input("HT Draw Odds", min_value=0.0, value=2.25)
+    ht_away_odds = st.sidebar.number_input("HT Away Odds", min_value=0.0, value=2.70)
+    
+    # Full-time odds inputs
+    ft_home_odds = st.sidebar.number_input("FT Home Odds", min_value=0.0, value=3.50)
+    ft_draw_odds = st.sidebar.number_input("FT Draw Odds", min_value=0.0, value=3.70)
+    ft_away_odds = st.sidebar.number_input("FT Away Odds", min_value=0.0, value=2.14)
+
     # User input: HT Odds for outcomes
     ht_odds_0_0 = st.number_input("HT Odds for 0:0", min_value=0.0, value=2.80)
     ht_odds_0_1 = st.number_input("HT Odds for 0:1", min_value=0.0, value=4.10)
