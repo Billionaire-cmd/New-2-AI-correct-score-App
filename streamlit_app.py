@@ -26,19 +26,26 @@ def calculate_predictions():
     team_a_home_conceded = st.number_input("Team A Average Goals Conceded (Home)", min_value=0.0, value=1.30)
     team_b_away_conceded = st.number_input("Team B Average Goals Conceded (Away)", min_value=0.0, value=1.50)
 
-    # User input: Odds for HT and FT outcomes
-    ht_home_win_odds = st.number_input("HT Home Win Odds", min_value=0.0, value=2.40)
-    ht_draw_odds = st.number_input("HT Draw Odds", min_value=0.0, value=2.10)
-    ht_away_win_odds = st.number_input("HT Away Win Odds", min_value=0.0, value=4.50)
-    ft_home_win_odds = st.number_input("FT Home Win Odds", min_value=0.0, value=1.80)
-    ft_draw_odds = st.number_input("FT Draw Odds", min_value=0.0, value=3.50)
-    ft_away_win_odds = st.number_input("FT Away Win Odds", min_value=0.0, value=3.90)
+    # User input: HT Odds for outcomes
+    ht_odds_0_0 = st.number_input("HT Odds for 0:0", min_value=0.0, value=2.58)
+    ht_odds_0_1 = st.number_input("HT Odds for 0:1", min_value=0.0, value=5.84)
+    ht_odds_0_2 = st.number_input("HT Odds for 0:2", min_value=0.0, value=26.08)
+    ht_odds_1_0 = st.number_input("HT Odds for 1:0", min_value=0.0, value=3.63)
+    ht_odds_1_1 = st.number_input("HT Odds for 1:1", min_value=0.0, value=8.07)
+    ht_odds_1_2 = st.number_input("HT Odds for 1:2", min_value=0.0, value=36.39)
+    ht_odds_2_0 = st.number_input("HT Odds for 2:0", min_value=0.0, value=9.73)
+    ht_odds_2_1 = st.number_input("HT Odds for 2:1", min_value=0.0, value=22.15)
+    ht_odds_2_2 = st.number_input("HT Odds for 2:2", min_value=0.0, value=100.00)
 
-    # User input: Over/Under 2.5 Goals and BTTS
-    over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=0.0, value=1.87)
-    under_2_5_odds = st.number_input("Under 2.5 Goals Odds", min_value=0.0, value=1.80)
-    btts_gg_odds = st.number_input("BTTS GG Odds", min_value=0.0, value=1.77)
-    btts_ng_odds = st.number_input("BTTS NG Odds", min_value=0.0, value=1.83)
+    # User input: FT Odds for outcomes
+    ft_odds_0_0 = st.number_input("FT Odds for 0:0", min_value=0.0, value=10.41)
+    ft_odds_0_1 = st.number_input("FT Odds for 0:1", min_value=0.0, value=10.74)
+    ft_odds_0_2 = st.number_input("FT Odds for 0:2", min_value=0.0, value=20.77)
+    ft_odds_0_3 = st.number_input("FT Odds for 0:3", min_value=0.0, value=60.40)
+    ft_odds_1_0 = st.number_input("FT Odds for 1:0", min_value=0.0, value=7.03)
+    ft_odds_1_1 = st.number_input("FT Odds for 1:1", min_value=0.0, value=6.51)
+    ft_odds_2_0 = st.number_input("FT Odds for 2:0", min_value=0.0, value=8.83)
+    ft_odds_2_1 = st.number_input("FT Odds for 2:1", min_value=0.0, value=8.63)
 
     # Generate all possible scorelines (for both HT and FT)
     max_goals = 5  # Define the maximum number of goals to consider for scorelines
@@ -86,15 +93,28 @@ def calculate_predictions():
     # Combine odds for each scoreline and display the odds-based probability
     st.subheader("Odds-based Probabilities for Correct Scorelines")
     for home_goals, away_goals, _ in ht_results:
-        # Here, you could use HT Odds (such as home win, away win, or draw) to calculate probabilities
-        # For simplicity, using just the Poisson probabilities here
-        ht_odds = ht_home_win_odds if home_goals > away_goals else ht_away_win_odds  # Example
+        # Example of using HT odds for scoreline (add more if needed)
+        if (home_goals == 0 and away_goals == 0):
+            ht_odds = ht_odds_0_0
+        elif (home_goals == 0 and away_goals == 1):
+            ht_odds = ht_odds_0_1
+        elif (home_goals == 0 and away_goals == 2):
+            ht_odds = ht_odds_0_2
+        # Add more conditions for each scoreline as needed
+        
         ht_odds_prob = odds_to_prob(ht_odds)
         st.write(f"HT {home_goals}-{away_goals}: Odds-based Probability: {ht_odds_prob:.4f}")
 
     for home_goals, away_goals, _ in ft_results:
-        # Similarly, apply the FT odds (home win, away win, or draw) to calculate probabilities
-        ft_odds = ft_home_win_odds if home_goals > away_goals else ft_away_win_odds  # Example
+        # Example of using FT odds for scoreline (add more if needed)
+        if (home_goals == 0 and away_goals == 0):
+            ft_odds = ft_odds_0_0
+        elif (home_goals == 0 and away_goals == 1):
+            ft_odds = ft_odds_0_1
+        elif (home_goals == 0 and away_goals == 2):
+            ft_odds = ft_odds_0_2
+        # Add more conditions for each scoreline as needed
+        
         ft_odds_prob = odds_to_prob(ft_odds)
         st.write(f"FT {home_goals}-{away_goals}: Odds-based Probability: {ft_odds_prob:.4f}")
 
