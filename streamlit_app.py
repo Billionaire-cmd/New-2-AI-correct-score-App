@@ -99,6 +99,10 @@ def calculate_predictions():
         ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
         ft_results.append((home_goals, away_goals, ft_prob))
 
+    # Highlight HT: 0-2 and FT: 1-2
+    ht_0_2_prob = next((prob for home, away, prob in ht_results if home == 0 and away == 2), 0)
+    ft_1_2_prob = next((prob for home, away, prob in ft_results if home == 1 and away == 2), 0)
+    
     # Final recommendation for the highest probability HT and FT scoreline
     highest_ht_prob = max(ht_results, key=lambda x: x[2])  # HT scoreline with the highest probability
     highest_ft_prob = max(ft_results, key=lambda x: x[2])  # FT scoreline with the highest probability
@@ -120,6 +124,9 @@ def calculate_predictions():
     st.subheader("Final Recommendations")
     st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]*100:.2f}%")
     st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]*100:.2f}%")
+    st.subheader("Final Recommendations")
+    st.write(f"HT 0-2: Poisson Probability: {ht_0_2_prob:.4f}, Adjusted: {adjust_for_over_2_5_goals(over_2_5_odds, ht_0_2_prob):.2f}%")
+    st.write(f"FT 1-2: Poisson Probability: {ft_1_2_prob:.4f}, Adjusted: {adjust_for_over_2_5_goals(over_2_5_odds, ft_1_2_prob):.2f}%")
 
 # Add a submit button to the sidebar
 with st.sidebar:
