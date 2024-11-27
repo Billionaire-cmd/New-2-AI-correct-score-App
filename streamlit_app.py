@@ -53,6 +53,7 @@ def calculate_predictions():
     ft_odds_1_1 = st.number_input("FT Odds for 1:1", min_value=0.0, value=6.51)
     ft_odds_2_0 = st.number_input("FT Odds for 2:0", min_value=0.0, value=8.83)
     ft_odds_2_1 = st.number_input("FT Odds for 2:1", min_value=0.0, value=8.63)
+    ft_odds_other = st.number_input("FT Odds for Other Scores", min_value=0.0, value=31.65)  # Other FT odds
 
     # User input: Over 2.5 Goals Odds
     over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.87)  # Example: 1.87
@@ -90,19 +91,19 @@ def calculate_predictions():
     st.subheader("Halftime Correct Score Predictions")
     for home_goals, away_goals, prob in ht_results:
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
-        adjusted_prob_percentage = adjusted_prob * 100  # Convert to percentage
-        st.write(f"HT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}, Adjusted for Over 2.5: {adjusted_prob_percentage:.2f}%")
+        implied_ht_prob = implied_prob(ht_odds_0_0)  # For example, use HT odds for 0:0
+        st.write(f"HT {home_goals}-{away_goals}: Poisson Probability: {prob*100:.2f}%, Adjusted for Over 2.5: {adjusted_prob*100:.2f}%")
 
     st.subheader("Full-time Correct Score Predictions")
     for home_goals, away_goals, prob in ft_results:
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
-        adjusted_prob_percentage = adjusted_prob * 100  # Convert to percentage
-        st.write(f"FT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}, Adjusted for Over 2.5: {adjusted_prob_percentage:.2f}%")
+        implied_ft_prob = implied_prob(ft_odds_0_0)  # For example, use FT odds for 0:0
+        st.write(f"FT {home_goals}-{away_goals}: Poisson Probability: {prob*100:.2f}%, Adjusted for Over 2.5: {adjusted_prob*100:.2f}%")
 
     # Final recommendation output
     st.subheader("Final Recommendations")
-    st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]:.4f}")
-    st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]:.4f}")
+    st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]*100:.2f}%")
+    st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]*100:.2f}%")
 
 # Create the app layout
 def main():
