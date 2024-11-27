@@ -6,9 +6,16 @@ from scipy.stats import poisson
 def poisson_prob(lambda_rate, k):
     return poisson.pmf(k, lambda_rate)
 
-# Function to calculate the odds-based probabilities
-def odds_to_prob(odds):
-    return 1 / odds
+# Function to calculate the implied probability from odds
+def implied_prob(odds):
+    return 1 / odds * 100
+
+# Function to calculate the odds-based probabilities (adjusted for over 2.5 goals)
+def adjust_for_over_2_5_goals(over_2_5_odds, poisson_prob):
+    # Over 2.5 goals implies scoring more than 2 goals, let's scale the probability
+    over_2_5_prob = implied_prob(over_2_5_odds)
+    adjusted_prob = poisson_prob * (over_2_5_prob / 100)
+    return adjusted_prob
 
 # Generate all possible scorelines for both HT and FT
 def generate_scorelines(max_goals=5):
@@ -47,6 +54,9 @@ def calculate_predictions():
     ft_odds_2_0 = st.number_input("FT Odds for 2:0", min_value=0.0, value=8.83)
     ft_odds_2_1 = st.number_input("FT Odds for 2:1", min_value=0.0, value=8.63)
 
+    # User input: Over 2.5 Goals Odds
+    over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.87)  # Example: 1.87
+
     # Generate all possible scorelines (for both HT and FT)
     max_goals = 5  # Define the maximum number of goals to consider for scorelines
     ht_scorelines = generate_scorelines(max_goals)
@@ -79,51 +89,25 @@ def calculate_predictions():
     # Display HT and FT predictions
     st.subheader("Halftime Correct Score Predictions")
     for home_goals, away_goals, prob in ht_results:
-        st.write(f"HT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}")
+        adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
+        implied_ht_prob = implied_prob(ht_odds_0_0)  # For example, use HT odds for 0:0
+        st.write(f"HT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}, Adjusted for Over 2.5: {adjusted_prob:.4f}")
 
     st.subheader("Full-time Correct Score Predictions")
     for home_goals, away_goals, prob in ft_results:
-        st.write(f"FT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}")
+        adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
+        implied_ft_prob = implied_prob(ft_odds_0_0)  # For example, use FT odds for 0:0
+        st.write(f"FT {home_goals}-{away_goals}: Poisson Probability: {prob:.4f}, Adjusted for Over 2.5: {adjusted_prob:.4f}")
 
     # Final recommendation output
     st.subheader("Final Recommendations")
     st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]:.4f}")
     st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]:.4f}")
 
-    # Combine odds for each scoreline and display the odds-based probability
-    st.subheader("Odds-based Probabilities for Correct Scorelines")
-    for home_goals, away_goals, _ in ht_results:
-        # Example of using HT odds for scoreline (add more if needed)
-        if (home_goals == 0 and away_goals == 0):
-            ht_odds = ht_odds_0_0
-        elif (home_goals == 0 and away_goals == 1):
-            ht_odds = ht_odds_0_1
-        elif (home_goals == 0 and away_goals == 2):
-            ht_odds = ht_odds_0_2
-        # Add more conditions for each scoreline as needed
-        
-        ht_odds_prob = odds_to_prob(ht_odds)
-        st.write(f"HT {home_goals}-{away_goals}: Odds-based Probability: {ht_odds_prob:.4f}")
-
-    for home_goals, away_goals, _ in ft_results:
-        # Example of using FT odds for scoreline (add more if needed)
-        if (home_goals == 0 and away_goals == 0):
-            ft_odds = ft_odds_0_0
-        elif (home_goals == 0 and away_goals == 1):
-            ft_odds = ft_odds_0_1
-        elif (home_goals == 0 and away_goals == 2):
-            ft_odds = ft_odds_0_2
-        # Add more conditions for each scoreline as needed
-        
-        ft_odds_prob = odds_to_prob(ft_odds)
-        st.write(f"FT {home_goals}-{away_goals}: Odds-based Probability: {ft_odds_prob:.4f}")
-
 # Create the app layout
 def main():
     st.title("Football Match Prediction: All Halftime & Full-time Correct Scorelines")
     st.sidebar.header("Enter Match Inputs")
-    
-    # Call the function to calculate predictions
     calculate_predictions()
 
 if __name__ == "__main__":
