@@ -80,7 +80,7 @@ def calculate_predictions():
     for scoreline in ht_results[:5]:  # Display top 5 HT scorelines
         home, away, prob = scoreline
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
-        st.write(f"HT {home}-{away} with Poisson Probability: {prob * 100:.2f}%")
+        st.write(f"HT {home}-{away} with Poisson Probability: {prob * 100:.2f}%, Adjusted for Over 2.5: {adjusted_prob * 100:.2f}%")
 
     # Display results for Full-Time predictions
     st.subheader("Most Likely Full-Time Scorelines:")
