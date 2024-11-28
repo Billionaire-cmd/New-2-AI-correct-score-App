@@ -10,14 +10,11 @@ def poisson_prob(lambda_rate, k):
 def implied_prob(odds):
     return 1 / odds * 100
 
-# Function to calculate the odds-based probabilities (adjusted for over 2.5 goals)
-def adjust_for_over_2_5_goals(over_2_5_odds, poisson_prob):
-    # Over 2.5 goals implies scoring more than 2 goals, let's scale the probability
-    over_2_5_prob = implied_prob(over_2_5_odds)
-    adjusted_prob = poisson_prob * (over_2_5_prob / 100)
-    return adjusted_prob
+# Function to adjust for home advantage
+def adjust_for_home_advantage(prob, home_advantage_factor):
+    return prob * home_advantage_factor
 
-# Generate all possible scorelines for both HT and FT
+# Function to generate all possible scorelines for both HT and FT
 def generate_scorelines(max_goals=5):
     scorelines = []
     for home_goals in range(max_goals + 1):
@@ -33,23 +30,18 @@ def calculate_predictions():
     team_a_home_conceded = st.number_input("Team A Average Goals Conceded (Home)", min_value=0.0, value=1.50)
     team_b_away_conceded = st.number_input("Team B Average Goals Conceded (Away)", min_value=0.0, value=2.00)
 
-    # Sidebar inputs
+    # Sidebar inputs for odds
     st.sidebar.subheader("Odds Inputs")
-    # Halftime odds inputs
-    ht_home_odds = st.sidebar.number_input("HT Home Odds", min_value=0.0, value=4.10)
-    ht_draw_odds = st.sidebar.number_input("HT Draw Odds", min_value=0.0, value=2.25)
-    ht_away_odds = st.sidebar.number_input("HT Away Odds", min_value=0.0, value=2.70)
-    
     # Full-time odds inputs
     ft_home_odds = st.sidebar.number_input("FT Home Odds", min_value=0.0, value=3.50)
     ft_draw_odds = st.sidebar.number_input("FT Draw Odds", min_value=0.0, value=3.70)
     ft_away_odds = st.sidebar.number_input("FT Away Odds", min_value=0.0, value=2.14)
 
     # User input: Over 2.5 Goals Odds
-    over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)  # Example: 1.87
-    
-    # Generate all possible scorelines (for both HT and FT)
-    max_goals = 5  # Define the maximum number of goals to consider for scorelines
+    over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)
+
+    # Generate all possible scorelines for HT and FT
+    max_goals = 5
     ht_scorelines = generate_scorelines(max_goals)
     ft_scorelines = generate_scorelines(max_goals)
 
@@ -58,11 +50,6 @@ def calculate_predictions():
     team_b_ht_goal_rate = team_b_away_goals / 2  # Approximate halftime goals
     team_a_ft_goal_rate = team_a_home_goals  # Full-time goal rate
     team_b_ft_goal_rate = team_b_away_goals  # Full-time goal rate
-
-    # Slightly bias the home team's goal rate
-    home_team_bias_factor = 1.1  # Slight bias towards home team (increase their goal rate)
-    team_a_ht_goal_rate *= home_team_bias_factor
-    team_a_ft_goal_rate *= home_team_bias_factor
 
     # Initialize lists to store results
     ht_results = []
@@ -78,25 +65,24 @@ def calculate_predictions():
         ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
         ft_results.append((home_goals, away_goals, ft_prob))
 
-    # Calculate adjusted probabilities for over 2.5 goals
-    adjusted_ft_results = []
-    for home, away, prob in ft_results:
-        adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
-        adjusted_ft_results.append((home, away, prob, adjusted_prob))
+    # Adjustment for home advantage
+    home_advantage_factor = 1.1  # Example factor for home advantage, can be adjusted
 
-    # Sort the results to find the most likely outcomes
-    ht_results.sort(key=lambda x: x[2], reverse=True)  # Sort by Poisson probability
-    ft_results.sort(key=lambda x: x[2], reverse=True)  # Sort by Poisson probability
-    adjusted_ft_results.sort(key=lambda x: x[3], reverse=True)  # Sort by adjusted probability for over 2.5
+    # Apply home advantage adjustment
+    adjusted_ft_results = [(home, away, adjust_for_home_advantage(prob, home_advantage_factor)) for home, away, prob in ft_results]
+    adjusted_ht_results = [(home, away, adjust_for_home_advantage(prob, home_advantage_factor)) for home, away, prob in ht_results]
 
-    # Display top 5 most likely scorelines for HT and FT
-    st.subheader("Most Likely Half-Time Scorelines (Top 5)")
-    for i in range(min(5, len(ht_results))):
-        st.write(f"HT {ht_results[i][0]}-{ht_results[i][1]} with Poisson Probability: {ht_results[i][2] * 100:.2f}%")
+    # Find the most likely FT and HT scorelines based on the adjusted probabilities
+    most_likely_ft = max(adjusted_ft_results, key=lambda x: x[2])
+    most_likely_ht = max(adjusted_ht_results, key=lambda x: x[2])
 
-    st.subheader("Most Likely Full-Time Scorelines (Top 5) with Adjusted Over 2.5 Goals Probability")
-    for i in range(min(5, len(adjusted_ft_results))):
-        st.write(f"FT {adjusted_ft_results[i][0]}-{adjusted_ft_results[i][1]} with Poisson Probability: {adjusted_ft_results[i][2] * 100:.2f}%, Adjusted for Over 2.5: {adjusted_ft_results[i][3] * 100:.2f}%")
+    # Adjust for over 2.5 goals probability for FT
+    ft_1_0_prob = next((prob for home, away, prob in adjusted_ft_results if home == 1 and away == 0), 0)
+    adjusted_ft_1_0_prob = adjust_for_home_advantage(ft_1_0_prob, home_advantage_factor)
+
+    # Display results for multiple outcomes
+    st.subheader(f"Most Likely Full-Time Scoreline: {most_likely_ft[0]}-{most_likely_ft[1]} with Poisson Probability: {most_likely_ft[2] * 100:.2f}%, Adjusted for Home Advantage: {adjusted_ft_1_0_prob * 100:.2f}%")
+    st.subheader(f"Most Likely Half-Time Scoreline: {most_likely_ht[0]}-{most_likely_ht[1]} with Poisson Probability: {most_likely_ht[2] * 100:.2f}%")
 
 # Main app
 st.title("Football Match Prediction using Poisson Distribution")
