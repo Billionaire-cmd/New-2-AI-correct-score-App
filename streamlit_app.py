@@ -77,7 +77,7 @@ def calculate_predictions():
 
     # Display results for Halftime predictions
     st.subheader("Most Likely Half-Time Scorelines:")
-    for scoreline in ht_results[:2]:  # Display top 5 HT scorelines
+    for scoreline in ht_results[:4]:  # Display top 5 HT scorelines
         home, away, prob = scoreline
         st.write(f"HT {home}-{away} with Poisson Probability: {prob * 100:.2f}%")
 
