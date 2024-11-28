@@ -113,7 +113,7 @@ def calculate_predictions():
 
     # Highlight HT: 0-2 and FT: 1-2
     ht_0_2_prob = next((prob for home, away, prob in ht_results if home == 0 and away == 2), 0)
-    ft_1_2_prob = next((prob for home, away, prob in ft_results if home == 1 and away == 2), 0)
+    ft_1_2_prob = next((prob for home, away, prob in ft_results if home == 1 and away == 2), 1)
     
     # Final recommendation for the highest probability HT and FT scoreline
     highest_ht_prob = max(ht_results, key=lambda x: x[2])  # HT scoreline with the highest probability
