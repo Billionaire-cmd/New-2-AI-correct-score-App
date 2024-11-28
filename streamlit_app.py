@@ -73,34 +73,25 @@ def calculate_predictions():
         ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
         ft_results.append((home_goals, away_goals, ft_prob))
 
-    # Adjust probabilities for over 2.5 goals for all scorelines
-    adjusted_ft_results = []
+    # Adjust probabilities for over 2.5 goals for both HT and FT
     adjusted_ht_results = []
-    
-    for result in ht_results:
-        home_goals, away_goals, prob = result
+    adjusted_ft_results = []
+
+    for home_goals, away_goals, prob in ht_results:
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
         adjusted_ht_results.append((home_goals, away_goals, prob, adjusted_prob))
-    
-    for result in ft_results:
-        home_goals, away_goals, prob = result
+
+    for home_goals, away_goals, prob in ft_results:
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
         adjusted_ft_results.append((home_goals, away_goals, prob, adjusted_prob))
 
-    # Sort the results based on probability
-    sorted_ht_results = sorted(adjusted_ht_results, key=lambda x: x[3], reverse=True)
-    sorted_ft_results = sorted(adjusted_ft_results, key=lambda x: x[3], reverse=True)
+    # Find most likely HT and FT scorelines
+    highest_ht_prob = max(adjusted_ht_results, key=lambda x: x[3])  # Using adjusted probabilities
+    highest_ft_prob = max(adjusted_ft_results, key=lambda x: x[3])  # Using adjusted probabilities
 
-    # Display results: Top 3 most likely HT and FT scorelines
-    st.subheader("Top 3 Most Likely Half-Time Scorelines (Poisson Probability + Adjusted for Over 2.5):")
-    for i in range(3):
-        ht_home, ht_away, ht_prob, ht_adj_prob = sorted_ht_results[i]
-        st.write(f"HT {ht_home}-{ht_away}: Poisson Probability: {ht_prob * 100:.2f}%, Adjusted for Over 2.5: {ht_adj_prob * 100:.2f}%")
-
-    st.subheader("Top 3 Most Likely Full-Time Scorelines (Poisson Probability + Adjusted for Over 2.5):")
-    for i in range(3):
-        ft_home, ft_away, ft_prob, ft_adj_prob = sorted_ft_results[i]
-        st.write(f"FT {ft_home}-{ft_away}: Poisson Probability: {ft_prob * 100:.2f}%, Adjusted for Over 2.5: {ft_adj_prob * 100:.2f}%")
+    # Display results
+    st.subheader(f"Most Likely Full-Time Scoreline: {highest_ft_prob[0]}-{highest_ft_prob[1]} with Poisson Probability: {highest_ft_prob[2] * 100:.2f}%, Adjusted for Over 2.5: {highest_ft_prob[3] * 100:.2f}%")
+    st.subheader(f"Most Likely Half-Time Scoreline: {highest_ht_prob[0]}-{highest_ht_prob[1]} with Poisson Probability: {highest_ht_prob[2] * 100:.2f}%, Adjusted for Over 2.5: {highest_ht_prob[3] * 100:.2f}%")
 
 # Main app
 st.title("Football Match Prediction using Poisson Distribution")
