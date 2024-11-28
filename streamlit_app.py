@@ -137,6 +137,29 @@ def calculate_predictions():
     st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]*100:.2f}%")
     st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]*100:.2f}%")
 
+# Final recommendation for the most likely HT and FT scorelines
+ht_0_0_prob = next((prob for home, away, prob in ht_results if home == 0 and away == 0), 0)
+ft_1_0_prob = next((prob for home, away, prob in ft_results if home == 1 and away == 0), 0)
+
+# Sort results to find the highest probabilities (for context)
+sorted_ht_results = sorted(ht_results, key=lambda x: x[2], reverse=True)
+sorted_ft_results = sorted(ft_results, key=lambda x: x[2], reverse=True)
+
+# Display the results
+st.subheader("Final Recommendations")
+st.write(f"The most likely halftime scoreline based on Poisson distribution is: **HT 0-0** with a probability of {ht_0_0_prob * 100:.2f}%")
+st.write(f"The most likely full-time scoreline based on Poisson distribution is: **FT 1-0** with a probability of {ft_1_0_prob * 100:.2f}%")
+
+# Optionally display top 3 HT and FT probabilities
+st.write("Top 3 Halftime Probabilities:")
+for home, away, prob in sorted_ht_results[:3]:
+    st.write(f"HT {home}-{away}: {prob * 100:.2f}%")
+
+st.write("Top 3 Full-Time Probabilities:")
+for home, away, prob in sorted_ft_results[:3]:
+    st.write(f"FT {home}-{away}: {prob * 100:.2f}%")
+
+
 # Add a submit button to the sidebar
 with st.sidebar:
     st.markdown("### Submit Prediction")
