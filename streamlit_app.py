@@ -149,7 +149,7 @@ with st.sidebar:
 
 # Create the app layout
 def main():
-    st.title("🤖🤖🤖💯💯💯 Rabiotic Halftime/Full-time Predictor pro: Correct Scorelines with Adjusted Probabilities")
+    st.title("🤖🤖💯💯💯 Rabiotic Halftime/Full-time Predictor pro: Correct Scorelines with Adjusted Probabilities")
     calculate_predictions()
 
 if __name__ == "__main__":
