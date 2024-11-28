@@ -73,25 +73,21 @@ def calculate_predictions():
         ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
         ft_results.append((home_goals, away_goals, ft_prob))
 
-    # Adjust probabilities for over 2.5 goals for both HT and FT
-    adjusted_ht_results = []
+    # Calculate adjusted probabilities for over 2.5 goals for each full-time scoreline
     adjusted_ft_results = []
+    for home_goals, away_goals, ft_prob in ft_results:
+        adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, ft_prob)
+        adjusted_ft_results.append((home_goals, away_goals, ft_prob, adjusted_prob))
 
-    for home_goals, away_goals, prob in ht_results:
-        adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
-        adjusted_ht_results.append((home_goals, away_goals, prob, adjusted_prob))
+    # Sort results to get the most likely scorelines
+    highest_ht_prob = max(ht_results, key=lambda x: x[2])  # Highest probability for HT scoreline
+    highest_ft_prob = max(ft_results, key=lambda x: x[2])  # Highest probability for FT scoreline
+    highest_ft_adjusted_prob = max(adjusted_ft_results, key=lambda x: x[3])  # Highest adjusted probability for FT
 
-    for home_goals, away_goals, prob in ft_results:
-        adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
-        adjusted_ft_results.append((home_goals, away_goals, prob, adjusted_prob))
-
-    # Find most likely HT and FT scorelines
-    highest_ht_prob = max(adjusted_ht_results, key=lambda x: x[3])  # Using adjusted probabilities
-    highest_ft_prob = max(adjusted_ft_results, key=lambda x: x[3])  # Using adjusted probabilities
-
-    # Display results
-    st.subheader(f"Most Likely Full-Time Scoreline: {highest_ft_prob[0]}-{highest_ft_prob[1]} with Poisson Probability: {highest_ft_prob[2] * 100:.2f}%, Adjusted for Over 2.5: {highest_ft_prob[3] * 100:.2f}%")
-    st.subheader(f"Most Likely Half-Time Scoreline: {highest_ht_prob[0]}-{highest_ht_prob[1]} with Poisson Probability: {highest_ht_prob[2] * 100:.2f}%, Adjusted for Over 2.5: {highest_ht_prob[3] * 100:.2f}%")
+    # Display the results
+    st.subheader(f"Most Likely Half-Time Scoreline: {highest_ht_prob[0]}-{highest_ht_prob[1]} with Poisson Probability: {highest_ht_prob[2] * 100:.2f}%")
+    st.subheader(f"Most Likely Full-Time Scoreline: {highest_ft_prob[0]}-{highest_ft_prob[1]} with Poisson Probability: {highest_ft_prob[2] * 100:.2f}%")
+    st.subheader(f"Most Likely Full-Time Scoreline Adjusted for Over 2.5 Goals: {highest_ft_adjusted_prob[0]}-{highest_ft_adjusted_prob[1]} with Poisson Probability: {highest_ft_adjusted_prob[2] * 100:.2f}%, Adjusted for Over 2.5: {highest_ft_adjusted_prob[3] * 100:.2f}%")
 
 # Main app
 st.title("Football Match Prediction using Poisson Distribution")
