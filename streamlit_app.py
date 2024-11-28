@@ -159,7 +159,6 @@ st.write("Top 3 Full-Time Probabilities:")
 for home, away, prob in sorted_ft_results[:3]:
     st.write(f"FT {home}-{away}: {prob * 100:.2f}%")
 
-
 # Add a submit button to the sidebar
 with st.sidebar:
     st.markdown("### Submit Prediction")
@@ -168,7 +167,7 @@ with st.sidebar:
 
 # Create the app layout
 def main():
-    st.title("🤖🤖🤖💯💯💯 Rabiotic Halftime/Full-time Predictor pro: Correct Scorelines with Adjusted Probabilities")
+    st.title("🤖🤖💯💯💯 Rabiotic Halftime/Full-time Predictor pro: Correct Scorelines with Adjusted Probabilities")
     calculate_predictions()
 
 if __name__ == "__main__":
