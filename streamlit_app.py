@@ -137,16 +137,6 @@ def calculate_predictions():
     st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]*100:.2f}%")
     st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]*100:.2f}%")
 
-st.write("Top 3 Full-Time Probabilities:")
-for home, away, prob in sorted_ft_results[:3]:
-    st.write(f"FT {home}-{away}: {prob * 100:.2f}%")
-
-# Add a submit button to the sidebar
-with st.sidebar:
-    st.markdown("### Submit Prediction")
-    if st.button("Submit Prediction"):
-        st.success("Prediction submitted! Results will be displayed below.")
-
 # Create the app layout
 def main():
     st.title("🤖🤖💯💯💯 Rabiotic Halftime/Full-time Predictor pro: Correct Scorelines with Adjusted Probabilities")
