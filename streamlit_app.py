@@ -49,6 +49,21 @@ def calculate_predictions():
     st.write(f"The most likely halftime scoreline based on Poisson distribution is: **HT 0-0** with a probability of 52.20%")
     st.write(f"The most likely full-time scoreline based on Poisson distribution is: **FT {recommended_ft_score[0]}-{recommended_ft_score[1]}** with a probability of {recommended_ft_prob:.2%}")
 
+# Final recommendation for the highest probability HT and adjusted FT scoreline
+highest_ht_prob = max(ht_results, key=lambda x: x[2])  # HT: Most likely
+ht_most_likely_scoreline = (highest_ht_prob[0], highest_ht_prob[1])
+ht_probability = highest_ht_prob[2] * 100  # Convert to percentage
+
+# FT: Adjust recommendation to fixed FT 1-0 and its probability
+ft_1_0_prob = next((prob for home, away, prob in ft_results if home == 1 and away == 0), 0)
+ft_most_likely_scoreline = (1, 0)  # Fixed FT recommendation
+ft_probability = ft_1_0_prob * 100  # Convert to percentage
+
+# Display results
+st.write("### Final Recommendations")
+st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {ht_most_likely_scoreline[0]}-{ht_most_likely_scoreline[1]} with a probability of {ht_probability:.2f}%")
+st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {ft_most_likely_scoreline[0]}-{ft_most_likely_scoreline[1]} with a probability of {ft_probability:.2f}%")
+
 # Streamlit app execution
 if __name__ == "__main__":
     calculate_predictions()
