@@ -67,7 +67,7 @@ def calculate_predictions():
         ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
         ft_results.append((home_goals, away_goals, ft_prob))
 
-    # Adjust the Poisson probabilities to favor Home Team scoring exactly 1 goal in FT
+    # Calculate the Poisson probability for FT 1-0
     ft_1_0_prob = next((prob for home, away, prob in ft_results if home == 1 and away == 0), 0)
     adjusted_ft_1_0_prob = adjust_for_over_2_5_goals(over_2_5_odds, ft_1_0_prob)
 
@@ -87,18 +87,12 @@ def calculate_predictions():
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
         st.write(f"FT {home}-{away} with Poisson Probability: {prob * 100:.2f}%, Adjusted for Over 2.5: {adjusted_prob * 100:.2f}%")
 
+    # Display FT 1-0 probability and adjusted for Over 2.5 goals
     st.subheader(f"FT 1-0 (Home Team to Score Exactly 1) with Poisson Probability: {ft_1_0_prob * 100:.2f}%, Adjusted for Over 2.5: {adjusted_ft_1_0_prob * 100:.2f}%")
 
-    # Calculate the final recommendation based on highest probability scoreline
+    # Display Final Recommendation for FT 1-0
     st.subheader("Final Recommendation Based on Poisson Probabilities:")
-
-    # Choose the highest probability FT and HT scoreline
-    best_ft_scoreline = ft_results[0]
-    best_ht_scoreline = ht_results[0]
-
-    # Compare and recommend the best possible final scoreline
-    st.write(f"Recommended Full-Time Scoreline: FT {best_ft_scoreline[0]}-{best_ft_scoreline[1]} with Poisson Probability: {best_ft_scoreline[2] * 100:.2f}%")
-    st.write(f"Recommended Half-Time Scoreline: HT {best_ht_scoreline[0]}-{best_ht_scoreline[1]} with Poisson Probability: {best_ht_scoreline[2] * 100:.2f}%")
+    st.write(f"Recommended Full-Time Scoreline: FT 1-0 (Home Team to Score Exactly 1) with Poisson Probability: {ft_1_0_prob * 100:.2f}%, Adjusted for Over 2.5: {adjusted_ft_1_0_prob * 100:.2f}%")
 
 # Main app
 st.title("Football Match Prediction using Poisson Distribution")
