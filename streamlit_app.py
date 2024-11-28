@@ -43,7 +43,7 @@ def calculate_predictions():
     over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)
 
     # Generate all possible scorelines (for both HT and FT)
-    max_goals = 5  # Define the maximum number of goals to consider for scorelines
+    max_goals = 4  # Define the maximum number of goals to consider for scorelines
     ht_scorelines = generate_scorelines(max_goals)
     ft_scorelines = generate_scorelines(max_goals)
 
