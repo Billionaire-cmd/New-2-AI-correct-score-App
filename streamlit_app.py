@@ -45,32 +45,6 @@ def calculate_predictions():
     ft_draw_odds = st.sidebar.number_input("FT Draw Odds", min_value=0.0, value=3.70)
     ft_away_odds = st.sidebar.number_input("FT Away Odds", min_value=0.0, value=2.14)
 
-    # User input: HT Odds for outcomes
-    ht_odds_0_0 = st.number_input("HT Odds for 0:0", min_value=0.0, value=2.80)
-    ht_odds_0_1 = st.number_input("HT Odds for 0:1", min_value=0.0, value=4.10)
-    ht_odds_0_2 = st.number_input("HT Odds for 0:2", min_value=0.0, value=11.50)
-    ht_odds_1_0 = st.number_input("HT Odds for 1:0", min_value=0.0, value=5.60)
-    ht_odds_1_1 = st.number_input("HT Odds for 1:1", min_value=0.0, value=8.00)
-    ht_odds_1_2 = st.number_input("HT Odds for 1:2", min_value=0.0, value=23.00)
-    ht_odds_2_0 = st.number_input("HT Odds for 2:0", min_value=0.0, value=22.00)
-    ht_odds_2_1 = st.number_input("HT Odds for 2:1", min_value=0.0, value=32.00)
-    ht_odds_2_2 = st.number_input("HT Odds for 2:2", min_value=0.0, value=91.00)
-    ht_odds_other = st.number_input("HT Odds for Other Scores", min_value=0.0, value=17.50) 
-    
-    # User input: FT Odds for outcomes
-    ft_odds_0_0 = st.number_input("FT Odds for 0:0", min_value=0.0, value=12.00)
-    ft_odds_0_1 = st.number_input("FT Odds for 0:1", min_value=0.0, value=7.80)
-    ft_odds_0_2 = st.number_input("FT Odds for 0:2", min_value=0.0, value=9.80)
-    ft_odds_0_3 = st.number_input("FT Odds for 0:3", min_value=0.0, value=18.50)
-    ft_odds_1_0 = st.number_input("FT Odds for 1:0", min_value=0.0, value=11.00)
-    ft_odds_1_1 = st.number_input("FT Odds for 1:1", min_value=0.0, value=6.70)
-    ft_odds_2_0 = st.number_input("FT Odds for 2:0", min_value=0.0, value=19.00)
-    ft_odds_2_1 = st.number_input("FT Odds for 2:1", min_value=0.0, value=12.00)
-    ft_odds_3_0 = st.number_input("FT Odds for 3:0", min_value=0.0, value=50.00)
-    ft_odds_1_2 = st.number_input("FT Odds for 1:2", min_value=0.0, value=8.70)
-    ft_odds_2_2 = st.number_input("FT Odds for 2:2", min_value=0.0, value=14.50)
-    ft_odds_other = st.number_input("FT Odds for Other Scores", min_value=0.0, value=27.00)  # Other FT odds
-
     # User input: Over 2.5 Goals Odds
     over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)  # Example: 1.87
     
@@ -99,20 +73,34 @@ def calculate_predictions():
         ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
         ft_results.append((home_goals, away_goals, ft_prob))
 
-    # Highlight the most likely scorelines for HT and FT and adjust for over 2.5 goals
-    highest_ht_prob = max(ht_results, key=lambda x: x[2])
-    highest_ft_prob = max(ft_results, key=lambda x: x[2])
+    # Adjust probabilities for over 2.5 goals for all scorelines
+    adjusted_ft_results = []
+    adjusted_ht_results = []
+    
+    for result in ht_results:
+        home_goals, away_goals, prob = result
+        adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
+        adjusted_ht_results.append((home_goals, away_goals, prob, adjusted_prob))
+    
+    for result in ft_results:
+        home_goals, away_goals, prob = result
+        adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
+        adjusted_ft_results.append((home_goals, away_goals, prob, adjusted_prob))
 
-    # Adjust the probabilities for over 2.5 goals
-    adjusted_ft_prob = adjust_for_over_2_5_goals(over_2_5_odds, highest_ft_prob[2])
-    adjusted_ht_prob = adjust_for_over_2_5_goals(over_2_5_odds, highest_ht_prob[2])
+    # Sort the results based on probability
+    sorted_ht_results = sorted(adjusted_ht_results, key=lambda x: x[3], reverse=True)
+    sorted_ft_results = sorted(adjusted_ft_results, key=lambda x: x[3], reverse=True)
 
-    # Output the most likely scorelines and probabilities
-    st.subheader(f"Most Likely Full-Time Scoreline: {highest_ft_prob[0]}-{highest_ft_prob[1]} with Poisson Probability: {highest_ft_prob[2] * 100:.2f}%")
-    st.subheader(f"Adjusted for Over 2.5: {adjusted_ft_prob * 100:.2f}%")
+    # Display results: Top 3 most likely HT and FT scorelines
+    st.subheader("Top 3 Most Likely Half-Time Scorelines (Poisson Probability + Adjusted for Over 2.5):")
+    for i in range(3):
+        ht_home, ht_away, ht_prob, ht_adj_prob = sorted_ht_results[i]
+        st.write(f"HT {ht_home}-{ht_away}: Poisson Probability: {ht_prob * 100:.2f}%, Adjusted for Over 2.5: {ht_adj_prob * 100:.2f}%")
 
-    st.subheader(f"Most Likely Half-Time Scoreline: {highest_ht_prob[0]}-{highest_ht_prob[1]} with Poisson Probability: {highest_ht_prob[2] * 100:.2f}%")
-    st.subheader(f"Adjusted for Over 2.5: {adjusted_ht_prob * 100:.2f}%")
+    st.subheader("Top 3 Most Likely Full-Time Scorelines (Poisson Probability + Adjusted for Over 2.5):")
+    for i in range(3):
+        ft_home, ft_away, ft_prob, ft_adj_prob = sorted_ft_results[i]
+        st.write(f"FT {ft_home}-{ft_away}: Poisson Probability: {ft_prob * 100:.2f}%, Adjusted for Over 2.5: {ft_adj_prob * 100:.2f}%")
 
 # Main app
 st.title("Football Match Prediction using Poisson Distribution")
