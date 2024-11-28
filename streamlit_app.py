@@ -134,8 +134,8 @@ def calculate_predictions():
 
     # Final recommendation output
     st.subheader("Final Recommendations")
-st.write(f"The most likely halftime scoreline based on Poisson distribution is: **HT 0-0** with a probability of {ht_0_0_prob * 100:.2f}%")
-st.write(f"The most likely full-time scoreline based on Poisson distribution is: **FT 1-0** with a probability of {ft_1_0_prob * 100:.2f}%")
+    st.write(f"The most likely halftime scoreline based on Poisson distribution is: **HT 0-0** with a probability of {ht_0_0_prob * 100:.2f}%")
+    st.write(f"The most likely full-time scoreline based on Poisson distribution is: **FT 1-0** with a probability of {ft_1_0_prob * 100:.2f}%")
 
 # Create the app layout
 def main():
