@@ -75,14 +75,15 @@ def calculate_predictions():
     ht_results.sort(key=lambda x: x[2], reverse=True)
     ft_results.sort(key=lambda x: x[2], reverse=True)
 
-    # Display results
+    # Display results for Halftime predictions
     st.subheader("Most Likely Half-Time Scorelines:")
-    for scoreline in ht_results[:4]:  # Display top 5 HT scorelines
+    for scoreline in ht_results[:5]:  # Display top 5 HT scorelines
         home, away, prob = scoreline
         st.write(f"HT {home}-{away} with Poisson Probability: {prob * 100:.2f}%")
 
+    # Display results for Full-Time predictions
     st.subheader("Most Likely Full-Time Scorelines:")
-    for scoreline in ft_results[:4]:  # Display top 5 FT scorelines
+    for scoreline in ft_results[:5]:  # Display top 5 FT scorelines
         home, away, prob = scoreline
         adjusted_prob = adjust_for_over_2_5_goals(over_2_5_odds, prob)
         st.write(f"FT {home}-{away} with Poisson Probability: {prob * 100:.2f}%, Adjusted for Over 2.5: {adjusted_prob * 100:.2f}%")
@@ -93,6 +94,12 @@ def calculate_predictions():
     # Display Final Recommendation for FT 1-0
     st.subheader("Final Recommendation Based on Poisson Probabilities:")
     st.write(f"Recommended Full-Time Scoreline: FT 1-0 (Home Team to Score Exactly 1) with Poisson Probability: {ft_1_0_prob * 100:.2f}%, Adjusted for Over 2.5: {adjusted_ft_1_0_prob * 100:.2f}%")
+
+    # Display Final Recommendation for HT scoreline
+    st.subheader("Final Recommendation Based on Half-Time Poisson Probabilities:")
+    ht_recommended_score = ht_results[0]
+    ht_home, ht_away, ht_prob = ht_recommended_score
+    st.write(f"Recommended Half-Time Scoreline: HT {ht_home}-{ht_away} with Poisson Probability: {ht_prob * 100:.2f}%")
 
 # Main app
 st.title("Football Match Prediction using Poisson Distribution")
