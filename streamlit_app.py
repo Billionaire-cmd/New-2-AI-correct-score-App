@@ -134,12 +134,12 @@ def calculate_predictions():
 
     # Final recommendation output
     st.subheader("Final Recommendations")
-    st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[0]} with a probability of {highest_ht_prob[2]*100:.2f}%")
-    st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[1]}-{highest_ft_prob[0]} with a probability of {highest_ft_prob[2]*100:.2f}%")
+    st.write(f"The most likely halftime scoreline based on Poisson distribution is: HT {highest_ht_prob[0]}-{highest_ht_prob[1]} with a probability of {highest_ht_prob[2]*100:.2f}%")
+    st.write(f"The most likely full-time scoreline based on Poisson distribution is: FT {highest_ft_prob[0]}-{highest_ft_prob[1]} with a probability of {highest_ft_prob[2]*100:.2f}%")
 
 # Create the app layout
 def main():
-    st.title("🤖🤖💯💯💯 Rabiotic Halftime/Full-time Predictor pro: Correct Scorelines with Adjusted Probabilities")
+    st.title("🤖🤖🤖💯💯💯 Rabiotic Halftime/Full-time Predictor pro: Correct Scorelines with Adjusted Probabilities")
     calculate_predictions()
 
 if __name__ == "__main__":
