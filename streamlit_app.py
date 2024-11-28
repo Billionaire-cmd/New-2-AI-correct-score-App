@@ -99,18 +99,19 @@ def calculate_predictions():
         ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
         ft_results.append((home_goals, away_goals, ft_prob))
 
-    # Highlight FT: 1-0 as the most likely full-time scoreline
+    # Highlight FT: 1-0 and calculate the adjusted probability for over 2.5 goals
     ft_1_0_prob = next((prob for home, away, prob in ft_results if home == 1 and away == 0), 0)
     
-    # Adjust for over 2.5 goals
+    # Adjust the probability for over 2.5 goals
     adjusted_ft_1_0_prob = adjust_for_over_2_5_goals(over_2_5_odds, ft_1_0_prob)
     
-    # Final recommendation for the highest probability FT scoreline
+    # Final recommendation for the highest probability HT and FT scoreline
+    highest_ht_prob = max(ht_results, key=lambda x: x[2])
     highest_ft_prob = max(ft_results, key=lambda x: x[2])
-    
+
     # Display results
-    st.subheader(f"Most Likely Full-Time Scoreline: FT 1-0 with Poisson Probability: {ft_1_0_prob * 100:.2f}%")
-    st.subheader(f"Adjusted for Over 2.5 Goals: {adjusted_ft_1_0_prob * 100:.2f}%")
+    st.subheader(f"Most Likely Full-Time Scoreline: FT 1-0 with Poisson Probability: {ft_1_0_prob * 100:.2f}%, Adjusted for Over 2.5: {adjusted_ft_1_0_prob * 100:.2f}%")
+    st.subheader(f"Most Likely Half-Time Scoreline: {highest_ht_prob[0]}-{highest_ht_prob[1]} with Poisson Probability: {highest_ht_prob[2] * 100:.2f}%")
 
 # Main app
 st.title("Football Match Prediction using Poisson Distribution")
