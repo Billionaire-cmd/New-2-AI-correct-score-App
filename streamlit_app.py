@@ -132,11 +132,11 @@ def calculate_predictions():
         implied_ft_prob = implied_prob(ft_odds_0_0)  # For example, use FT odds for 0:0
         st.write(f"FT {home_goals}-{away_goals}: Poisson Probability: {prob*100:.2f}%, Adjusted for Over 2.5: {adjusted_prob*100:.2f}%")
 
-    # Final recommendation output
-    st.subheader("Final Recommendations")
-    st.write(f"The most likely halftime scoreline based on Poisson distribution is: **HT 0-0** with a probability of {ht_0_0_prob * 100:.2f}%")
-    st.write(f"The most likely full-time scoreline based on Poisson distribution is: **FT 1-0** with a probability of {ft_1_0_prob * 100:.2f}%")
-
+    
+ # Final recommendation output
+st.subheader("Final Recommendations")
+st.write(f"The most likely halftime scoreline based on Poisson distribution is: **HT 0-0** with a probability of {ht_0_0_prob * 100:.2f}%")
+st.write(f"The most likely full-time scoreline based on Poisson distribution is: **FT 1-0** with a probability of {ft_1_0_prob * 100:.2f}%")
 # Create the app layout
 def main():
     st.title("🤖🤖🤖💯💯💯 Rabiotic Halftime/Full-time Predictor pro: Correct Scorelines with Adjusted Probabilities")
