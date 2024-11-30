@@ -65,7 +65,7 @@ def calculate_predictions():
 
         # Poisson Distributions for Halftime (assuming half the expected goals for each team)
         home_goals_dist_ht = poisson(home_expected_goals / 2)
-        away_goals_dist_ht = poisson(away_expected_goals / 4)
+        away_goals_dist_ht = poisson(away_expected_goals / 3.5)
 
         # Correct Score Probabilities for Full-time
         correct_score_probs_ft = {}
