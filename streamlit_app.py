@@ -1,106 +1,92 @@
 import streamlit as st
-import numpy as np
 from scipy.stats import poisson
+import matplotlib.pyplot as plt
+import numpy as np
 
-# Function to calculate Poisson probabilities
-def poisson_prob(lambda_rate, k):
-    return poisson.pmf(k, lambda_rate)
+# Function to calculate expected goals
+def calculate_expected_goals(attack_strength, defense_strength, league_avg_goals):
+    return attack_strength * defense_strength * league_avg_goals
 
-# Function to calculate the implied probability from odds
-def implied_prob(odds):
-    return 1 / odds * 100
+# Function to generate Poisson distribution
+def generate_poisson_distribution(expected_goals, max_goals=5):
+    return [poisson.pmf(i, expected_goals) for i in range(max_goals + 1)]
 
-# Function to adjust probabilities based on Over 2.5 goals odds
-def adjust_for_over_2_5_goals(over_2_5_odds, poisson_prob):
-    over_2_5_prob = implied_prob(over_2_5_odds)
-    return poisson_prob * (over_2_5_prob / 100)
+# Main function to handle the Streamlit app logic
+def main():
+    st.title('Rabiotic Football Match Prediction ⚽')
 
-# Function to generate all possible scorelines up to max_goals
-def generate_scorelines(max_goals=5):
-    return [(home, away) for home in range(max_goals + 1) for away in range(max_goals + 1)]
+    st.sidebar.header('Match Settings')
+    
+    # Input fields
+    home_attack_strength = st.sidebar.number_input("Home Team Attack Strength", min_value=0.1, value=1.2)
+    away_defense_strength = st.sidebar.number_input("Away Team Defense Strength", min_value=0.1, value=0.9)
+    league_avg_goals = st.sidebar.number_input("League Average Goals per Match", min_value=0.1, value=1.4)
+    
+    st.sidebar.markdown("### Prediction Output Range")
+    max_goals = st.sidebar.slider("Max Goals for Prediction", min_value=3, max_value=10, value=5)
 
-# Function to calculate the distribution of goals
-def calculate_goal_distributions(home_rate, away_rate, max_goals):
-    home_dist = [poisson_prob(home_rate, k) for k in range(max_goals + 1)]
-    away_dist = [poisson_prob(away_rate, k) for k in range(max_goals + 1)]
-    return home_dist, away_dist
+    # Calculate expected goals for home and away teams
+    home_expected_goals = calculate_expected_goals(home_attack_strength, away_defense_strength, league_avg_goals)
+    away_expected_goals = calculate_expected_goals(away_defense_strength, home_attack_strength, league_avg_goals)
+    
+    st.subheader("Match Prediction Results")
+    st.write(f"Home Expected Goals: {home_expected_goals:.2f}")
+    st.write(f"Away Expected Goals: {away_expected_goals:.2f}")
+    
+    # Generate Poisson distribution for both teams
+    home_goals_probabilities = generate_poisson_distribution(home_expected_goals, max_goals)
+    away_goals_probabilities = generate_poisson_distribution(away_expected_goals, max_goals)
 
-# Main function to calculate predictions
-def calculate_predictions():
-    # User inputs for team statistics
-    st.title("Advanced Football Prediction Tool")
+    # Display the probabilities in a table
+    st.write("### Probability Distribution of Goals Scored (Poisson Distribution)")
+    
+    # Table for home goals probabilities
+    home_goals = list(range(max_goals + 1))
+    st.write(f"#### Home Goals Probabilities (Mean: {home_expected_goals:.2f})")
+    home_goal_probs = list(zip(home_goals, home_goals_probabilities))
+    st.write(pd.DataFrame(home_goal_probs, columns=["Goals", "Probability"]))
 
-    st.header("Team Statistics")
-    team_a_home_goals = st.number_input("Team A Average Goals Scored (Home)", min_value=0.0, value=1.30)
-    team_b_away_goals = st.number_input("Team B Average Goals Scored (Away)", min_value=0.0, value=0.96)
-    team_a_home_conceded = st.number_input("Team A Average Goals Conceded (Home)", min_value=0.0, value=1.50)
-    team_b_away_conceded = st.number_input("Team B Average Goals Conceded (Away)", min_value=0.0, value=2.00)
+    # Table for away goals probabilities
+    st.write(f"#### Away Goals Probabilities (Mean: {away_expected_goals:.2f})")
+    away_goal_probs = list(zip(home_goals, away_goals_probabilities))
+    st.write(pd.DataFrame(away_goal_probs, columns=["Goals", "Probability"]))
+    
+    # Visualization of the goal probabilities
+    fig, ax = plt.subplots(figsize=(8, 6))
 
-    # Sidebar inputs for odds
-    st.sidebar.header("Odds and Parameters")
-    over_2_5_odds = st.sidebar.number_input("Over 2.5 Goals Odds", min_value=1.0, value=2.50)
-    ht_home_odds = st.sidebar.number_input("HT Home Odds", min_value=1.0, value=3.50)
-    ht_draw_odds = st.sidebar.number_input("HT Draw Odds", min_value=1.0, value=3.70)
-    ht_away_odds = st.sidebar.number_input("HT Away Odds", min_value=1.0, value=2.80)
-    ft_home_odds = st.sidebar.number_input("FT Home Odds", min_value=1.0, value=2.20)
-    ft_draw_odds = st.sidebar.number_input("FT Draw Odds", min_value=1.0, value=3.20)
-    ft_away_odds = st.sidebar.number_input("FT Away Odds", min_value=1.0, value=2.70)
+    # Plot Home Goals Probability
+    ax.bar(home_goals, home_goals_probabilities, width=0.4, label="Home Goals", align='center', color='b', alpha=0.6)
+    
+    # Plot Away Goals Probability
+    ax.bar(home_goals, away_goals_probabilities, width=0.4, label="Away Goals", align='edge', color='r', alpha=0.6)
+    
+    ax.set_xlabel('Goals Scored')
+    ax.set_ylabel('Probability')
+    ax.set_title(f'Goal Scoring Probabilities (Home vs Away)')
+    ax.legend()
 
-    # Compute expected goals
-    st.sidebar.header("Expected Goals")
-    home_expected_goals = (team_a_home_goals + team_b_away_conceded) / 2
-    away_expected_goals = (team_b_away_goals + team_a_home_conceded) / 2
+    # Display the plot
+    st.pyplot(fig)
+    
+    # Predict the most likely scoreline (HT/FT)
+    st.write("### Predicted Match Scorelines (Most Likely Outcome)")
+    scorelines = [(home_goals[i], home_goals[j]) for i in range(len(home_goals)) for j in range(len(home_goals))]
+    score_probabilities = [
+        home_goals_probabilities[i] * away_goals_probabilities[j]
+        for i in range(len(home_goals)) for j in range(len(home_goals))
+    ]
+    
+    score_probabilities_sum = sum(score_probabilities)
+    score_probabilities_normalized = [p / score_probabilities_sum for p in score_probabilities]
+    
+    scoreline_probs = list(zip(scorelines, score_probabilities_normalized))
+    
+    # Display the top 5 most probable scorelines
+    sorted_scoreline_probs = sorted(scoreline_probs, key=lambda x: x[1], reverse=True)[:5]
+    
+    st.write("### Top 5 Most Likely Scorelines")
+    st.write(pd.DataFrame(sorted_scoreline_probs, columns=["Scoreline (Home-Away)", "Probability"]))
 
-    st.sidebar.write(f"Home Expected Goals: {home_expected_goals:.2f}")
-    st.sidebar.write(f"Away Expected Goals: {away_expected_goals:.2f}")
-
-    # Generate scorelines and probabilities
-    max_goals = 5
-    scorelines = generate_scorelines(max_goals)
-    home_dist, away_dist = calculate_goal_distributions(home_expected_goals, away_expected_goals, max_goals)
-
-    correct_score_probs = {}
-    for home_goals, away_goals in scorelines:
-        prob = home_dist[home_goals] * away_dist[away_goals]
-        correct_score_probs[f"{home_goals}-{away_goals}"] = prob
-
-    # Most likely scoreline
-    most_likely_scoreline = max(correct_score_probs, key=correct_score_probs.get)
-    most_likely_scoreline_prob = correct_score_probs[most_likely_scoreline] * 100
-
-    # Calculate probabilities for outcomes
-    home_win_prob = sum(
-        home_dist[i] * sum(away_dist[j] for j in range(i))
-        for i in range(max_goals + 1)
-    ) * 100
-    draw_prob = sum(home_dist[i] * away_dist[i] for i in range(max_goals + 1)) * 100
-    away_win_prob = sum(
-        away_dist[i] * sum(home_dist[j] for j in range(i))
-        for i in range(max_goals + 1)
-    ) * 100
-
-    over_2_5_prob = sum(
-        home_dist[i] * away_dist[j]
-        for i in range(max_goals + 1)
-        for j in range(max_goals + 1) if i + j > 2
-    ) * 100
-    under_2_5_prob = 100 - over_2_5_prob
-
-    # Display results
-    st.subheader("Predicted Probabilities")
-    st.write(f"🏠 **Home Win Probability:** {home_win_prob:.2f}%")
-    st.write(f"🤝 **Draw Probability:** {draw_prob:.2f}%")
-    st.write(f"📈 **Away Win Probability:** {away_win_prob:.2f}%")
-    st.write(f"⚽ **Over 2.5 Goals Probability:** {over_2_5_prob:.2f}%")
-    st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.2f}%")
-
-    st.subheader("Most Likely Outcome")
-    st.write(f"**Most likely scoreline:** {most_likely_scoreline} with a probability of {most_likely_scoreline_prob:.2f}%.")
-
-    st.subheader("Top Correct Score Probabilities")
-    for score, prob in sorted(correct_score_probs.items(), key=lambda x: x[1], reverse=True)[:10]:
-        st.write(f"{score}: {prob * 100:.2f}%")
-
-# Run the application
+# Run the app
 if __name__ == "__main__":
-    calculate_predictions()
+    main()
