@@ -83,7 +83,7 @@ def calculate_correct_score(probabilities):
     return highest[0]
 
 # Streamlit UI
-st.title("🤖🤖🤖💯Rabiotic Correct Score Probability℅ Analyzer")
+st.title("🤖🤖🤖🤑💯Rabiotic Correct Score Probability℅ Analyzer")
 st.sidebar.header("Input the 12 Top Most Likely Scorelines")
 
 # Input fields for scorelines and probabilities
