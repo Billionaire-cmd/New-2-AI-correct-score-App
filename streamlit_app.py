@@ -7,7 +7,7 @@ def calculate_final_score(scorelines):
     
     # Extract specific probabilities for rules
     highest = sorted_scorelines[0]
-    second_highest = sorted_scorelines[1]
+    second_highest = sorted_scorelines[2]
     middle_high = sorted_scorelines[3]
     middle_second_high = sorted_scorelines[1]
     final_score = None
