@@ -1,104 +1,67 @@
 import streamlit as st
 
-# Streamlit UI - Sidebar for Input
-st.title("🤖🤖🤖💯Rabiotic Correct Score Probability℅ Analyzer")
-st.sidebar.title("Input Top 12 Scorelines")
-st.sidebar.markdown(
-    """
-    Enter the Top 12 Most Likely Scorelines and their probabilities below:
-    """
-)
+# Title of the app
+st.title("🤖🤖🤖Rabiotic Correct Score Probability℅ Of Scorelines Analyzer")
+st.markdown("## Final 💯 Correct Score Calculator")
+st.markdown("### Powered by Rabiotic Rules")
 
-# Create input fields for the 12 most likely scorelines
+# Sidebar for user input
+st.sidebar.title("Input 12 Top Most Likely Scorelines")
+st.sidebar.markdown("Enter the **Scorelines and Probability%** in descending order.")
+
+# Input fields for scorelines and probabilities
 scorelines = []
 probabilities = []
+
 for i in range(1, 13):
-    scoreline = st.sidebar.text_input(f"Scoreline {i}", f"0-0" if i == 1 else "")
-    probability = st.sidebar.number_input(
-        f"Probability% for Scoreline {i}", min_value=0.0, max_value=100.0, value=0.0, step=0.01
-    )
-    scorelines.append(scoreline)
-    probabilities.append(probability)
+    scoreline = st.sidebar.text_input(f"Scoreline {i}", key=f"scoreline_{i}")
+    probability = st.sidebar.number_input(f"Probability℅ for Scoreline {i}", min_value=0.0, max_value=100.0, step=0.01, key=f"probability_{i}")
+    if scoreline and probability:
+        scorelines.append(scoreline)
+        probabilities.append(probability)
+
+# Function to apply Rabiotic rules
+def calculate_final_score(scorelines, probabilities):
+    sorted_data = sorted(zip(probabilities, scorelines), reverse=True)  # Sort by descending probabilities
+    probabilities, scorelines = zip(*sorted_data)
+    
+    highest_probability = probabilities[0]
+    highest_middle_probabilities = probabilities[4:6]  # 5th and 6th probabilities
+    
+    # Apply the rules
+    if 6.8 <= probabilities[4] <= 6.02:
+        final_score = scorelines[4]
+    elif 5.71 <= probabilities[4] <= 5.2:
+        final_score = scorelines[4]
+    elif 6.50 <= probabilities[4] <= 6.19:
+        final_score = scorelines[4]
+    elif probabilities[0] == 12.26 and 6.38 <= probabilities[4] <= 6.07:
+        final_score = scorelines[4]
+    elif 6.85 <= probabilities[4] <= 6.39:
+        final_score = scorelines[4]
+    elif probabilities[0] == 20.39 and len(probabilities) == 6:
+        final_score = scorelines[5]
+    elif probabilities[0] == 11.92 and 6.08 in highest_middle_probabilities:
+        final_score = scorelines[5]
+    elif probabilities[0] == 9.25:
+        final_score = scorelines[2]
+    elif probabilities[0] == 12.26 and 6.67 in probabilities:
+        final_score = scorelines[1]
+    elif probabilities[0] == 11.54 and probabilities[5] > probabilities[4]:
+        final_score = scorelines[5]
+    else:
+        final_score = scorelines[4]  # Default to the 5th scoreline
+    
+    return final_score
 
 # Predict Button
 if st.sidebar.button("Predict Final Correct Score"):
-    # Process the input data
-    data = list(zip(scorelines, probabilities))
-    data.sort(key=lambda x: x[1], reverse=True)  # Sort by probability in descending order
-    
-    # Extract probabilities and corresponding scorelines
-    sorted_scorelines = [item[0] for item in data]
-    sorted_probabilities = [item[1] for item in data]
-    
-    st.write("### Sorted Scorelines with Probabilities")
-    for i, (scoreline, probability) in enumerate(zip(sorted_scorelines, sorted_probabilities), start=1):
-        st.write(f"{i}. {scoreline} - {probability:.2f}%")
-
-    # Rules to determine the final correct score
-    final_correct_score = None
-    
-    def apply_rules():
-        global final_correct_score
-        rules_applied = []
-        
-        # Rule 1
-        if 6.02 <= sorted_probabilities[4] <= 6.8 and sorted_probabilities[0] == 11.23:
-            final_correct_score = sorted_scorelines[4]
-            rules_applied.append("Rule 1 applied")
-        
-        # Rule 2
-        elif 5.2 <= sorted_probabilities[4] <= 5.71 and sorted_probabilities[0] == 12.9:
-            final_correct_score = sorted_scorelines[4]
-            rules_applied.append("Rule 2 applied")
-        
-        # Rule 3
-        elif 6.19 <= sorted_probabilities[4] <= 6.50 and sorted_probabilities[0] == 11.38:
-            final_correct_score = sorted_scorelines[4]
-            rules_applied.append("Rule 3 applied")
-        
-        # Rule 4
-        elif 6.07 <= sorted_probabilities[4] <= 6.38 and sorted_probabilities[0] == 12.26:
-            final_correct_score = sorted_scorelines[0]
-            rules_applied.append("Rule 4 applied")
-        
-        # Rule 5
-        elif 6.39 <= sorted_probabilities[4] <= 6.85 and sorted_probabilities[0] == 11.99:
-            final_correct_score = sorted_scorelines[4]
-            rules_applied.append("Rule 5 applied")
-        
-        # Rule 6
-        elif sorted_probabilities[0] == 20.39:
-            final_correct_score = sorted_scorelines[1]  # Second highest
-            rules_applied.append("Rule 6 applied")
-        
-        # Rule 7
-        elif sorted_probabilities[0] == 11.92 and sorted_probabilities[1] == 6.08:
-            final_correct_score = sorted_scorelines[1]
-            rules_applied.append("Rule 7 applied")
-        
-        # Rule 8
-        elif sorted_probabilities[0] == 9.25:
-            final_correct_score = sorted_scorelines[2]  # Third descending
-            rules_applied.append("Rule 8 applied")
-        
-        # Rule 9
-        elif sorted_probabilities[0] == 12.26:
-            final_correct_score = sorted_scorelines[1]  # Second highest
-            rules_applied.append("Rule 9 applied")
-        
-        # Rule 10
-        elif sorted_probabilities[0] == 11.54:
-            final_correct_score = sorted_scorelines[1]  # Second highest
-            rules_applied.append("Rule 10 applied")
-        
-        return rules_applied
-    
-    # Apply rules and get the final score
-    rules_applied = apply_rules()
-    if final_correct_score:
-        st.success(f"**Final Correct Score Prediction:** {final_correct_score}")
-        st.write("### Rules Applied:")
-        for rule in rules_applied:
-            st.write(f"- {rule}")
+    if len(scorelines) == 12 and len(probabilities) == 12:
+        final_score = calculate_final_score(scorelines, probabilities)
+        st.success(f"🎯 The Final Correct Score is: **{final_score}**")
     else:
-        st.error("Could not determine a final correct score based on the given rules.")
+        st.error("Please input all 12 Scorelines and their Probabilities℅.")
+
+# Footer
+st.markdown("---")
+st.markdown("**Designed by Rabiotic Analyzer**")
