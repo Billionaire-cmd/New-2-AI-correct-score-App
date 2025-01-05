@@ -7,6 +7,7 @@ def calculate_correct_score(probabilities):
     
     # Extract key probabilities for rule application
     highest = sorted_probs[0]  # Highest correct score probability
+    second_highest = sorted_probs[1]  # Second highest probability
     middle = sorted_probs[4:6]  # 5th and 6th probabilities for middle range
     lowest = sorted_probs[-1]  # Lowest probability
     
@@ -72,6 +73,12 @@ def calculate_correct_score(probabilities):
     if highest[1] == 10.54 and len([x[1] for x in sorted_probs if x[1] in [6.85, 6.2, 6.17]]) > 0:
         return sorted_probs[-1][0]  # 6.17℅ is the final correct score for the game
 
+    # Rule 15
+    if highest[1] == 12.90 and second_highest[1] == 11.22:
+        fifth_position = sorted_probs[4]  # 5th position in sorted probabilities
+        if fifth_position[1] == 8.39:
+            return fifth_position[0]  # Return the scoreline at 8.39%
+
     # Default fallback
     return highest[0]
 
@@ -105,8 +112,5 @@ st.markdown("""
 ### Rules Applied:
 - **Rule 1:** If the highest frequency of correct score probability ℅ ranges from 6.8℅ to 6.02℅, pick the corresponding scoreline.
 - ...
-- **Rule 11:** If the highest scoreline correct score probability ℅ is 12.26℅ with competitive 6.74℅, 6.36℅, pick 6.36℅ corresponding to the highest correct score.
-- **Rule 12:** If the highest scoreline correct score probability ℅ is 12.45℅ with competitive 6.85℅, 6.54℅, pick 6.54℅ corresponding to the highest correct score.
-- **Rule 13:** If the highest scoreline correct score probability ℅ is 13.02℅, select 3.18℅ corresponding to 0-3 as the final correct score.
-- **Rule 14:** If the highest scoreline correct score probability ℅ is 10.54℅ with competitive 6.85℅, 6.2℅, 6.17℅, pick 6.17℅ as the final correct score.
+- **Rule 15:** If the highest scoreline correct score probability ℅ is 12.90℅ and 11.22℅ is the second highest probability℅, pick 8.39℅ at the fifth position as the final correct score if 6.02℅ is not present in the probabilities.
 """)
