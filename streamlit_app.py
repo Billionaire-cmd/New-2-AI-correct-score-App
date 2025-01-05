@@ -15,7 +15,7 @@ def calculate_final_score(scorelines):
     # Implement rules based on the given probabilities
     if highest[1] >= 11.23 and 6.02 <= middle_second_high[1] <= 6.8:
         final_score = middle_second_high[0]
-    elif highest[1] >= 12.9 and 5.2 <= middle_second_high[1] <= 5.71:
+    elif highest[2] >= 12.9 and 5.2 <= middle_second_high[1] <= 5.71:
         final_score = middle_second_high[0]
     elif highest[1] >= 11.38 and 6.19 <= middle_second_high[1] <= 6.5:
         final_score = middle_second_high[0]
