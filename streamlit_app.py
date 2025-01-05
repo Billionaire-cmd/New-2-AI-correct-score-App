@@ -39,7 +39,7 @@ def calculate_final_score(scorelines):
     return final_score
 
 # Streamlit app UI
-st.title("Rabiotic Correct Score Probability℅ of Scorelines Analyzer for Final 💯 Correct Score")
+st.title("🤖🤖🤖💯Rabiotic Correct Score Probability℅ of Scorelines Analyzer for Final 💯 Correct Score")
 
 st.sidebar.header("Input Top 12 Most Likely Scorelines")
 st.sidebar.write("Enter the scorelines and their corresponding probabilities (%):")
