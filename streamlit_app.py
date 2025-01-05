@@ -56,11 +56,27 @@ def calculate_correct_score(probabilities):
         if len(competitive) > 0:
             return sorted_probs[1][0]  # 10.03 is second highest after 11.54
     
+    # Rule 11
+    if highest[1] == 12.26 and len([x[1] for x in sorted_probs if x[1] in [6.74, 6.36]]) > 0:
+        return sorted_probs[1][0]  # 11.14℅ corresponds to the second highest after 12.26℅
+
+    # Rule 12
+    if highest[1] == 12.45 and len([x[1] for x in sorted_probs if x[1] in [6.85, 6.54]]) > 0:
+        return sorted_probs[1][0]  # 11.32℅ corresponds to the second highest after 12.45℅
+
+    # Rule 13
+    if highest[1] == 13.02 and len([x[1] for x in sorted_probs if x[1] in [6.83, 5.26]]) > 0:
+        return sorted_probs[2][0]  # 0-3 corresponds to 3.18% for final score
+
+    # Rule 14
+    if highest[1] == 10.54 and len([x[1] for x in sorted_probs if x[1] in [6.85, 6.2, 6.17]]) > 0:
+        return sorted_probs[-1][0]  # 6.17℅ is the final correct score for the game
+
     # Default fallback
     return highest[0]
 
 # Streamlit UI
-st.title("🤖🤖🤖💯Rabiotic Correct Score Probability℅ Analyzer")
+st.title("🤖🤖🤖💯💯Rabiotic Correct Score Probability℅ Analyzer")
 st.sidebar.header("Input the 12 Top Most Likely Scorelines")
 
 # Input fields for scorelines and probabilities
@@ -88,7 +104,9 @@ st.markdown("""
 
 ### Rules Applied:
 - **Rule 1:** If the highest frequency of correct score probability ℅ ranges from 6.8℅ to 6.02℅, pick the corresponding scoreline.
-- **Rule 2:** If the highest correct score probability ℅ is 12.9℅, select the 5.71℅ correct score as the final correct score.
-- **Rule 3:** ...
-(Include the detailed descriptions of all rules here for clarity.)
+- ...
+- **Rule 11:** If the highest scoreline correct score probability ℅ is 12.26℅ with competitive 6.74℅, 6.36℅, pick 6.36℅ corresponding to the highest correct score.
+- **Rule 12:** If the highest scoreline correct score probability ℅ is 12.45℅ with competitive 6.85℅, 6.54℅, pick 6.54℅ corresponding to the highest correct score.
+- **Rule 13:** If the highest scoreline correct score probability ℅ is 13.02℅, select 3.18℅ corresponding to 0-3 as the final correct score.
+- **Rule 14:** If the highest scoreline correct score probability ℅ is 10.54℅ with competitive 6.85℅, 6.2℅, 6.17℅, pick 6.17℅ as the final correct score.
 """)
