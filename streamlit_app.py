@@ -1,70 +1,67 @@
 import streamlit as st
 
-# App Title and Description
-st.set_page_config(page_title="Rabiotic Correct Score Probability℅ Analyzer", layout="wide")
-st.title("Rabiotic Correct Score Probability℅ Analyzer")
-st.subheader("Final 💯 Correct Score with Machine Learning-Driven Rules")
+# Function to calculate the final correct score based on user rules
+def calculate_final_score(scorelines):
+    # Sort scorelines by probability in descending order
+    sorted_scorelines = sorted(scorelines, key=lambda x: x[1], reverse=True)
+    
+    # Extract specific probabilities for rules
+    highest = sorted_scorelines[0]
+    second_highest = sorted_scorelines[1]
+    middle_high = sorted_scorelines[4]
+    middle_second_high = sorted_scorelines[5]
+    final_score = None
 
-st.sidebar.header("Input the 12 Top Most Likely Scorelines")
-st.sidebar.markdown(
-    """
-    Input the **Scorelines** and their **Probability%** below. 
-    Example format:  
-    **Scoreline: Probability%**  
-    1-1: 6.85%  
-    """
-)
+    # Implement rules based on the given probabilities
+    if highest[1] >= 11.23 and 6.02 <= middle_second_high[1] <= 6.8:
+        final_score = middle_second_high[0]
+    elif highest[1] >= 12.9 and 5.2 <= middle_second_high[1] <= 5.71:
+        final_score = middle_second_high[0]
+    elif highest[1] >= 11.38 and 6.19 <= middle_second_high[1] <= 6.5:
+        final_score = middle_second_high[0]
+    elif highest[1] >= 12.26 and 6.07 <= middle_second_high[1] <= 6.38:
+        final_score = middle_high[0]
+    elif highest[1] >= 11.99 and 6.39 <= middle_second_high[1] <= 6.85:
+        final_score = middle_second_high[0]
+    elif highest[1] >= 20.39 and middle_high[1] == 10.15:
+        final_score = middle_high[0]
+    elif highest[1] >= 11.92 and middle_high[1] == 6.08:
+        final_score = middle_high[0]
+    elif highest[1] == 9.25:
+        final_score = sorted_scorelines[2][0]
+    elif highest[1] >= 12.26 and 6.67 in [x[1] for x in sorted_scorelines]:
+        final_score = second_highest[0]
+    elif highest[1] >= 11.54 and 6.99 in [x[1] for x in sorted_scorelines]:
+        final_score = second_highest[0]
+    else:
+        final_score = highest[0]  # Default to the highest scoreline if no rule applies
 
-# Input Fields for 12 Scorelines and Probabilities
-input_data = {}
+    return final_score
+
+# Streamlit app UI
+st.title("Rabiotic Correct Score Probability℅ of Scorelines Analyzer for Final 💯 Correct Score")
+
+st.sidebar.header("Input Top 12 Most Likely Scorelines")
+st.sidebar.write("Enter the scorelines and their corresponding probabilities (%):")
+
+# Sidebar input for scorelines and probabilities
+scorelines = []
 for i in range(1, 13):
-    input_data[f"scoreline_{i}"] = st.sidebar.text_input(f"Scoreline {i}", "")
-    input_data[f"probability_{i}"] = st.sidebar.text_input(f"Probability {i} (%)", "")
+    scoreline = st.sidebar.text_input(f"Scoreline {i}", key=f"scoreline_{i}")
+    probability = st.sidebar.number_input(
+        f"Probability℅ for Scoreline {i}", min_value=0.0, max_value=100.0, step=0.01, key=f"probability_{i}"
+    )
+    if scoreline and probability > 0:
+        scorelines.append((scoreline, probability))
 
-# Predict Button
-if st.sidebar.button("Predict Final Correct Score"):
-    try:
-        # Parse Input Data
-        scorelines = []
-        probabilities = []
-        for i in range(1, 13):
-            if input_data[f"scoreline_{i}"] and input_data[f"probability_{i}"]:
-                scorelines.append(input_data[f"scoreline_{i}"])
-                probabilities.append(float(input_data[f"probability_{i}"]))
-
-        if len(scorelines) != 12 or len(probabilities) != 12:
-            st.error("Please input all 12 scorelines and their probabilities.")
-        else:
-            # Combine and Sort Data
-            scoreline_data = list(zip(scorelines, probabilities))
-            sorted_data = sorted(scoreline_data, key=lambda x: x[1], reverse=True)
-
-            # Calculate the Final Correct Score Based on Your Rules
-            final_correct_score = None
-            highest = sorted_data[0]
-            middle_scores = sorted_data[4:6]
-            lowest_scores = sorted_data[6:]
-
-            # Example Calculation Based on Rule 1 (Adjust Logic for Each Rule)
-            if 6.02 <= middle_scores[0][1] <= 7.30:
-                final_correct_score = middle_scores[0][0]
-            else:
-                final_correct_score = highest[0]  # Default to highest scoreline if rules aren't matched
-
-            # Display Results
-            st.success("Final Correct Score Calculated!")
-            st.write(f"**Final Correct Score:** {final_correct_score}")
-            st.write("### Scorelines and Probabilities (Descending Order)")
-            for score, prob in sorted_data:
-                st.write(f"**{score}: {prob:.2f}%**")
-
-    except ValueError:
-        st.error("Please ensure all probabilities are valid numbers.")
-
-# Footer
-st.markdown(
-    """
-    ---
-    **Created by:** Rabiotic Analyzer System  
-    """
-)
+# Predict button
+if st.sidebar.button("Predict"):
+    if len(scorelines) == 12:
+        final_correct_score = calculate_final_score(scorelines)
+        st.success(f"The Final Correct Score is: **{final_correct_score}**")
+        
+        # Display a table of scorelines and probabilities
+        st.write("### Input Scorelines and Probabilities")
+        st.table(scorelines)
+    else:
+        st.error("Please input all 12 scorelines with their probabilities.")
