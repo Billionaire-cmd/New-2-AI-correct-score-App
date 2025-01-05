@@ -1,7 +1,7 @@
 import streamlit as st
 
 # Streamlit UI - Sidebar for Input
-st.title("Rabiotic Correct Score Probability℅ Analyzer")
+st.title("🤖🤖🤖💯💯💯Rabiotic Correct Score Probability℅ Analyzer")
 st.sidebar.title("Input Top 12 Scorelines")
 st.sidebar.markdown(
     """
